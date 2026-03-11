@@ -795,7 +795,7 @@
             if (isOnline) {
                 const { error } = await _supabase
                     .from('player_scores')
-                    .upsert(updates);
+                    .upsert(updates, { onConflict: 'name' });
 
                 if (error) {
                     alert('Lỗi khi lưu lên Supabase: ' + error.message);
