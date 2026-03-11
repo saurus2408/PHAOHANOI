@@ -786,8 +786,8 @@
                 const newVal = parseInt(input.value) || 0;
                 rankingData[idx].monthly[currentAdminMonth] = newVal;
                 
-                // Prepare update for Supabase
-                const updateObj = { id: rankingData[idx].id };
+                // Prepare update for Supabase - ONLY send the column that changed
+                const updateObj = { name: rankingData[idx].name };
                 updateObj[`m${currentAdminMonth + 1}`] = newVal;
                 updates.push(updateObj);
             });
