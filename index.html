@@ -472,7 +472,7 @@
     </section>
 
     <footer>
-        <img src="Logo%20PHN.png" alt="Logo" class="footer-logo">
+        <img src="Arsenal_FC.svg.png" alt="Logo" class="footer-logo">
         <p>&copy; 2026 PHN FC</p>
     </footer>
 
@@ -664,9 +664,9 @@
         });
 
         // Supabase Configuration
-        const SUPABASE_URL = 'https://hiykohhpxogniosdowjo.supabase.co'; 
-        const SUPABASE_KEY = 'sb_publishable_9BGxNUPQ2XGuOH437-4PuA_lIaAzv0_'; 
-        
+        const SUPABASE_URL = 'https://hiykohhpxogniosdowjo.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_9BGxNUPQ2XGuOH437-4PuA_lIaAzv0_';
+
         let _supabase = null;
         let isOnline = false;
 
@@ -682,7 +682,7 @@
 
         let rankingData = [];
         let currentAdminMonth = 0;
-        
+
         const defaultPlayers = [
             "Nguyên Mạnh", "Nguyễn Xuân Đạt", "Nguyễn Trung Kiên", "Hoàng Xuân Giao",
             "Hưng LV", "Đỗ Việt Hoàng", "Đức Anh", "Duy Nam", "Niêm",
@@ -698,7 +698,7 @@
                 const { data, error } = await _supabase
                     .from('player_scores')
                     .select('*');
-                
+
                 if (error) {
                     console.error('Error fetching data:', error);
                     useLocalData();
@@ -785,7 +785,7 @@
                 const idx = parseInt(input.dataset.index);
                 const newVal = parseInt(input.value) || 0;
                 rankingData[idx].monthly[currentAdminMonth] = newVal;
-                
+
                 // Prepare update for Supabase - ONLY send the column that changed
                 const updateObj = { name: rankingData[idx].name };
                 updateObj[`m${currentAdminMonth + 1}`] = newVal;
