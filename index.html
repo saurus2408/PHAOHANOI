@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
         content="Trang web chính thức của CLB Bóng Đá - Nơi cập nhật tin tức, đội hình, video và bảng xếp hạng.">
-    <title>Vibrant FC - Trang chủ Chính thức</title>
+    <title>PHÁO HÀ NỘI FC</title>
     <link rel="stylesheet" href="vibrant-football.css">
     <!-- Lucide Icons for simplicity -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -27,6 +27,19 @@
                 <li><a href="#videos" class="nav-link">Video xem lại</a></li>
                 <li><a href="#rankings" class="nav-link">Bảng xếp hạng</a></li>
                 <li><a href="#awards" class="nav-link">Giải thưởng</a></li>
+            </ul>
+            <div class="mobile-toggle" id="mobile-toggle">
+                <i data-lucide="menu"></i>
+            </div>
+        </div>
+        <!-- Mobile Navigation Menu -->
+        <div class="mobile-nav" id="mobile-nav">
+            <ul class="mobile-nav-links">
+                <li><a href="#home" class="mobile-nav-link">Home</a></li>
+                <li><a href="#players" class="mobile-nav-link">Danh sách cầu thủ</a></li>
+                <li><a href="#videos" class="mobile-nav-link">Video xem lại</a></li>
+                <li><a href="#rankings" class="mobile-nav-link">Bảng xếp hạng</a></li>
+                <li><a href="#awards" class="mobile-nav-link">Giải thưởng</a></li>
             </ul>
         </div>
     </header>
@@ -449,8 +462,7 @@
 
     <footer>
         <img src="Logo%20PHN.png" alt="Logo" class="footer-logo">
-        <p>&copy; 2026 PHN FC. All rights reserved.</p>
-        <p>Thiết kế bởi Antigravity</p>
+        <p>&copy; 2026 PHN FC</p>
     </footer>
 
     <script>
@@ -475,13 +487,36 @@
         });
 
         // Smooth Scrolling for Nav Links
-        document.querySelectorAll('.nav-link').forEach(anchor => {
+        document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                // Close mobile nav if open
+                if (mobileNav.classList.contains('active')) {
+                    mobileNav.classList.remove('active');
+                    mobileToggle.innerHTML = '<i data-lucide="menu"></i>';
+                    lucide.createIcons();
+                }
+
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
+        });
+
+        // Mobile Menu Toggle Logic
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+
+        mobileToggle.addEventListener('click', () => {
+            mobileNav.classList.toggle('active');
+            const isActive = mobileNav.classList.contains('active');
+            mobileToggle.innerHTML = isActive ? '<i data-lucide="x"></i>' : '<i data-lucide="menu"></i>';
+            lucide.createIcons();
         });
 
         // Awards Tab Interaction
