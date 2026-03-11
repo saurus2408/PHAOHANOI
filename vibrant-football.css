@@ -238,13 +238,21 @@ section {
     gap: 30px;
 }
 
+/* Enhanced Player Card */
 .player-card {
     background: var(--card-bg);
-    border-radius: 15px;
+    border-radius: 20px;
     overflow: hidden;
     border: 1px solid var(--glass-border);
     transition: var(--transition);
     position: relative;
+    padding: 0; /* Remove padding for immersive image */
+}
+
+.player-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .player-num {
@@ -264,28 +272,36 @@ section {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.player-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--primary);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
 .player-img {
     width: 100%;
-    height: 300px;
+    height: 350px;
     object-fit: cover;
     background: #1a202c;
+    transition: var(--transition);
+}
+
+.player-card:hover .player-img {
+    transform: scale(1.05);
 }
 
 .player-info {
-    padding: 20px;
+    padding: 25px;
     text-align: center;
+    background: linear-gradient(to top, rgba(10, 14, 26, 0.9), transparent);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 1;
 }
 
 .player-info h3 {
     margin-bottom: 5px;
-    color: var(--primary);
+    color: var(--text-white);
+    font-size: 1.4rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
+
+
 
 .player-pos {
     font-size: 0.8rem;
@@ -503,11 +519,14 @@ section {
     border-color: var(--primary);
 }
 
+/* Glassmorphism Goal Table */
 .ranking-container {
-    background: var(--card-bg);
-    border-radius: 15px;
-    padding: 25px;
+    background: rgba(20, 27, 45, 0.7);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 30px;
     border: 1px solid var(--glass-border);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
     overflow-x: auto;
     max-height: 550px;
     position: relative;
@@ -516,56 +535,61 @@ section {
 table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0;
+    border-spacing: 0 8px; /* Floating row effect */
     min-width: 400px;
 }
 
-/* Detail Table Styles */
-.detail-table th, .detail-table td {
-    text-align: center;
-}
-
-.detail-table th:nth-child(2),
-.detail-table td:nth-child(2) {
-    text-align: left;
-    padding-left: 20px;
-}
-
 th {
-    text-align: center;
     padding: 18px 15px;
-    border-bottom: 2px solid var(--primary);
+    background: rgba(10, 14, 26, 0.95);
     color: var(--primary);
     text-transform: uppercase;
-    font-size: 0.85rem;
-    font-weight: 700;
-    /* Sử dụng nền đặc để không bị lộ nội dung bên dưới khi cuộn */
-    background: #141b2d; 
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    font-weight: 800;
     position: sticky;
     top: 0;
-    z-index: 20; /* Tăng z-index để luôn nằm trên cùng */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Thêm bóng đổ nhẹ để phân tách rõ hơn */
+    z-index: 20;
+    border-bottom: 2px solid var(--primary);
 }
 
 td {
     padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-top: 1px solid var(--glass-border);
     border-bottom: 1px solid var(--glass-border);
-    text-align: center;
+    transition: var(--transition);
+}
+
+td:first-child {
+    border-left: 1px solid var(--glass-border);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+td:last-child {
+    border-right: 1px solid var(--glass-border);
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(201, 162, 39, 0.08);
+    border-color: var(--primary);
+    transform: scale(1.01);
 }
 
 .rank-num {
+    font-family: 'Outfit', sans-serif;
     font-weight: 800;
     color: var(--primary);
 }
 
 .total-col {
-    background: rgba(201, 162, 39, 0.1);
+    font-family: 'Outfit', sans-serif;
     font-weight: 800;
     color: var(--primary);
+    font-size: 1.2rem;
 }
 
 /* Awards Section */
