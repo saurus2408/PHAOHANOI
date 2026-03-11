@@ -33,15 +33,24 @@
             </div>
         </div>
         <!-- Mobile Navigation Menu -->
-        <div class="mobile-nav" id="mobile-nav">
+        <nav class="mobile-nav" id="mobile-nav">
+            <div class="mobile-nav-header">
+                <img src="Logph.png" alt="Logo" class="mobile-logo">
+                <div class="close-mobile" id="close-mobile">
+                    <i data-lucide="x"></i>
+                </div>
+            </div>
             <ul class="mobile-nav-links">
-                <li><a href="#home" class="mobile-nav-link">Home</a></li>
-                <li><a href="#players" class="mobile-nav-link">Danh sách cầu thủ</a></li>
-                <li><a href="#videos" class="mobile-nav-link">Video xem lại</a></li>
-                <li><a href="#rankings" class="mobile-nav-link">Bảng xếp hạng</a></li>
-                <li><a href="#awards" class="mobile-nav-link">Giải thưởng</a></li>
+                <li><a href="#home" class="mobile-nav-link"><span>01</span> Home</a></li>
+                <li><a href="#players" class="mobile-nav-link"><span>02</span> Danh sách cầu thủ</a></li>
+                <li><a href="#videos" class="mobile-nav-link"><span>03</span> Video xem lại</a></li>
+                <li><a href="#rankings" class="mobile-nav-link"><span>04</span> Bảng xếp hạng</a></li>
+                <li><a href="#awards" class="mobile-nav-link"><span>05</span> Giải thưởng</a></li>
             </ul>
-        </div>
+            <div class="mobile-nav-footer">
+                <p>&copy; 2026 PHN FC</p>
+            </div>
+        </nav>
     </header>
 
     <!-- Hero Section -->
@@ -493,12 +502,6 @@
                 const targetId = this.getAttribute('href');
                 const targetElement = document.querySelector(targetId);
 
-                // Close mobile nav if open
-                if (mobileNav.classList.contains('active')) {
-                    mobileNav.classList.remove('active');
-                    mobileToggle.innerHTML = '<i data-lucide="menu"></i>';
-                    lucide.createIcons();
-                }
 
                 if (targetElement) {
                     targetElement.scrollIntoView({
@@ -508,16 +511,36 @@
             });
         });
 
-        // Mobile Menu Toggle Logic
+        // Enhanced Mobile Menu Logic
         const mobileToggle = document.getElementById('mobile-toggle');
+        const closeMobile = document.getElementById('close-mobile');
         const mobileNav = document.getElementById('mobile-nav');
+        const body = document.body;
 
-        mobileToggle.addEventListener('click', () => {
-            mobileNav.classList.toggle('active');
-            const isActive = mobileNav.classList.contains('active');
-            mobileToggle.innerHTML = isActive ? '<i data-lucide="x"></i>' : '<i data-lucide="menu"></i>';
-            lucide.createIcons();
+        function toggleMenu(show) {
+            mobileNav.classList.toggle('active', show);
+            if (show) {
+                body.style.overflow = 'hidden';
+            } else {
+                body.style.overflow = '';
+            }
+        }
+
+        mobileToggle.addEventListener('click', () => toggleMenu(true));
+        closeMobile.addEventListener('click', () => toggleMenu(false));
+
+        // Close on link click
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => toggleMenu(false));
         });
+
+        // Close on clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileNav.classList.contains('active') && !mobileNav.contains(e.target) && !mobileToggle.contains(e.target)) {
+                toggleMenu(false);
+            }
+        });
+
 
         // Awards Tab Interaction
         const tabs = document.querySelectorAll('.month-tab');

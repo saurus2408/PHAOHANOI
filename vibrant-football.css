@@ -124,13 +124,14 @@ header {
     transition: var(--transition);
 }
 
-.nav-link:hover {
-    color: var(--primary);
-}
-
 .nav-link:hover::after {
     width: 100%;
 }
+
+.mobile-toggle, .mobile-nav {
+    display: none;
+}
+
 
 /* Hero Section */
 .hero {
@@ -666,63 +667,152 @@ footer {
         display: none;
     }
 
+    /* Mobile Navigation Enhancement */
     .mobile-toggle {
-        display: block;
-        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
         color: var(--primary);
         cursor: pointer;
         z-index: 1001;
+        transition: var(--transition);
+    }
+
+    .mobile-toggle:hover {
+        background: var(--primary);
+        color: var(--secondary);
     }
 
     .mobile-nav {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 70%;
+        width: 100%;
+        max-width: 320px;
         height: 100vh;
-        background: rgba(10, 14, 26, 0.95);
-        backdrop-filter: blur(15px);
-        z-index: 999;
+        background: rgba(10, 14, 26, 0.98);
+        backdrop-filter: blur(20px);
+        z-index: 2000;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        transition: var(--transition);
+        transition: all 0.5s cubic-bezier(0.85, 0, 0.15, 1);
         border-left: 1px solid var(--glass-border);
+        padding: 40px;
     }
 
     .mobile-nav.active {
         right: 0;
+        box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .mobile-nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 60px;
+    }
+
+    .mobile-logo {
+        height: 40px;
+        width: auto;
+    }
+
+    .close-mobile {
+        color: var(--text-white);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .close-mobile:hover {
+        color: var(--primary);
+        transform: rotate(90deg);
     }
 
     .mobile-nav-links {
         list-style: none;
         padding: 0;
-        text-align: center;
     }
 
     .mobile-nav-links li {
-        margin: 25px 0;
+        margin: 30px 0;
+        opacity: 0;
+        transform: translateX(30px);
+        transition: all 0.4s ease;
     }
+
+    .mobile-nav.active .mobile-nav-links li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Stagger labels animation */
+    .mobile-nav.active li:nth-child(1) { transition-delay: 0.2s; }
+    .mobile-nav.active li:nth-child(2) { transition-delay: 0.3s; }
+    .mobile-nav.active li:nth-child(3) { transition-delay: 0.4s; }
+    .mobile-nav.active li:nth-child(4) { transition-delay: 0.5s; }
+    .mobile-nav.active li:nth-child(5) { transition-delay: 0.6s; }
 
     .mobile-nav-link {
         text-decoration: none;
         color: var(--text-white);
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
         font-family: 'Outfit', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 
+    .mobile-nav-link span {
+        font-size: 0.8rem;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .mobile-nav-link:hover {
+        color: var(--primary);
+    }
+
+    .mobile-nav-footer {
+        margin-top: auto;
+        opacity: 0.5;
+        font-size: 0.8rem;
+    }
+
+    /* Layout Adjustments */
     .hero-content h1 {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
+    }
+
+    .players-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 15px;
+    }
+
+    .player-img {
+        height: 200px;
+    }
+
+    .ranking-container {
+        padding: 15px;
     }
 
     .award-card-inner {
         grid-template-columns: 1fr;
+        padding: 20px;
     }
-}
 
-.mobile-toggle {
-    display: none;
+    .month-selector, .awards-tabs {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
