@@ -27,6 +27,7 @@
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#players" class="nav-link">Danh sách cầu thủ</a></li>
                 <li><a href="#videos" class="nav-link">Video xem lại</a></li>
+                <li><a href="#match-results" class="nav-link">Kết quả</a></li>
                 <li><a href="#rankings" class="nav-link">Bảng xếp hạng</a></li>
                 <li><a href="#awards" class="nav-link">Giải thưởng</a></li>
             </ul>
@@ -46,8 +47,9 @@
                 <li><a href="#home" class="mobile-nav-link"><span>01</span> Home</a></li>
                 <li><a href="#players" class="mobile-nav-link"><span>02</span> Danh sách cầu thủ</a></li>
                 <li><a href="#videos" class="mobile-nav-link"><span>03</span> Video xem lại</a></li>
-                <li><a href="#rankings" class="mobile-nav-link"><span>04</span> Bảng xếp hạng</a></li>
-                <li><a href="#awards" class="mobile-nav-link"><span>05</span> Giải thưởng</a></li>
+                <li><a href="#match-results" class="mobile-nav-link"><span>04</span> Kết quả</a></li>
+                <li><a href="#rankings" class="mobile-nav-link"><span>05</span> Bảng xếp hạng</a></li>
+                <li><a href="#awards" class="mobile-nav-link"><span>06</span> Giải thưởng</a></li>
             </ul>
             <div class="mobile-nav-footer">
                 <p>&copy; 2026 PHN FC</p>
@@ -297,6 +299,19 @@
                     <h3 class="video-title">Full Match: 04/03/2026</h3>
                 </div>
             </div>
+            <!-- Video 3 (New Full Match) -->
+            <div class="video-card reveal" data-category="full">
+                <div class="video-placeholder" data-video-id="VRaGbnzC8Bs">
+                    <div class="video-thumb"
+                        style="background-image: url('https://img.youtube.com/vi/VRaGbnzC8Bs/hqdefault.jpg')">
+                        <div class="play-icon"><i data-lucide="play"></i></div>
+                    </div>
+                </div>
+                <div class="video-info">
+                    <h3 class="video-title">Full Match: 11/03/2026</h3>
+                </div>
+            </div>
+
             <!-- Video 3 -->
             <div class="video-card reveal" data-category="highlights">
                 <div class="video-placeholder" data-video-id="_uHRBLLadVY">
@@ -309,6 +324,40 @@
                     <h3 class="video-title">Highlights: 04/03/2026</h3>
                 </div>
             </div>
+            <!-- Video 4 (New Highlights) -->
+            <div class="video-card reveal" data-category="highlights">
+                <div class="video-placeholder" data-video-id="lgyW8feTcps">
+                    <div class="video-thumb"
+                        style="background-image: url('https://img.youtube.com/vi/lgyW8feTcps/hqdefault.jpg')">
+                        <div class="play-icon"><i data-lucide="play"></i></div>
+                    </div>
+                </div>
+                <div class="video-info">
+                    <h3 class="video-title">Highlights: 11/03/2026</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Match Results Section -->
+    <section id="match-results">
+        <h2 class="section-title">Kết quả PHN A vs PHN B</h2>
+        <div class="match-results-tabs">
+            <div class="month-tab active" data-match-month="1">T1</div>
+            <div class="month-tab" data-match-month="2">T2</div>
+            <div class="month-tab" data-match-month="3">T3</div>
+            <div class="month-tab" data-match-month="4">T4</div>
+            <div class="month-tab" data-match-month="5">T5</div>
+            <div class="month-tab" data-match-month="6">T6</div>
+            <div class="month-tab" data-match-month="7">T7</div>
+            <div class="month-tab" data-match-month="8">T8</div>
+            <div class="month-tab" data-match-month="9">T9</div>
+            <div class="month-tab" data-match-month="10">T10</div>
+            <div class="month-tab" data-match-month="11">T11</div>
+            <div class="month-tab" data-match-month="12">T12</div>
+        </div>
+        <div id="match-list" class="match-grid">
+            <!-- JavaScript will populate this -->
         </div>
     </section>
 
@@ -545,7 +594,7 @@
 
 
         // Awards Tab Interaction
-        const tabs = document.querySelectorAll('.month-tab');
+        const tabs = document.querySelectorAll('.awards-tabs .month-tab');
         const displays = document.querySelectorAll('.award-display');
         const awardContentContainer = document.getElementById('awards-content');
 
@@ -886,6 +935,69 @@
                 }
             });
         });
+
+        // Match Results Data & Logic
+        const matchData = {
+            1: [
+
+            ],
+            2: [
+
+            ],
+            3: [
+                { date: '04/03/2026', a: 5, b: 2, status: 'FT', note: 'Sân Đức An' },
+                { date: '11/03/2026', a: 4, b: 5, status: 'FT', note: 'Sân Đức An' }
+            ]
+        };
+
+        function renderMatches(month) {
+            const list = document.getElementById('match-list');
+            const matches = matchData[month] || [];
+
+            if (matches.length === 0) {
+                list.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.5; padding: 40px;">Đang cập nhật dữ liệu trận đấu...</p>';
+                return;
+            }
+
+            list.innerHTML = matches.map(m => `
+                <div class="match-card">
+                    <div class="match-header">
+                        <span>${m.date}</span>
+                        <span class="match-status">${m.status}</span>
+                    </div>
+                    <div class="match-main">
+                        <div class="team">
+                            <div class="team-logo">PHN A</div>
+                            <div class="team-name">PHN A</div>
+                        </div>
+                        <div class="match-score-display">
+                            <div class="score-box">${m.a}</div>
+                            <div class="score-divider">-</div>
+                            <div class="score-box">${m.b}</div>
+                        </div>
+                        <div class="team">
+                            <div class="team-logo" style="border-color: #fff; color: #fff;">PHN B</div>
+                            <div class="team-name">PHN B</div>
+                        </div>
+                    </div>
+                    <div class="match-footer">
+                        <span>${m.note}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.querySelectorAll('.match-results-tabs .month-tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                const m = this.dataset.matchMonth;
+                document.querySelectorAll('.match-results-tabs .month-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                renderMatches(m);
+            });
+        });
+
+        // Initialize with Month 3 (Current)
+        renderMatches(3);
 
         // Initial render
         renderSummary();
