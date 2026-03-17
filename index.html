@@ -264,6 +264,22 @@
                     <h3>Tùng LB</h3>
                 </div>
             </div>
+            <!-- Player 25 -->
+            <div class="player-card">
+                <div class="player-num">25</div>
+                <img src="1-1206.jpg" alt="Player" class="player-img">
+                <div class="player-info">
+                    <h3>Trác Phong</h3>
+                </div>
+            </div>
+            <!-- Player 26 -->
+            <div class="player-card">
+                <div class="player-num">26</div>
+                <img src="1-1206.jpg" alt="Player" class="player-img">
+                <div class="player-info">
+                    <h3>Cuộc Sống</h3>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -372,13 +388,17 @@
 
         <!-- Seasonal Summary -->
         <div id="rank-summary" class="ranking-view active">
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
+                <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
+            </div>
             <div class="ranking-container">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 80px">Hạng</th>
+                            <th style="width: 80px">Hạng</u></th>
                             <th>Cầu thủ</th>
-                            <th class="total-col">Tổng cả mùa</th>
+                            <th class="total-col" id="summary-header">Tổng bàn thắng</th>
                         </tr>
                     </thead>
                     <tbody id="summary-body"></tbody>
@@ -402,6 +422,10 @@
                 <button class="month-btn" data-month="11">T11</button>
                 <button class="month-btn" data-month="12">T12</button>
             </div>
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
+                <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
+            </div>
             <div class="ranking-container">
                 <table class="detail-table">
                     <thead>
@@ -420,7 +444,7 @@
         <div id="rank-admin" class="ranking-view">
             <div class="admin-controls">
                 <div class="admin-header">
-                    <span class="admin-title">🛠 Nhập số bàn thắng theo tháng</span>
+                    <span class="admin-title">🛠 Nhập chỉ số theo tháng</span>
                     <button onclick="saveScores()" class="save-btn">Lưu & Cập nhật BXH</button>
                 </div>
                 <div class="month-selector" style="margin-bottom: 15px;">
@@ -442,9 +466,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 80px">#</th>
+                            <th style="width: 60px">#</th>
                             <th>Tên cầu thủ</th>
-                            <th>Số bàn</th>
+                            <th style="width: 100px">Số bàn</th>
+                            <th style="width: 100px">Kiến tạo</th>
                         </tr>
                     </thead>
                     <tbody id="admin-body"></tbody>
@@ -476,47 +501,7 @@
         </div>
 
         <div id="awards-content">
-            <!-- JavaScript will populate or show/hide these -->
-            <div class="award-display active" id="month-1">
-                <div class="award-card-inner">
-                    <div class="award-item">
-                        <span class="award-icon">👤</span>
-                        <p class="award-label">Cầu thủ xuất sắc nhất</p>
-                        <p>Nguyễn Văn A</p>
-                    </div>
-                    <div class="award-item">
-                        <span class="award-icon">⚽</span>
-                        <p class="award-label">Bàn thắng đẹp nhất</p>
-                        <p>Trần Minh B</p>
-                    </div>
-                    <div class="award-item">
-                        <span class="award-icon">🔥</span>
-                        <p class="award-label">Vua phá lưới tháng</p>
-                        <p>Nguyễn Văn A (5 bàn)</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Additional months can be pre-rendered or handled by JS. For simplicity, I'll add one more example and handle others via JS mockup logic -->
-            <div class="award-display" id="month-2">
-                <div class="award-card-inner">
-                    <div class="award-item">
-                        <span class="award-icon">👤</span>
-                        <p class="award-label">Cầu thủ xuất sắc nhất</p>
-                        <p>Lê Hoàng C</p>
-                    </div>
-                    <div class="award-item">
-                        <span class="award-icon">⚽</span>
-                        <p class="award-label">Bàn thắng đẹp nhất</p>
-                        <p>Phạm Gia D</p>
-                    </div>
-                    <div class="award-item">
-                        <span class="award-icon">🔥</span>
-                        <p class="award-label">Vua phá lưới tháng</p>
-                        <p>Trần Minh B (4 bàn)</p>
-                    </div>
-                </div>
-            </div>
-            <!-- More months would follow same pattern -->
+            <!-- JavaScript will populate this -->
         </div>
     </section>
 
@@ -529,208 +514,93 @@
         // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Simple Reveal Animation on Scroll
-        const observerOptions = {
-            threshold: 0.1
-        };
-
+        // Reveal Animation
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('reveal');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('reveal');
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
+        document.querySelectorAll('section').forEach(s => observer.observe(s));
 
-        document.querySelectorAll('section').forEach(section => {
-            observer.observe(section);
-        });
-
-        // Smooth Scrolling for Nav Links
+        // Smooth Scroll
         document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-
-
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        // Enhanced Mobile Menu Logic
+        // Mobile Menu
         const mobileToggle = document.getElementById('mobile-toggle');
         const closeMobile = document.getElementById('close-mobile');
         const mobileNav = document.getElementById('mobile-nav');
-        const body = document.body;
+        mobileToggle.addEventListener('click', () => { mobileNav.classList.add('active'); document.body.style.overflow = 'hidden'; });
+        closeMobile.addEventListener('click', () => { mobileNav.classList.remove('active'); document.body.style.overflow = ''; });
 
-        function toggleMenu(show) {
-            mobileNav.classList.toggle('active', show);
-            if (show) {
-                body.style.overflow = 'hidden';
-            } else {
-                body.style.overflow = '';
-            }
+        // --- AWARDS LOGIC ---
+        let awardsData = JSON.parse(localStorage.getItem('phnAwards')) || {};
+        function renderAward(month) {
+            const data = awardsData[month] || { bestPlayer: "Đang cập nhật", bestGoal: "Đang cập nhật", topScorer: "Đang cập nhật", topAssist: "Đang cập nhật", bestGK: "Đang cập nhật" };
+            document.getElementById('awards-content').innerHTML = `
+                <div class="award-display active">
+                    <div class="award-card-inner">
+                        <div class="award-item"><span class="award-icon">👤</span><p class="award-label">Cầu thủ xuất sắc nhất</p><p class="award-name">${data.bestPlayer}</p></div>
+                        <div class="award-item"><span class="award-icon">⚽</span><p class="award-label">Bàn thắng đẹp nhất</p><p class="award-name">${data.bestGoal}</p></div>
+                        <div class="award-item"><span class="award-icon">🔥</span><p class="award-label">Vua phá lưới tháng</p><p class="award-name">${data.topScorer}</p></div>
+                        <div class="award-item"><span class="award-icon">🎯</span><p class="award-label">Vua kiến tạo tháng</p><p class="award-name">${data.topAssist}</p></div>
+                        <div class="award-item"><span class="award-icon">🧤</span><p class="award-label">Thủ môn xuất sắc</p><p class="award-name">${data.bestGK}</p></div>
+                    </div>
+                </div>`;
         }
-
-        mobileToggle.addEventListener('click', () => toggleMenu(true));
-        closeMobile.addEventListener('click', () => toggleMenu(false));
-
-        // Close on link click
-        document.querySelectorAll('.mobile-nav-link').forEach(link => {
-            link.addEventListener('click', () => toggleMenu(false));
-        });
-
-        // Close on clicking outside
-        document.addEventListener('click', (e) => {
-            if (mobileNav.classList.contains('active') && !mobileNav.contains(e.target) && !mobileToggle.contains(e.target)) {
-                toggleMenu(false);
-            }
-        });
-
-
-        // Awards Tab Interaction
-        const tabs = document.querySelectorAll('.awards-tabs .month-tab');
-        const displays = document.querySelectorAll('.award-display');
-        const awardContentContainer = document.getElementById('awards-content');
-
-        // Mock data for months 3-12 to avoid massive HTML
-        const mockData = {
-            3: ["Lê Hoàng C", "Nguyễn Văn A", "Trần Minh B (3 bàn)"],
-            4: ["Nguyễn Văn A", "Trần Minh B", "Lê Hoàng C (2 bàn)"],
-            5: ["Trần Minh B", "Lê Hoàng C", "Nguyễn Văn A (6 bàn)"],
-            // ... and so on
-        };
-
-        tabs.forEach(tab => {
+        document.querySelectorAll('.awards-tabs .month-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                const month = tab.dataset.month;
-
-                // Update active tab
-                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.awards-tabs .month-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-
-                // Try to find existing display
-                let currentDisplay = document.getElementById(`month-${month}`);
-
-                // Hide all
-                displays.forEach(d => d.classList.remove('active'));
-                document.querySelectorAll('.award-display').forEach(d => d.classList.remove('active'));
-
-                if (currentDisplay) {
-                    currentDisplay.classList.add('active');
-                } else {
-                    // Create dynamic content if not in HTML
-                    const data = mockData[month] || ["Đang cập nhật", "Đang cập nhật", "Đang cập nhật"];
-                    const newDisplay = document.createElement('div');
-                    newDisplay.className = 'award-display active';
-                    newDisplay.id = `month-${month}`;
-                    newDisplay.innerHTML = `
-                        <div class="award-card-inner">
-                            <div class="award-item">
-                                <span class="award-icon">👤</span>
-                                <p class="award-label">Cầu thủ xuất sắc nhất</p>
-                                <p>${data[0]}</p>
-                            </div>
-                            <div class="award-item">
-                                <span class="award-icon">⚽</span>
-                                <p class="award-label">Bàn thắng đẹp nhất</p>
-                                <p>${data[1]}</p>
-                            </div>
-                            <div class="award-item">
-                                <span class="award-icon">🔥</span>
-                                <p class="award-label">Vua phá lưới tháng</p>
-                                <p>${data[2]}</p>
-                            </div>
-                        </div>
-                    `;
-                    awardContentContainer.appendChild(newDisplay);
-                }
+                renderAward(tab.dataset.month);
             });
         });
+        renderAward(3); // Default to current month T3
 
-        // Video Categories Logic (Double click as requested)
-        const videoBtns = document.querySelectorAll('.cat-btn');
-        const videos = document.querySelectorAll('.video-card');
-
-        videoBtns.forEach(btn => {
-            // Function to handle the switch
-            const switchCategory = () => {
-                const targetCat = btn.getAttribute('data-category');
-
-                // Update button active state
-                videoBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                // Filter videos with a small animation
-                videos.forEach(v => {
-                    v.style.opacity = '0';
-                    v.style.transform = 'translateY(10px)';
-
-                    setTimeout(() => {
-                        if (v.getAttribute('data-category') === targetCat) {
-                            v.style.display = 'block';
-                            setTimeout(() => {
-                                v.style.opacity = '1';
-                                v.style.transform = 'translateY(0)';
-                            }, 50);
-                        } else {
-                            v.style.display = 'none';
-                        }
-                    }, 300);
-                });
-            };
-
-            // Double click event as requested ("khi đúp vào highlight")
-            btn.addEventListener('dblclick', function (e) {
-                e.preventDefault();
-                switchCategory();
-            });
-
-            // Also adding single click for better usability, though double click is the trigger requested
-            btn.addEventListener('click', function (e) {
-                // If the user specifically wants the 'double click' feel, we can keep it.
-                // But usually, single click should also work.
-                switchCategory();
-            });
-        });
-
-        // Handle Play Video on click
-        document.querySelectorAll('.video-placeholder').forEach(placeholder => {
-            placeholder.addEventListener('click', function () {
-                const videoId = this.dataset.videoId;
-                this.innerHTML = `
-                    <iframe width="100%" height="250" 
-                        src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
-                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-                    </iframe>
-                `;
-            });
-        });
-
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://hiykohhpxogniosdowjo.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_9BGxNUPQ2XGuOH437-4PuA_lIaAzv0_';
-
-        let _supabase = null;
-        let isOnline = false;
-
-        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
-            try {
-                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                isOnline = true;
-                console.log("Supabase connected.");
-            } catch (e) {
-                console.error("Supabase connection failed, falling back to local storage.", e);
+        // --- MATCH RESULTS LOGIC ---
+        const matchData = {
+            3: [
+                { date: '04/03/2026', a: 5, b: 2, status: 'FT', note: 'Sân Đức An' },
+                { date: '11/03/2026', a: 4, b: 5, status: 'FT', note: 'Sân Đức An' }
+            ]
+        };
+        function renderMatches(month) {
+            const list = document.getElementById('match-list');
+            const matches = matchData[month] || [];
+            if (matches.length === 0) {
+                list.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.5; padding: 40px;">Đang cập nhật dữ liệu trận đấu...</p>';
+                return;
             }
+            list.innerHTML = matches.map(m => `
+                <div class="match-card">
+                    <div class="match-header"><span>${m.date}</span><span class="match-status">${m.status}</span></div>
+                    <div class="match-main">
+                        <div class="team"><div class="team-logo">PHN A</div><div class="team-name">PHN A</div></div>
+                        <div class="match-score-display"><div class="score-box">${m.a}</div><div class="score-divider">-</div><div class="score-box">${m.b}</div></div>
+                        <div class="team"><div class="team-logo" style="border-color: #fff; color: #fff;">PHN B</div><div class="team-name">PHN B</div></div>
+                    </div>
+                    <div class="match-footer"><span>${m.note}</span></div>
+                </div>`).join('');
         }
+        document.querySelectorAll('.match-results-tabs .month-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.match-results-tabs .month-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                renderMatches(this.dataset.matchMonth);
+            });
+        });
+        renderMatches(3);
 
+        // --- RANKING LOGIC ---
         let rankingData = [];
-        let currentAdminMonth = 0;
+        let curMonth = 1;
+        let curAdminMonth = 1;
+        let curType = 'goals'; 
 
         const defaultPlayers = [
             "Nguyên Mạnh", "Nguyễn Xuân Đạt", "Nguyễn Trung Kiên", "Hoàng Xuân Giao",
@@ -738,272 +608,191 @@
             "Nguyễn Minh Nghĩa", "Hùng Vũ", "Phạm Hồng Quân", "Phạm Kiên",
             "Quang Phương", "Thạc Bảo", "Thành", "Tiến Dũng", "Tô Minh Tuấn",
             "Nguyễn Tú", "Tuấn Arsenal", "Vũ Tấn Lộc", "Viết Hiệp",
-            "Nguyễn Thái Đức", "Tùng LB"
+            "Nguyễn Thái Đức", "Tùng LB", "Trác Phong", "Cuộc Sống"
         ];
 
-        // Fetch Data
-        async function fetchRankingData() {
-            if (isOnline) {
-                const { data, error } = await _supabase
-                    .from('player_scores')
-                    .select('*');
-
-                if (error) {
-                    console.error('Error fetching data:', error);
-                    useLocalData();
-                    return;
-                }
-
-                rankingData = data.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    monthly: [
-                        item.m1, item.m2, item.m3, item.m4, item.m5, item.m6,
-                        item.m7, item.m8, item.m9, item.m10, item.m11, item.m12
-                    ],
-                    total: 0
+        function initRanking() {
+            // First check for V2, then V1 (Legacy migration)
+            const savedV2 = localStorage.getItem('phnScoresV2');
+            const savedV1 = localStorage.getItem('phnScores');
+            
+            if (savedV2) {
+                rankingData = JSON.parse(savedV2);
+            } else if (savedV1) {
+                // Migrate V1 to V2 structure
+                const oldData = JSON.parse(savedV1);
+                rankingData = oldData.map(p => ({
+                    name: p.name,
+                    monthlyGoals: p.monthly || Array(12).fill(0),
+                    monthlyAssists: Array(12).fill(0),
+                    totalGoals: p.total || 0,
+                    totalAssists: 0
                 }));
             } else {
-                useLocalData();
+                rankingData = defaultPlayers.map(name => ({
+                    name, monthlyGoals: Array(12).fill(0), monthlyAssists: Array(12).fill(0), totalGoals: 0, totalAssists: 0
+                }));
             }
-
-            updateTotalsLocally();
-            renderAll();
+            updateTotals();
+            renderAllRankings();
         }
 
-        function useLocalData() {
-            rankingData = JSON.parse(localStorage.getItem('phnScores')) || defaultPlayers.map(name => ({
-                name, monthly: Array.from({ length: 12 }, () => 0), total: 0
-            }));
-        }
-
-        const updateTotalsLocally = () => {
+        function updateTotals() {
             rankingData.forEach(p => {
-                p.total = p.monthly.reduce((a, b) => a + b, 0);
+                p.totalGoals = p.monthlyGoals.reduce((a, b) => a + b, 0);
+                p.totalAssists = p.monthlyAssists.reduce((a, b) => a + b, 0);
             });
-        };
+        }
 
-        const renderAll = () => {
+        function renderAllRankings() {
             renderSummary();
-            renderMonthly(0);
+            renderMonthly();
             renderAdmin();
-        };
+        }
 
-        const renderSummary = () => {
-            const sorted = [...rankingData].sort((a, b) => b.total - a.total);
+        function renderSummary() {
+            const sorted = [...rankingData].sort((a, b) => curType === 'goals' ? b.totalGoals - a.totalGoals : b.totalAssists - a.totalAssists);
+            document.getElementById('summary-header').innerText = curType === 'goals' ? 'Tổng bàn thắng' : 'Tổng kiến tạo';
             document.getElementById('summary-body').innerHTML = sorted.map((p, i) => `
                 <tr>
                     <td><span class="rank-num">${(i + 1).toString().padStart(2, '0')}</span></td>
                     <td>${p.name}</td>
-                    <td class="total-col">${p.total}</td>
-                </tr>
-            `).join('');
-        };
+                    <td class="total-col">${curType === 'goals' ? p.totalGoals : p.totalAssists}</td>
+                </tr>`).join('');
+        }
 
-        const renderMonthly = (mIdx) => {
-            const sorted = [...rankingData].sort((a, b) => b.monthly[mIdx] - a.monthly[mIdx]);
-            document.getElementById('month-header').innerText = `Số bàn T${mIdx + 1}`;
+        function renderMonthly() {
+            const sorted = [...rankingData].sort((a, b) => {
+                const valA = curType === 'goals' ? a.monthlyGoals[curMonth - 1] : a.monthlyAssists[curMonth - 1];
+                const valB = curType === 'goals' ? b.monthlyGoals[curMonth - 1] : b.monthlyAssists[curMonth - 1];
+                return valB - valA;
+            });
+            document.getElementById('month-header').innerText = `${curType === 'goals' ? 'Số bàn' : 'Kiến tạo'} T${curMonth}`;
             document.getElementById('detail-body').innerHTML = sorted.map((p, i) => `
                 <tr>
                     <td><span class="rank-num">${(i + 1).toString().padStart(2, '0')}</span></td>
                     <td>${p.name}</td>
-                    <td class="total-col">${p.monthly[mIdx]}</td>
-                </tr>
-            `).join('');
-        };
+                    <td class="total-col">${curType === 'goals' ? p.monthlyGoals[curMonth - 1] : p.monthlyAssists[curMonth - 1]}</td>
+                </tr>`).join('');
+        }
 
-        const renderAdmin = () => {
+        function renderAdmin() {
             document.getElementById('admin-body').innerHTML = rankingData.map((p, i) => `
                 <tr>
                     <td>${i + 1}</td>
                     <td>${p.name}</td>
-                    <td><input type="number" class="score-input" value="${p.monthly[currentAdminMonth]}" data-index="${i}"></td>
-                </tr>
-            `).join('');
-        };
+                    <td><input type="number" class="score-input g-input" data-index="${i}" value="${p.monthlyGoals[curAdminMonth - 1]}"></td>
+                    <td><input type="number" class="score-input a-input" data-index="${i}" value="${p.monthlyAssists[curAdminMonth - 1]}"></td>
+                </tr>`).join('');
+        }
 
         window.saveScores = async () => {
             const saveBtn = document.querySelector('.save-btn');
             saveBtn.innerText = 'Đang lưu...';
             saveBtn.disabled = true;
 
-            const inputs = document.querySelectorAll('.score-input');
-            const updates = [];
-
-            inputs.forEach(input => {
-                const idx = parseInt(input.dataset.index);
-                const newVal = parseInt(input.value) || 0;
-                rankingData[idx].monthly[currentAdminMonth] = newVal;
-
-                // Prepare update for Supabase - ONLY send the column that changed
-                const updateObj = { name: rankingData[idx].name };
-                updateObj[`m${currentAdminMonth + 1}`] = newVal;
-                updates.push(updateObj);
+            document.querySelectorAll('.g-input').forEach(input => {
+                rankingData[input.dataset.index].monthlyGoals[curAdminMonth - 1] = parseInt(input.value) || 0;
             });
+            document.querySelectorAll('.a-input').forEach(input => {
+                rankingData[input.dataset.index].monthlyAssists[curAdminMonth - 1] = parseInt(input.value) || 0;
+            });
+            updateTotals();
 
-            if (isOnline) {
-                const { error } = await _supabase
-                    .from('player_scores')
-                    .upsert(updates, { onConflict: 'name' });
+            // Save locally
+            localStorage.setItem('phnScoresV2', JSON.stringify(rankingData));
 
+            // Save to Supabase
+            if (_supabase) {
+                const updates = rankingData.map(p => {
+                    const row = { name: p.name };
+                    // Map goals
+                    for(let i=1; i<=12; i++) row[`m${i}`] = p.monthlyGoals[i-1];
+                    // Map assists (assuming columns a1-a12 exist)
+                    for(let i=1; i<=12; i++) row[`a${i}`] = p.monthlyAssists[i-1];
+                    return row;
+                });
+
+                const { error } = await _supabase.from('player_scores').upsert(updates, { onConflict: 'name' });
                 if (error) {
-                    alert('Lỗi khi lưu lên Supabase: ' + error.message);
+                    console.error("Supabase Save Error:", error);
+                    alert('Lưu Local thành công nhưng lỗi đồng bộ Supabase (Có thể do thiếu cột Kiến tạo).');
                 } else {
-                    alert('Đã cập nhật dữ liệu lên hệ thống đám mây!');
+                    alert('Đã cập nhật dữ liệu toàn hệ thống!');
                 }
             } else {
-                localStorage.setItem('phnScores', JSON.stringify(rankingData));
-                alert('Đã lưu dữ liệu vào trình duyệt (Local Storage). Hãy kết nối Supabase để mọi người cùng thấy!');
+                alert('Đã cập nhật dữ liệu (Chế độ Offline)!');
             }
 
-            updateTotalsLocally();
-            renderAll();
+            renderAllRankings();
             saveBtn.innerText = 'Lưu & Cập nhật BXH';
             saveBtn.disabled = false;
         };
 
-        window.resetData = async () => {
-            if (confirm('Bạn có chắc muốn xoá hết số bàn thắng? (Hành động này sẽ xóa dữ liệu trên toàn hệ thống)')) {
-                const updates = rankingData.map(p => ({
-                    id: p.id,
-                    m1: 0, m2: 0, m3: 0, m4: 0, m5: 0, m6: 0,
-                    m7: 0, m8: 0, m9: 0, m10: 0, m11: 0, m12: 0
-                }));
+        window.resetData = () => { if (confirm('Xoá toàn bộ dữ liệu?')) { localStorage.removeItem('phnScoresV2'); initRanking(); } };
 
-                const { error } = await _supabase
-                    .from('player_scores')
-                    .upsert(updates);
-
-                if (error) {
-                    alert('Lỗi khi xóa dữ liệu: ' + error.message);
-                } else {
-                    location.reload();
-                }
-            }
-        };
-
-        // Real-time Update Listener
-        if (isOnline) {
-            _supabase
-                .channel('public:player_scores')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'player_scores' }, () => {
-                    fetchRankingData();
-                })
-                .subscribe();
-        }
-
-        // Initial Load
-        fetchRankingData();
-
-        // Tab Switching with Security Check
-        const rankBtns = document.querySelectorAll('.rank-tab-btn');
-        const rankViews = document.querySelectorAll('.ranking-view');
-        rankBtns.forEach(btn => {
+        // Ranking Tabs
+        document.querySelectorAll('.rank-tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.dataset.target;
-
-                // Password protection for Admin tab
-                if (target === 'admin') {
-                    const pass = prompt("Nhập mật khẩu quản lý để tiếp tục:");
-                    if (pass !== 'Giao240806') { // Change your password here
-                        alert("Mật khẩu không chính xác!");
-                        return;
-                    }
-                }
-
-                rankBtns.forEach(b => b.classList.remove('active'));
+                if (target === 'admin' && prompt("Nhập mật khẩu quản lý:") !== 'Giao240806') return alert("Sai mật khẩu!");
+                document.querySelectorAll('.rank-tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                rankViews.forEach(v => v.classList.remove('active'));
-                document.getElementById(`rank-${target}`).classList.add('active');
+                document.querySelectorAll('.ranking-view').forEach(v => v.classList.remove('active'));
+                document.getElementById('rank-' + target).classList.add('active');
             });
         });
 
-        // Month Selection (Common)
-        document.querySelectorAll('.month-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const m = parseInt(this.dataset.month) - 1;
-                const parent = this.parentElement;
-
-                parent.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                if (parent.classList.contains('month-selector') && this.classList.contains('admin-m-btn')) {
-                    currentAdminMonth = m;
-                    renderAdmin();
-                } else {
-                    renderMonthly(m);
-                }
+        // Detail Month Selection
+        document.querySelectorAll('#rank-detail .month-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#rank-detail .month-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                curMonth = parseInt(btn.dataset.month);
+                renderMonthly();
             });
         });
 
-        // Match Results Data & Logic
-        const matchData = {
-            1: [
-
-            ],
-            2: [
-
-            ],
-            3: [
-                { date: '04/03/2026', a: 5, b: 2, status: 'FT', note: 'Sân Đức An' },
-                { date: '11/03/2026', a: 4, b: 5, status: 'FT', note: 'Sân Đức An' }
-            ]
-        };
-
-        function renderMatches(month) {
-            const list = document.getElementById('match-list');
-            const matches = matchData[month] || [];
-
-            if (matches.length === 0) {
-                list.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.5; padding: 40px;">Đang cập nhật dữ liệu trận đấu...</p>';
-                return;
-            }
-
-            list.innerHTML = matches.map(m => `
-                <div class="match-card">
-                    <div class="match-header">
-                        <span>${m.date}</span>
-                        <span class="match-status">${m.status}</span>
-                    </div>
-                    <div class="match-main">
-                        <div class="team">
-                            <div class="team-logo">PHN A</div>
-                            <div class="team-name">PHN A</div>
-                        </div>
-                        <div class="match-score-display">
-                            <div class="score-box">${m.a}</div>
-                            <div class="score-divider">-</div>
-                            <div class="score-box">${m.b}</div>
-                        </div>
-                        <div class="team">
-                            <div class="team-logo" style="border-color: #fff; color: #fff;">PHN B</div>
-                            <div class="team-name">PHN B</div>
-                        </div>
-                    </div>
-                    <div class="match-footer">
-                        <span>${m.note}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        document.querySelectorAll('.match-results-tabs .month-tab').forEach(tab => {
-            tab.addEventListener('click', function () {
-                const m = this.dataset.matchMonth;
-                document.querySelectorAll('.match-results-tabs .month-tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                renderMatches(m);
+        // Admin Month Selection
+        document.querySelectorAll('.admin-m-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.admin-m-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                curAdminMonth = parseInt(btn.dataset.month);
+                renderAdmin();
             });
         });
 
-        // Initialize with Month 3 (Current)
-        renderMatches(3);
+        // Sub-tabs (Goals/Assists)
+        document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sub-tab-btn').forEach(b => b.dataset.type === btn.dataset.type ? b.classList.add('active') : b.classList.remove('active'));
+                curType = btn.dataset.type;
+                renderSummary();
+                renderMonthly();
+            });
+        });
 
-        // Initial render
-        renderSummary();
-        renderMonthly(0);
-        renderAdmin();
+        // Video category
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.video-card').forEach(v => v.style.display = v.dataset.category === btn.dataset.category ? 'block' : 'none');
+            });
+        });
+
+        // YouTube Embed
+        document.querySelectorAll('.video-placeholder').forEach(p => {
+            p.addEventListener('click', function() {
+                this.innerHTML = `<iframe width="100%" height="250" src="https://www.youtube.com/embed/${this.dataset.videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            });
+        });
+
+        initRanking();
     </script>
+</body>
+</html>
 </body>
 
 </html>
