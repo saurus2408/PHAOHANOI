@@ -511,6 +511,19 @@
     </footer>
 
     <script>
+        // Cấu hình Supabase (Cần thay thông tin của dự án bạn vào đây)
+        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL'; // Thay bằng URL dự án của bạn (vd: https://xyz.supabase.co)
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Thay bằng mã Anon Key của dự án bạn
+        
+        let _supabase = null;
+        if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('http')) {
+            try {
+                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } catch (error) {
+                console.error("Lỗi khởi tạo Supabase:", error);
+            }
+        }
+
         // Đảm bảo luôn cuộn được trang khi tải (Failsafe)
         document.body.style.overflow = 'auto';
 
@@ -583,7 +596,8 @@
         const matchData = {
             3: [
                 { date: '04/03/2026', a: 5, b: 3, status: 'FT', note: 'Sân Đức An' },
-                { date: '11/03/2026', a: 4, b: 5, status: 'FT', note: 'Sân Đức An' }
+                { date: '11/03/2026', a: 4, b: 5, status: 'FT', note: 'Sân Đức An' },
+                { date: '18/03/2026', a: 9, b: 4, status: 'FT', note: 'Sân Đức An' }
             ]
         };
         function renderMatches(month) {
@@ -720,7 +734,7 @@
             localStorage.setItem('phnScoresV2', JSON.stringify(rankingData));
 
             // Save to Supabase
-            if (_supabase) {
+            if (typeof _supabase !== 'undefined' && _supabase && SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL') {
                 const updates = rankingData.map(p => {
                     const row = { name: p.name };
                     // Map goals
@@ -733,12 +747,16 @@
                 const { error } = await _supabase.from('player_scores').upsert(updates, { onConflict: 'name' });
                 if (error) {
                     console.error("Supabase Save Error:", error);
-                    alert('Lưu Local thành công nhưng lỗi đồng bộ Supabase (Có thể do thiếu cột Kiến tạo).');
+                    alert('Lưu Local thành công nhưng lỗi đồng bộ Supabase (Kiểm tra lại dữ liệu hoặc cài đặt bảng).');
                 } else {
-                    alert('Đã cập nhật dữ liệu toàn hệ thống!');
+                    alert('Đã cập nhật dữ liệu toàn hệ thống lên Supabase!');
                 }
             } else {
-                alert('Đã cập nhật dữ liệu (Chế độ Offline)!');
+                if (SUPABASE_URL === 'YOUR_SUPABASE_PROJECT_URL') {
+                    alert('Vui lòng thêm SUPABASE_URL và SUPABASE_ANON_KEY của bạn vào file index.html để bật tính năng Online! (Hiện tại: Chế độ Offline)');
+                } else {
+                    alert('Đã cập nhật dữ liệu (Chế độ Offline)!');
+                }
             }
 
             renderAllRankings();
