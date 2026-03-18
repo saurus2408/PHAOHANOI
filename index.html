@@ -780,7 +780,7 @@
                 const { error } = await _supabase.from('player_scores').upsert(updates, { onConflict: 'name' });
                 if (error) {
                     console.error("Supabase Save Error:", error);
-                    alert('Lưu Local thành công nhưng lỗi đồng bộ Supabase (Kiểm tra lại dữ liệu hoặc cài đặt bảng).');
+                    alert('Lưu Local báo lỗi đồng bộ Supabase: ' + error.message + '\n\n(Vui lòng chụp lại màn hình dòng tiếng Anh này để biết lỗi thiếu cột gì bên Supabase!)');
                 } else {
                     alert('Đã cập nhật dữ liệu toàn hệ thống lên Supabase!');
                 }
