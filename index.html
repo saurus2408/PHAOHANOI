@@ -642,28 +642,61 @@
             "Nguyễn Thái Đức", "Tùng LB", "Trác Phong", "Cuộc Sống"
         ];
 
-        function initRanking() {
-            // First check for V2, then V1 (Legacy migration)
-            const savedV2 = localStorage.getItem('phnScoresV2');
-            const savedV1 = localStorage.getItem('phnScores');
+        async function initRanking() {
+            let loadedFromSupabase = false;
 
-            if (savedV2) {
-                rankingData = JSON.parse(savedV2);
-            } else if (savedV1) {
-                // Migrate V1 to V2 structure
-                const oldData = JSON.parse(savedV1);
-                rankingData = oldData.map(p => ({
-                    name: p.name,
-                    monthlyGoals: p.monthly || Array(12).fill(0),
-                    monthlyAssists: Array(12).fill(0),
-                    totalGoals: p.total || 0,
-                    totalAssists: 0
-                }));
-            } else {
-                rankingData = defaultPlayers.map(name => ({
-                    name, monthlyGoals: Array(12).fill(0), monthlyAssists: Array(12).fill(0), totalGoals: 0, totalAssists: 0
-                }));
+            if (typeof _supabase !== 'undefined' && _supabase) {
+                try {
+                    const { data, error } = await _supabase.from('player_scores').select('*');
+                    if (!error && data && data.length > 0) {
+                        rankingData = data.map(row => ({
+                            name: row.name,
+                            monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
+                            monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
+                            totalGoals: 0,
+                            totalAssists: 0
+                        }));
+                        
+                        // Ghép các cầu thủ mặc định nếu chưa tồn tại trên Supabase
+                        const existingNames = rankingData.map(p => p.name);
+                        defaultPlayers.forEach(name => {
+                            if (!existingNames.includes(name)) {
+                                rankingData.push({ name, monthlyGoals: Array(12).fill(0), monthlyAssists: Array(12).fill(0), totalGoals: 0, totalAssists: 0 });
+                            }
+                        });
+
+                        loadedFromSupabase = true;
+                        localStorage.setItem('phnScoresV2', JSON.stringify(rankingData));
+                    }
+                } catch (err) {
+                    console.error("Lỗi lấy dữ liệu Supabase:", err);
+                }
             }
+
+            if (!loadedFromSupabase) {
+                // First check for V2, then V1 (Legacy migration)
+                const savedV2 = localStorage.getItem('phnScoresV2');
+                const savedV1 = localStorage.getItem('phnScores');
+
+                if (savedV2) {
+                    rankingData = JSON.parse(savedV2);
+                } else if (savedV1) {
+                    // Migrate V1 to V2 structure
+                    const oldData = JSON.parse(savedV1);
+                    rankingData = oldData.map(p => ({
+                        name: p.name,
+                        monthlyGoals: p.monthly || Array(12).fill(0),
+                        monthlyAssists: Array(12).fill(0),
+                        totalGoals: p.total || 0,
+                        totalAssists: 0
+                    }));
+                } else {
+                    rankingData = defaultPlayers.map(name => ({
+                        name, monthlyGoals: Array(12).fill(0), monthlyAssists: Array(12).fill(0), totalGoals: 0, totalAssists: 0
+                    }));
+                }
+            }
+
             updateTotals();
             renderAllRankings();
         }
