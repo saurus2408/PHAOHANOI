@@ -632,6 +632,7 @@
         let curMonth = 1;
         let curAdminMonth = 1;
         let curType = 'goals';
+        let dbHasAssists = false; // Tự động phát hiện xem DB đã có cột kiến tạo chưa
 
         const defaultPlayers = [
             "Nguyên Mạnh", "Nguyễn Xuân Đạt", "Nguyễn Trung Kiên", "Hoàng Xuân Giao",
@@ -649,7 +650,11 @@
                 try {
                     const { data, error } = await _supabase.from('player_scores').select('*');
                     if (!error && data && data.length > 0) {
+                        // Nhận diện DB xem có cột a1 không
+                        dbHasAssists = data[0].hasOwnProperty('a1');
+
                         rankingData = data.map(row => ({
+                            id: row.id, // Lấy ID thực tế từ DB để Update không bị lỗi
                             name: row.name,
                             monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
                             monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
@@ -770,14 +775,21 @@
             if (typeof _supabase !== 'undefined' && _supabase && SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL') {
                 const updates = rankingData.map(p => {
                     const row = { name: p.name };
+                    if (p.id) row.id = p.id; // Nếu có ID gốc thì chèn vào để tránh lỗi trùng lặp Unique "name"
+                    
                     // Map goals
                     for (let i = 1; i <= 12; i++) row[`m${i}`] = p.monthlyGoals[i - 1];
-                    // Map assists (assuming columns a1-a12 exist)
-                    for (let i = 1; i <= 12; i++) row[`a${i}`] = p.monthlyAssists[i - 1];
+                    
+                    // Map assists CHỈ KHI BẢNG SUPABASE ĐÃ TẠO (Auto-bypass error)
+                    if (dbHasAssists) {
+                        for (let i = 1; i <= 12; i++) row[`a${i}`] = p.monthlyAssists[i - 1];
+                    }
+                    
                     return row;
                 });
 
-                const { error } = await _supabase.from('player_scores').upsert(updates, { onConflict: 'name' });
+                // Xoá điều kiện { onConflict: 'name' } để Supabase tự dùng khóa chính `id` nhận sẵn
+                const { error } = await _supabase.from('player_scores').upsert(updates);
                 if (error) {
                     console.error("Supabase Save Error:", error);
                     alert('Lưu Local báo lỗi đồng bộ Supabase: ' + error.message + '\n\n(Vui lòng chụp lại màn hình dòng tiếng Anh này để biết lỗi thiếu cột gì bên Supabase!)');
