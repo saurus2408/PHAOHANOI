@@ -80,7 +80,7 @@
     <!-- Players Section -->
     <section id="players">
         <h2 class="section-title">Danh sách cầu thủ</h2>
-        <div class="players-grid">
+        <div class="players-grid" id="players-grid">
             <!-- Player 1 -->
             <div class="player-card">
                 <div class="player-num">1</div>
@@ -593,7 +593,7 @@
         renderAward(3); // Default to current month T3
 
         // --- MATCH RESULTS LOGIC ---
-        const matchData = {
+        let matchData = {
             3: [
                 { date: '04/03/2026', a: 5, b: 3, status: 'FT', note: 'Sân Đức An' },
                 { date: '11/03/2026', a: 4, b: 5, status: 'FT', note: 'Sân Đức An' },
@@ -893,7 +893,43 @@
             });
         });
 
+        async function initDynamicContent() {
+            if (typeof _supabase === 'undefined' || !_supabase) return;
+            try {
+                // Tải danh sách cầu thủ tự động
+                const { data: players, error: pError } = await _supabase.from('players').select('*').order('id', { ascending: true });
+                if (!pError && players && players.length > 0) {
+                    const grid = document.getElementById('players-grid');
+                    grid.innerHTML = players.map(p => `
+                        <div class="player-card">
+                            <div class="player-num">${p.num || '?'}</div>
+                            <img src="${p.img || '1-1206.jpg'}" alt="Player" class="player-img">
+                            <div class="player-info">
+                                <h3>${p.name}</h3>
+                            </div>
+                        </div>`).join('');
+                }
+
+                // Tải lịch sử trận đấu tự động
+                const { data: matches, error: mError } = await _supabase.from('match_results').select('*').order('id', { ascending: false });
+                if (!mError && matches && matches.length > 0) {
+                    matchData = {};
+                    matches.forEach(m => {
+                        if (!matchData[m.month]) matchData[m.month] = [];
+                        matchData[m.month].push({ date: m.match_date, a: m.score_a, b: m.score_b, status: m.status, note: m.note });
+                    });
+                    
+                    // Nạp lại tab tháng hiện tại
+                    const activeTab = document.querySelector('.match-results-tabs .month-tab.active');
+                    if (activeTab) renderMatches(activeTab.dataset.matchMonth);
+                }
+            } catch (err) {
+                console.error("Lỗi nạp dữ liệu động:", err);
+            }
+        }
+
         initRanking();
+        initDynamicContent();
     </script>
 </body>
 
