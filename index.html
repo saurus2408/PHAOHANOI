@@ -531,7 +531,7 @@
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) target.scrollIntoView({ behavior: 'smooth' });
-                
+
                 // Đóng menu và mở khóa cuộn khi bấm vào link trên mobile
                 if (document.getElementById('mobile-nav').classList.contains('active')) {
                     document.getElementById('mobile-nav').classList.remove('active');
@@ -544,15 +544,15 @@
         const mobileToggle = document.getElementById('mobile-toggle');
         const closeMobile = document.getElementById('close-mobile');
         const mobileNav = document.getElementById('mobile-nav');
-        
-        mobileToggle.addEventListener('click', () => { 
-            mobileNav.classList.add('active'); 
-            document.body.style.overflow = 'hidden'; 
+
+        mobileToggle.addEventListener('click', () => {
+            mobileNav.classList.add('active');
+            document.body.style.overflow = 'hidden';
         });
-        
-        closeMobile.addEventListener('click', () => { 
-            mobileNav.classList.remove('active'); 
-            document.body.style.overflow = 'auto'; 
+
+        closeMobile.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = 'auto';
         });
 
         // --- AWARDS LOGIC ---
@@ -605,7 +605,7 @@
                 </div>`).join('');
         }
         document.querySelectorAll('.match-results-tabs .month-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
+            tab.addEventListener('click', function () {
                 document.querySelectorAll('.match-results-tabs .month-tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 renderMatches(this.dataset.matchMonth);
@@ -617,7 +617,7 @@
         let rankingData = [];
         let curMonth = 1;
         let curAdminMonth = 1;
-        let curType = 'goals'; 
+        let curType = 'goals';
 
         const defaultPlayers = [
             "Nguyên Mạnh", "Nguyễn Xuân Đạt", "Nguyễn Trung Kiên", "Hoàng Xuân Giao",
@@ -632,7 +632,7 @@
             // First check for V2, then V1 (Legacy migration)
             const savedV2 = localStorage.getItem('phnScoresV2');
             const savedV1 = localStorage.getItem('phnScores');
-            
+
             if (savedV2) {
                 rankingData = JSON.parse(savedV2);
             } else if (savedV1) {
@@ -724,9 +724,9 @@
                 const updates = rankingData.map(p => {
                     const row = { name: p.name };
                     // Map goals
-                    for(let i=1; i<=12; i++) row[`m${i}`] = p.monthlyGoals[i-1];
+                    for (let i = 1; i <= 12; i++) row[`m${i}`] = p.monthlyGoals[i - 1];
                     // Map assists (assuming columns a1-a12 exist)
-                    for(let i=1; i<=12; i++) row[`a${i}`] = p.monthlyAssists[i-1];
+                    for (let i = 1; i <= 12; i++) row[`a${i}`] = p.monthlyAssists[i - 1];
                     return row;
                 });
 
@@ -801,7 +801,7 @@
 
         // YouTube Embed
         document.querySelectorAll('.video-placeholder').forEach(p => {
-            p.addEventListener('click', function() {
+            p.addEventListener('click', function () {
                 this.innerHTML = `<iframe width="100%" height="250" src="https://www.youtube.com/embed/${this.dataset.videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             });
         });
@@ -809,4 +809,5 @@
         initRanking();
     </script>
 </body>
+
 </html>
