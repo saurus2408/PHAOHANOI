@@ -269,7 +269,7 @@
                 <div class="player-num">25</div>
                 <img src="1-1206.jpg" alt="Player" class="player-img">
                 <div class="player-info">
-                        <h3>Trác Phong</h3>
+                    <h3>Trác Phong</h3>
                 </div>
             </div>
             <!-- Player 26 -->
@@ -327,6 +327,20 @@
                     <h3 class="video-title">Full Match: 11/03/2026</h3>
                 </div>
             </div>
+
+            <!-- Video 4 (New Full Match) -->
+            <div class="video-card reveal" data-category="full">
+                <div class="video-placeholder" data-video-id="hd8lkb_bD_k">
+                    <div class="video-thumb"
+                        style="background-image: url('https://img.youtube.com/vi/hd8lkb_bD_k/hqdefault.jpg')">
+                        <div class="play-icon"><i data-lucide="play"></i></div>
+                    </div>
+                </div>
+                <div class="video-info">
+                    <h3 class="video-title">Full Match: 18/03/2026</h3>
+                </div>
+            </div>
+
 
             <!-- Video 3 -->
             <div class="video-card reveal" data-category="highlights">
@@ -514,7 +528,7 @@
         // Cấu hình Supabase (Cần thay thông tin của dự án bạn vào đây)
         const SUPABASE_URL = 'https://hiykohhpxogniosdowjo.supabase.co'; // Thay bằng URL dự án của bạn (vd: https://xyz.supabase.co)
         const SUPABASE_ANON_KEY = 'sb_publishable_9BGxNUPQ2XGuOH437-4PuA_lIaAzv0_'; // Thay bằng mã Anon Key của dự án bạn
-        
+
         let _supabase = null;
         if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('http')) {
             try {
@@ -655,13 +669,13 @@
 
                         rankingData = data.map(row => ({
                             id: row.id, // Lấy ID thực tế từ DB để Update không bị lỗi
-                            name: row.name,
+                            name: row.name ? row.name.trim() : row.name,
                             monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
                             monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
                             totalGoals: 0,
                             totalAssists: 0
                         }));
-                        
+
                         // Ghép các cầu thủ mặc định nếu chưa tồn tại trên Supabase
                         const existingNames = rankingData.map(p => p.name);
                         defaultPlayers.forEach(name => {
@@ -780,12 +794,12 @@
                     const row = { name: p.name };
                     // Map goals
                     for (let i = 1; i <= 12; i++) row[`m${i}`] = p.monthlyGoals[i - 1];
-                    
+
                     // Map assists CHỈ KHI BẢNG SUPABASE ĐÃ TẠO (Auto-bypass error)
                     if (dbHasAssists) {
                         for (let i = 1; i <= 12; i++) row[`a${i}`] = p.monthlyAssists[i - 1];
                     }
-                    
+
                     if (p.id) {
                         existingPlayers.push({ id: p.id, ...row });
                     } else {
@@ -802,7 +816,7 @@
                         delete payload.id;
                         promises.push(_supabase.from('player_scores').update(payload).eq('id', p.id));
                     });
-                    
+
                     // Insert đồng loạt người mới (Không gửi ID để Supabase tự cấp ngẫu nhiên)
                     if (newPlayers.length > 0) {
                         promises.push(_supabase.from('player_scores').insert(newPlayers));
@@ -810,7 +824,7 @@
 
                     const results = await Promise.all(promises);
                     const errorObj = results.find(r => r.error);
-                    
+
                     if (errorObj) {
                         console.error("Supabase Save Error:", errorObj.error);
                         alert('Lưu Local báo lỗi đồng bộ Supabase: ' + errorObj.error.message);
@@ -918,7 +932,7 @@
                         if (!matchData[m.month]) matchData[m.month] = [];
                         matchData[m.month].push({ date: m.match_date, a: m.score_a, b: m.score_b, status: m.status, note: m.note });
                     });
-                    
+
                     // Nạp lại tab tháng hiện tại
                     const activeTab = document.querySelector('.match-results-tabs .month-tab.active');
                     if (activeTab) renderMatches(activeTab.dataset.matchMonth);
