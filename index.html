@@ -436,13 +436,15 @@
                 <div class="video-card reveal">
                     <div class="video-placeholder" data-video-id="${v.video_id}" onclick="playVideo(this)">
                         <div class="video-thumb" style="background-image: url('https://img.youtube.com/vi/${v.video_id}/hqdefault.jpg')">
-                            <div class="play-icon"><i data-lucide="play"></i></div>
+                            <div class="play-overlay">
+                                <div class="play-icon"><i data-lucide="play"></i></div>
+                            </div>
                         </div>
                     </div>
                     <div class="video-info">
                         <h3 class="video-title">${v.title}</h3>
                         <div class="admin-only" style="margin-top:10px;">
-                             <button class="del-btn" onclick="deleteItem('videos', '${v.id}')">Xóa</button>
+                             <button class="del-btn" onclick="deleteItem('videos', '${v.id}')">Xóa Video</button>
                         </div>
                     </div>
                 </div>
@@ -548,14 +550,26 @@
             }
         }
 
+        function extractYoutubeId(url) {
+            const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : url;
+        }
+
         async function saveVideo() {
             const category = document.getElementById('v-cat').value;
-            const video_id = document.getElementById('v-id').value;
+            const rawId = document.getElementById('v-id').value;
+            const video_id = extractYoutubeId(rawId);
             const title = document.getElementById('v-title').value;
 
             const { error } = await _supabase.from('videos').insert([{ category, video_id, title }]);
-            if (!error) { alert("Đã thêm video!"); closeModal(); renderAll(); }
-            else alert("Lỗi khi thêm video: " + error.message);
+            if (!error) { 
+                alert("Đã thêm video thành công!"); 
+                closeModal(); 
+                renderAll(); 
+            } else {
+                alert("Lỗi khi thêm video: " + error.message);
+            }
         }
 
         async function saveMatch() {
