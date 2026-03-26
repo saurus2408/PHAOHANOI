@@ -106,7 +106,7 @@
     <!-- Match Results Section -->
     <section id="match-results">
         <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-            <h2 class="section-title" style="margin-bottom: 0;">Kết quả PHN A vs PHN B</h2>
+            <h2 class="section-title" style="margin-bottom: 0;">Kết quả các trận đấu</h2>
             <button class="add-btn-main admin-only" onclick="openModal('match')"><i data-lucide="plus"></i> Thêm Kết quả</button>
         </div>
         <div class="match-results-tabs">
@@ -312,11 +312,19 @@
             <input type="text" id="m-date">
         </div>
         <div class="form-group">
-            <label>Tỉ số PHN A</label>
+            <label>Tên Đội 1 (Trái)</label>
+            <input type="text" id="m-team-a" placeholder="Vd: PHN A">
+        </div>
+        <div class="form-group">
+            <label>Tỉ số Đội 1</label>
             <input type="number" id="m-score-a">
         </div>
         <div class="form-group">
-            <label>Tỉ số PHN B</label>
+            <label>Tên Đội 2 (Phải)</label>
+            <input type="text" id="m-team-b" placeholder="Vd: PHN B">
+        </div>
+        <div class="form-group">
+            <label>Tỉ số Đội 2</label>
             <input type="number" id="m-score-b">
         </div>
         <div class="form-group">
@@ -334,10 +342,7 @@
             <label>Cầu thủ xuất sắc nhất</label>
             <input type="text" id="a-best-player">
         </div>
-        <div class="form-group">
-            <label>Bàn thắng đẹp nhất</label>
-            <input type="text" id="a-best-goal">
-        </div>
+
         <div class="form-group">
             <label>Vua phá lưới tháng</label>
             <input type="text" id="a-top-scorer">
@@ -467,9 +472,9 @@
                 <div class="match-card">
                     <div class="match-header"><span>${m.match_date}</span><span class="match-status">${m.status}</span></div>
                     <div class="match-main">
-                        <div class="team"><div class="team-logo">PHN A</div><div class="team-name">PHN A</div></div>
+                        <div class="team"><div class="team-logo">${m.team_a || 'PHN'}</div><div class="team-name">${m.team_a || 'PHN A'}</div></div>
                         <div class="match-score-display"><div class="score-box">${m.score_a}</div><div class="score-divider">-</div><div class="score-box">${m.score_b}</div></div>
-                        <div class="team"><div class="team-logo" style="border-color: #fff; color: #fff;">PHN B</div><div class="team-name">PHN B</div></div>
+                        <div class="team"><div class="team-logo" style="border-color: #fff; color: #fff;">${m.team_b || 'PHN'}</div><div class="team-name">${m.team_b || 'PHN B'}</div></div>
                     </div>
                     <div class="match-footer">
                         <span>${m.note}</span>
@@ -483,13 +488,13 @@
         async function renderAward(month) {
             const { data, error } = await _supabase.from('awards').select('*').eq('month', month).single();
             const container = document.getElementById('awards-content');
-            const d = data || { best_player: "...", best_goal: "...", top_scorer: "...", top_assist: "...", best_gk: "..." };
+            const d = data || { best_player: "...", top_scorer: "...", top_assist: "...", best_gk: "..." };
             
             container.innerHTML = `
                 <div class="award-display active">
                     <div class="award-card-inner">
                         <div class="award-item"><span class="award-icon">👤</span><p class="award-label">Cầu thủ xuất sắc nhất</p><p class="award-name">${d.best_player || 'Đang cập nhật'}</p></div>
-                        <div class="award-item"><span class="award-icon">⚽</span><p class="award-label">Bàn thắng đẹp nhất</p><p class="award-name">${d.best_goal || 'Đang cập nhật'}</p></div>
+
                         <div class="award-item"><span class="award-icon">🔥</span><p class="award-label">Vua phá lưới tháng</p><p class="award-name">${d.top_scorer || 'Đang cập nhật'}</p></div>
                         <div class="award-item"><span class="award-icon">🎯</span><p class="award-label">Vua kiến tạo tháng</p><p class="award-name">${d.top_assist || 'Đang cập nhật'}</p></div>
                         <div class="award-item"><span class="award-icon">🧤</span><p class="award-label">Thủ môn xuất sắc</p><p class="award-name">${d.best_gk || 'Đang cập nhật'}</p></div>
@@ -575,14 +580,18 @@
         async function saveMatch() {
             const month = document.getElementById('m-month').value;
             const match_date = document.getElementById('m-date').value;
+            const team_a = document.getElementById('m-team-a').value;
             const score_a = document.getElementById('m-score-a').value;
+            const team_b = document.getElementById('m-team-b').value;
             const score_b = document.getElementById('m-score-b').value;
             const note = document.getElementById('m-note').value;
 
             const { error } = await _supabase.from('match_results').insert([{ 
                 month: parseInt(month), 
                 match_date, 
+                team_a,
                 score_a: parseInt(score_a), 
+                team_b,
                 score_b: parseInt(score_b), 
                 note 
             }]);
@@ -595,7 +604,7 @@
             const payload = {
                 month: parseInt(month),
                 best_player: document.getElementById('a-best-player').value,
-                best_goal: document.getElementById('a-best-goal').value,
+
                 top_scorer: document.getElementById('a-top-scorer').value,
                 top_assist: document.getElementById('a-top-assist').value,
                 best_gk: document.getElementById('a-best-gk').value
