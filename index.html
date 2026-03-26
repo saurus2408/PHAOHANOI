@@ -503,18 +503,42 @@
             const file = document.getElementById('p-img').files[0];
             let imgUrl = '';
 
-            if (file) {
-                const fileName = `${Date.now()}-${file.name}`;
-                const { data, error } = await _supabase.storage.from('players').upload(fileName, file);
-                if (data) {
-                    const { data: urlData } = _supabase.storage.from('players').getPublicUrl(fileName);
-                    imgUrl = urlData.publicUrl;
-                }
-            }
+            const saveBtn = document.querySelector('#player-modal .btn-primary');
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = 'Đang tải ảnh...';
+            saveBtn.disabled = true;
 
-            const { error } = await _supabase.from('players').insert([{ num: parseInt(num), name, img: imgUrl }]);
-            if (!error) { alert("Đã thêm cầu thủ!"); closeModal(); renderAll(); }
-            else alert("Lỗi khi thêm cầu thủ: " + error.message);
+            try {
+                if (file) {
+                    const fileName = `${Date.now()}-${file.name}`;
+                    const { data, error: uploadError } = await _supabase.storage.from('players').upload(fileName, file);
+                    
+                    if (uploadError) {
+                        console.error("Upload Error:", uploadError);
+                        alert("Lỗi tải ảnh lên: " + uploadError.message + "\n\nGiải quyết: Hãy kiểm tra xem bạn đã tạo Bucket tên là 'players' trong Supabase và đặt ở chế độ 'Public' chưa.");
+                        throw uploadError;
+                    }
+
+                    if (data) {
+                        const { data: urlData } = _supabase.storage.from('players').getPublicUrl(fileName);
+                        imgUrl = urlData.publicUrl;
+                    }
+                }
+
+                const { error: dbError } = await _supabase.from('players').insert([{ num: parseInt(num), name, img: imgUrl }]);
+                if (!dbError) { 
+                    alert("Đã thêm cầu thủ thành công!"); 
+                    closeModal(); 
+                    renderAll(); 
+                } else {
+                    alert("Lỗi khi lưu vào Database: " + dbError.message);
+                }
+            } catch (err) {
+                console.error("Critical Error:", err);
+            } finally {
+                saveBtn.innerText = originalText;
+                saveBtn.disabled = false;
+            }
         }
 
         async function saveVideo() {
