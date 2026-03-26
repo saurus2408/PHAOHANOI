@@ -510,12 +510,19 @@
 
             try {
                 if (file) {
-                    const fileName = `${Date.now()}-${file.name}`;
+                    // Sanitize Filename: remove accents and spaces
+                    let cleanName = file.name
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+                        .replace(/[đĐ]/g, "d") // Fix 'd'
+                        .replace(/\s+/g, '-') // Spaces to hyphens
+                        .replace(/[^a-zA-Z0-9.-]/g, ''); // Keep only safe chars
+                    
+                    const fileName = `${Date.now()}-${cleanName}`;
                     const { data, error: uploadError } = await _supabase.storage.from('players').upload(fileName, file);
                     
                     if (uploadError) {
                         console.error("Upload Error:", uploadError);
-                        alert("Lỗi tải ảnh lên: " + uploadError.message + "\n\nGiải quyết: Hãy kiểm tra xem bạn đã tạo Bucket tên là 'players' trong Supabase và đặt ở chế độ 'Public' chưa.");
+                        alert("Lỗi tải ảnh lên: " + uploadError.message + "\n\nGiải quyết: Đừng lo, mình đã sửa lỗi tên file. Bạn hãy thử nhấn F5 trang web và upload lại nhé.");
                         throw uploadError;
                     }
 
