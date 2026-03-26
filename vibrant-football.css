@@ -1002,14 +1002,156 @@ footer {
     opacity: 0.5;
 }
 
-.match-footer {
-    margin-top: 20px;
+/* --- Admin System --- */
+.admin-only {
+    display: none !important;
+}
+
+body.admin-active .admin-only {
+    display: block !important;
+}
+
+body.admin-active .admin-only-flex {
+    display: flex !important;
+}
+
+.admin-header-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: var(--primary);
+    color: var(--secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: var(--transition);
+}
+
+.admin-header-btn:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+/* Admin Form Controls */
+.modal-admin {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    border: 1px solid var(--primary);
+    padding: 30px;
+    border-radius: 20px;
+    z-index: 2001;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 100px rgba(0,0,0,0.8);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-admin.active {
+    display: block;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    text-align: center;
-    border-top: 1px solid var(--glass-border);
-    padding-top: 15px;
-    color: var(--text-gray);
-    font-size: 0.85rem;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+}
+
+.overlay.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    color: var(--text-white);
+    border-radius: 8px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: var(--primary);
+}
+
+/* Delete Button */
+.del-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.del-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.add-btn-main {
+    margin-bottom: 20px;
+    padding: 12px 25px;
+    background: var(--primary);
+    color: var(--secondary);
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+}
+
+.add-btn-main:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(201, 162, 39, 0.4);
+}
+
+.player-card .admin-controls-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 10px;
+    z-index: 5;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.player-card:hover .admin-controls-overlay {
+    opacity: 1;
 }
 
 @media (max-width: 600px) {
@@ -1029,4 +1171,5 @@ footer {
         font-size: 2rem;
         width: 40px;
     }
-}
+}
+
