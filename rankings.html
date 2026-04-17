@@ -45,30 +45,29 @@
                 <li><a href="rankings.html" class="nav-link active">Xếp hạng</a></li>
                 <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
             </ul>
-        </div>
-    </header>
-
+       
     <section id="rankings">
-        <h2 class="section-title">Bảng xếp hạng mùa giải</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <h2 class="section-title" style="margin-bottom: 0;">Bảng xếp hạng mùa giải</h2>
+            <button id="save-all-btn" class="btn-primary admin-only" onclick="saveAllChanges()" style="background: #28a745;">
+                <i data-lucide="check"></i> LƯU TẤT CẢ
+            </button>
+        </div>
 
         <div class="ranking-tabs">
             <button class="rank-tab-btn active" data-target="summary">Xếp hạng tổng</button>
             <button class="rank-tab-btn" data-target="detail">Xếp hạng tháng</button>
-            <button class="rank-tab-btn admin-only" data-target="admin">⚙️ Quản lý</button>
         </div>
 
         <div id="rank-content">
-            <!-- Dynamic Content based on tabs -->
-             <div class="sub-tabs">
+            <div class="sub-tabs">
                 <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
                 <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
             </div>
 
             <div id="monthly-ctrl" style="display:none;">
                 <div class="month-selector">
-                    <!-- Months 1-12 -->
-                     <button class="month-btn active" data-month="1">T1</button>
-                     <!-- ... dynamically generated or just listed ... -->
+                    <button class="month-btn active" data-month="1">T1</button>
                 </div>
             </div>
 
@@ -94,18 +93,20 @@
     <script src="js/app.js"></script>
     <script>
         let rankingData = [];
-        let currentView = 'summary'; // summary, detail, admin
-        let currentType = 'goals'; // goals, assists
+        let currentView = 'summary'; 
+        let currentType = 'goals'; 
         let currentMonth = 1;
 
         async function initRanking() {
             const { data, error } = await _supabase.from('player_scores').select('*').order('name', { ascending: true });
             if (!error && data) {
                 rankingData = data.map(row => ({
-                    id: row.id, name: row.name,
+                    id: row.id, 
+                    name: row.name,
                     monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
                     monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
-                    totalGoals: 0, totalAssists: 0
+                    totalGoals: 0, 
+                    totalAssists: 0
                 }));
                 updateTotals();
                 renderRanking();
@@ -122,7 +123,12 @@
         function renderRanking() {
             const body = document.getElementById('rank-body');
             const header = document.getElementById('stat-header');
+            const saveBtn = document.getElementById('save-all-btn');
             
+            // Show/Hide save button based on Admin + Month View
+            if (isAdmin && currentView === 'detail') saveBtn.style.display = 'block';
+            else saveBtn.style.display = 'none';
+
             let sorted = [...rankingData];
             if (currentView === 'summary') {
                 sorted.sort((a, b) => currentType === 'goals' ? b.totalGoals - a.totalGoals : b.totalAssists - a.totalAssists);
@@ -136,14 +142,54 @@
                 header.innerText = `${currentType === 'goals' ? 'Số bàn' : 'Kiến tạo'} T${currentMonth}`;
             }
 
-            body.innerHTML = sorted.map((p, i) => `
+            body.innerHTML = sorted.map((p, i) => {
+                const val = currentView === 'summary' 
+                        ? (currentType === 'goals' ? p.totalGoals : p.totalAssists) 
+                        : (currentType === 'goals' ? p.monthlyGoals[currentMonth - 1] : p.monthlyAssists[currentMonth - 1]);
+                
+                let displayVal = val;
+                if (isAdmin && currentView === 'detail') {
+                    displayVal = `<input type="number" class="edit-input" value="${val}" min="0" onchange="updateLocalData('${p.id}', this.value)" style="width:60px; padding:5px; text-align:right; border:1px solid #ddd; border-radius:4px; font-weight:800; color:var(--primary);">`;
+                }
+
+                return `
                 <tr>
                     <td><div class="rank-num">${i + 1}</div></td>
                     <td>${p.name}</td>
-                    <td class="total-col">${currentView === 'summary' 
-                        ? (currentType === 'goals' ? p.totalGoals : p.totalAssists) 
-                        : (currentType === 'goals' ? p.monthlyGoals[currentMonth - 1] : p.monthlyAssists[currentMonth - 1])}</td>
-                </tr>`).join('');
+                    <td class="total-col">${displayVal}</td>
+                </tr>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function updateLocalData(id, val) {
+            const player = rankingData.find(p => p.id === id);
+            if (player) {
+                if (currentType === 'goals') player.monthlyGoals[currentMonth - 1] = parseInt(val) || 0;
+                else player.monthlyAssists[currentMonth - 1] = parseInt(val) || 0;
+            }
+        }
+
+        async function saveAllChanges() {
+            if (!confirm("Xác nhận lưu thay đổi lên hệ thống?")) return;
+            
+            for (const p of rankingData) {
+                const colPrefix = currentType === 'goals' ? 'm' : 'a';
+                const colName = colPrefix + currentMonth;
+                const val = currentType === 'goals' ? p.monthlyGoals[currentMonth - 1] : p.monthlyAssists[currentMonth - 1];
+                
+                const { error } = await _supabase.from('player_scores')
+                    .update({ [colName]: val })
+                    .eq('id', p.id);
+                
+                if (error) {
+                    alert("Lỗi khi lưu " + p.name + ": " + error.message);
+                    return;
+                }
+            }
+            alert("Đã cập nhật dữ liệu thành công!");
+            updateTotals();
+            renderRanking();
         }
 
         document.querySelectorAll('.rank-tab-btn').forEach(btn => btn.addEventListener('click', () => {
