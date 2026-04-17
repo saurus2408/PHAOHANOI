@@ -106,6 +106,7 @@
              <div class="sub-tabs">
                 <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
                 <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
+                <button class="sub-tab-btn" data-type="gk">Thủ môn</button>
             </div>
 
             <div id="monthly-ctrl" style="display:none;">
@@ -119,7 +120,7 @@
             <div class="ranking-container">
                 <table id="rank-table">
                     <thead>
-                        <tr>
+                        <tr id="table-head-row">
                             <th style="width: 50px">#</th>
                             <th>Cầu thủ</th>
                             <th id="stat-header" style="text-align:right;">Tổng bàn thắng</th>
@@ -157,7 +158,9 @@
                     id: row.id, name: row.name,
                     monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
                     monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
-                    totalGoals: 0, totalAssists: 0
+                    monthlyGames: [row.g1, row.g2, row.g3, row.g4, row.g5, row.g6, row.g7, row.g8, row.g9, row.g10, row.g11, row.g12].map(v => v || 0),
+                    monthlyConceded: [row.c1, row.c2, row.c3, row.c4, row.c5, row.c6, row.c7, row.c8, row.c9, row.c10, row.c11, row.c12].map(v => v || 0),
+                    totalGoals: 0, totalAssists: 0, totalGames: 0, totalConceded: 0
                 }));
                 updateTotals();
                 renderRanking();
@@ -168,47 +171,89 @@
             rankingData.forEach(p => {
                 p.totalGoals = p.monthlyGoals.reduce((a, b) => a + b, 0);
                 p.totalAssists = p.monthlyAssists.reduce((a, b) => a + b, 0);
+                p.totalGames = p.monthlyGames.reduce((a, b) => a + b, 0);
+                p.totalConceded = p.monthlyConceded.reduce((a, b) => a + b, 0);
             });
         }
 
         function renderRanking() {
             const body = document.getElementById('rank-body');
-            const header = document.getElementById('stat-header');
+            const headRow = document.getElementById('table-head-row');
             
             let sorted = [...rankingData];
+            
+            // Build Head
+            if (currentType === 'gk') {
+                headRow.innerHTML = `
+                    <th style="width: 50px">#</th>
+                    <th>Thủ môn</th>
+                    <th style="text-align:right;">Số trận</th>
+                    <th style="text-align:right;">Bàn thua</th>
+                `;
+            } else {
+                const headText = currentView === 'summary' 
+                    ? (currentType === 'goals' ? 'Tổng bàn thắng' : 'Tổng kiến tạo')
+                    : (currentType === 'goals' ? `Số bàn T${currentMonth}` : `Kiến tạo T${currentMonth}`);
+                headRow.innerHTML = `
+                    <th style="width: 50px">#</th>
+                    <th>Cầu thủ</th>
+                    <th style="text-align:right;">${headText}</th>
+                `;
+            }
+
             if (currentView === 'summary') {
-                sorted.sort((a, b) => currentType === 'goals' ? b.totalGoals - a.totalGoals : b.totalAssists - a.totalAssists);
-                header.innerText = currentType === 'goals' ? 'Tổng bàn thắng' : 'Tổng kiến tạo';
+                sorted.sort((a, b) => {
+                    if (currentType === 'goals') return b.totalGoals - a.totalGoals;
+                    if (currentType === 'assists') return b.totalAssists - a.totalAssists;
+                    return a.totalConceded - b.totalConceded; // Fewer goals is better for GK
+                });
             } else {
                 sorted.sort((a, b) => {
-                    const valA = currentType === 'goals' ? a.monthlyGoals[currentMonth - 1] : a.monthlyAssists[currentMonth - 1];
-                    const valB = currentType === 'goals' ? b.monthlyGoals[currentMonth - 1] : b.monthlyAssists[currentMonth - 1];
-                    return valB - valA;
+                    const idx = currentMonth - 1;
+                    if (currentType === 'goals') return b.monthlyGoals[idx] - a.monthlyGoals[idx];
+                    if (currentType === 'assists') return b.monthlyAssists[idx] - a.monthlyAssists[idx];
+                    return a.monthlyConceded[idx] - b.monthlyConceded[idx];
                 });
-                header.innerText = `${currentType === 'goals' ? 'Số bàn' : 'Kiến tạo'} T${currentMonth}`;
             }
 
             body.innerHTML = sorted.map((p, i) => {
-                const score = currentView === 'summary' 
-                    ? (currentType === 'goals' ? p.totalGoals : p.totalAssists) 
-                    : (currentType === 'goals' ? p.monthlyGoals[currentMonth - 1] : p.monthlyAssists[currentMonth - 1]);
-                
-                let scoreVal = score;
                 let nameVal = p.name;
-                
+                let statHTML = '';
+
                 if (isAdmin && currentView === 'detail') {
-                    scoreVal = `<input type="number" class="score-input" value="${score}" data-pid="${p.id}">`;
                     nameVal = `<input type="text" class="name-input" value="${p.name}" data-pid="${p.id}">`;
+                    
+                    if (currentType === 'gk') {
+                        statHTML = `
+                            <td style="text-align:right;"><input type="number" class="score-input gk-game" value="${p.monthlyGames[currentMonth-1]}" data-pid="${p.id}"></td>
+                            <td style="text-align:right;"><input type="number" class="score-input gk-conceded" value="${p.monthlyConceded[currentMonth-1]}" data-pid="${p.id}"></td>
+                        `;
+                    } else {
+                        const score = currentType === 'goals' ? p.monthlyGoals[currentMonth-1] : p.monthlyAssists[currentMonth-1];
+                        statHTML = `<td class="total-col" style="text-align:right;"><input type="number" class="score-input normal-score" value="${score}" data-pid="${p.id}"></td>`;
+                    }
+                } else {
+                    if (currentType === 'gk') {
+                        const games = currentView === 'summary' ? p.totalGames : p.monthlyGames[currentMonth-1];
+                        const conceded = currentView === 'summary' ? p.totalConceded : p.monthlyConceded[currentMonth-1];
+                        statHTML = `
+                            <td style="text-align:right;">${games}</td>
+                            <td style="text-align:right; color:var(--primary); font-weight:800;">${conceded}</td>
+                        `;
+                    } else {
+                        const score = currentView === 'summary' 
+                            ? (currentType === 'goals' ? p.totalGoals : p.totalAssists) 
+                            : (currentType === 'goals' ? p.monthlyGoals[currentMonth-1] : p.monthlyAssists[currentMonth-1]);
+                        statHTML = `<td class="total-col" style="text-align:right;">${score}</td>`;
+                    }
                 }
 
                 return `
                 <tr>
                     <td><div class="rank-num">${i + 1}</div></td>
                     <td>${nameVal}</td>
-                    <td class="total-col" style="display:flex; align-items:center; justify-content:flex-end; gap:15px;">
-                        ${scoreVal}
-                        ${isAdmin && currentView === 'detail' ? `<button class="del-btn" onclick="deleteItem('player_scores', '${p.id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>` : ''}
-                    </td>
+                    ${statHTML}
+                    ${isAdmin && currentView === 'detail' ? `<td><button class="del-btn" onclick="deleteItem('player_scores', '${p.id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></td>` : ''}
                 </tr>`;
             }).join('');
             
@@ -231,10 +276,14 @@
 
         async function resetMonth() {
             if (!isAdmin) return;
-            if (confirm(`Xác nhận RESET toàn bộ bàn thắng & kiến tạo của THÁNG ${currentMonth} về 0?`)) {
-                const colM = 'm' + currentMonth;
-                const colA = 'a' + currentMonth;
-                const { error } = await _supabase.from('player_scores').update({ [colM]: 0, [colA]: 0 }).neq('id', '00000000-0000-0000-0000-000000000000'); // update all
+            if (confirm(`Xác nhận RESET toàn bộ bàn thắng, kiến tạo, số trận, bàn thua của THÁNG ${currentMonth} về 0?`)) {
+                const updates = {
+                    ['m' + currentMonth]: 0,
+                    ['a' + currentMonth]: 0,
+                    ['g' + currentMonth]: 0,
+                    ['c' + currentMonth]: 0
+                };
+                const { error } = await _supabase.from('player_scores').update(updates).neq('id', '00000000-0000-0000-0000-000000000000');
                 if (!error) {
                     alert("Đã reset!");
                     initRanking();
@@ -246,29 +295,32 @@
 
         async function saveAllRanking() {
             if (!isAdmin) return;
-            const scoreInputs = document.querySelectorAll('.score-input');
-            const nameInputs = document.querySelectorAll('.name-input');
-            const updates = [];
             
-            // Map inputs by ID for batch processing (conceptually)
             const playerUpdates = {};
+            const pidSet = new Set();
 
-            scoreInputs.forEach(input => {
-                const pid = input.dataset.pid;
-                if (!playerUpdates[pid]) playerUpdates[pid] = {};
-                const colPrefix = currentType === 'goals' ? 'm' : 'a';
-                playerUpdates[pid][colPrefix + currentMonth] = parseInt(input.value) || 0;
+            document.querySelectorAll('[data-pid]').forEach(el => pidSet.add(el.dataset.pid));
+
+            pidSet.forEach(pid => {
+                playerUpdates[pid] = {};
+                const nameInp = document.querySelector(`.name-input[data-pid="${pid}"]`);
+                if (nameInp) playerUpdates[pid].name = nameInp.value;
+
+                if (currentType === 'gk') {
+                    const gInp = document.querySelector(`.gk-game[data-pid="${pid}"]`);
+                    const cInp = document.querySelector(`.gk-conceded[data-pid="${pid}"]`);
+                    if (gInp) playerUpdates[pid]['g' + currentMonth] = parseInt(gInp.value) || 0;
+                    if (cInp) playerUpdates[pid]['c' + currentMonth] = parseInt(cInp.value) || 0;
+                } else {
+                    const sInp = document.querySelector(`.normal-score[data-pid="${pid}"]`);
+                    const colPrefix = currentType === 'goals' ? 'm' : 'a';
+                    if (sInp) playerUpdates[pid][colPrefix + currentMonth] = parseInt(sInp.value) || 0;
+                }
             });
 
-            nameInputs.forEach(input => {
-                const pid = input.dataset.pid;
-                if (!playerUpdates[pid]) playerUpdates[pid] = {};
-                playerUpdates[pid].name = input.value;
-            });
-
-            for (const pid in playerUpdates) {
-                updates.push(_supabase.from('player_scores').update(playerUpdates[pid]).eq('id', pid));
-            }
+            const updates = Object.keys(playerUpdates).map(pid => 
+                _supabase.from('player_scores').update(playerUpdates[pid]).eq('id', pid)
+            );
 
             try {
                 await Promise.all(updates);
