@@ -73,6 +73,9 @@
                 <li><a href="results.html" class="nav-link">Kết quả</a></li>
                 <li><a href="rankings.html" class="nav-link active">Xếp hạng</a></li>
                 <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                    <i data-lucide="lock"></i> <span>LOGIN</span>
+                </div>
             </ul>
         </div>
     </header>
@@ -128,9 +131,6 @@
         </div>
     </section>
 
-    <div class="admin-header-btn" onclick="toggleAdmin()">
-        <i data-lucide="settings"></i>
-    </div>
 
     <!-- Modals -->
     <div class="overlay" id="overlay" onclick="closeModal()"></div>

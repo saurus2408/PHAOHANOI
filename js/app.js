@@ -18,6 +18,7 @@ function toggleAdmin() {
             isAdmin = true;
             sessionStorage.setItem('phn_admin', 'true');
             document.body.classList.add('admin-active');
+            updateAdminUI();
             alert("Chế độ Admin đã được kích hoạt!");
             if (typeof renderAll === 'function') renderAll();
         } else {
@@ -27,13 +28,27 @@ function toggleAdmin() {
         isAdmin = false;
         sessionStorage.removeItem('phn_admin');
         document.body.classList.remove('admin-active');
+        updateAdminUI();
         if (typeof renderAll === 'function') renderAll();
+    }
+}
+
+function updateAdminUI() {
+    const adminLink = document.getElementById('header-admin-btn');
+    if (adminLink) {
+        if (isAdmin) {
+            adminLink.innerHTML = '<i data-lucide="unlock"></i> <span>ADMIN</span>';
+        } else {
+            adminLink.innerHTML = '<i data-lucide="lock"></i> <span>LOGIN</span>';
+        }
+        lucide.createIcons();
     }
 }
 
 // Initialize Admin UI on load
 document.addEventListener('DOMContentLoaded', () => {
     if (isAdmin) document.body.classList.add('admin-active');
+    updateAdminUI();
     lucide.createIcons();
 });
 

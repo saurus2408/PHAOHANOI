@@ -106,6 +106,9 @@
                 <li><a href="results.html" class="nav-link">Kết quả</a></li>
                 <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
                 <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                    <i data-lucide="lock"></i> <span>LOGIN</span>
+                </div>
             </ul>
         </div>
     </header>
@@ -139,9 +142,6 @@
         <button class="btn-primary" onclick="savePlayer()" style="width: 100%;">Lưu</button>
     </div>
 
-    <div class="admin-header-btn" onclick="toggleAdmin()">
-        <i data-lucide="settings"></i>
-    </div>
 
     <script src="js/app.js"></script>
     <script>
@@ -157,7 +157,9 @@
                         <h3>${p.name}</h3>
                     </div>
                     <div class="admin-actions">
-                        <button class="del-btn" onclick="deleteItem('players', '${p.id}')">Xóa</button>
+                        <button class="del-btn" onclick="deleteItem('players', '${p.id}')">
+                            <i data-lucide="trash-2" style="width:14px; height:14px;"></i> Xóa cầu thủ
+                        </button>
                     </div>
                 </div>
             `).join('');

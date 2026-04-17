@@ -284,25 +284,40 @@ section {
 .admin-active .admin-only { display: block !important; }
 .admin-only { display: none; }
 
-.admin-header-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background: var(--primary);
-    color: white;
-    border-radius: 50%;
+.admin-header-btn { display: none; }
+
+/* Header Admin */
+.header-admin-link {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
     cursor: pointer;
-    box-shadow: var(--shadow);
-    z-index: 1001;
     transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.admin-header-btn:hover { transform: rotate(90deg) scale(1.1); }
+.header-admin-link:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.admin-active .header-admin-link {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .header-admin-link span { display: none; }
+    .header-admin-link { padding: 8px; }
+}
 
 /* Mobile */
 .mobile-toggle { display: none; }

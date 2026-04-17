@@ -66,6 +66,9 @@
                 <li><a href="results.html" class="nav-link active">Kết quả</a></li>
                 <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
                 <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                    <i data-lucide="lock"></i> <span>LOGIN</span>
+                </div>
             </ul>
         </div>
     </header>
@@ -110,9 +113,6 @@
         <button class="btn-primary" onclick="saveMatch()" style="width: 100%;">Lưu</button>
     </div>
 
-    <div class="admin-header-btn" onclick="toggleAdmin()">
-        <i data-lucide="settings"></i>
-    </div>
 
     <script src="js/app.js"></script>
     <script>
