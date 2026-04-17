@@ -37,9 +37,9 @@ function updateAdminUI() {
     const adminLink = document.getElementById('header-admin-btn');
     if (adminLink) {
         if (isAdmin) {
-            adminLink.innerHTML = '<i data-lucide="unlock"></i> <span>ADMIN</span>';
+            adminLink.innerHTML = '<i data-lucide="user"></i>';
         } else {
-            adminLink.innerHTML = '<i data-lucide="lock"></i> <span>LOGIN</span>';
+            adminLink.innerHTML = '<i data-lucide="lock"></i>';
         }
         lucide.createIcons();
     }
