@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng xếp hạng | PHN FC</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .ranking-tabs { display: flex; gap: 15px; margin-bottom: 30px; }
+        .rank-tab-btn { padding: 10px 20px; border: 1px solid var(--primary); background: transparent; color: var(--primary); border-radius: 4px; cursor: pointer; font-weight: 700; transition: var(--transition); }
+        .rank-tab-btn.active { background: var(--primary); color: white; }
+        .ranking-container { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #eee; color: #666; font-size: 0.8rem; text-transform: uppercase; }
+        td { padding: 20px 15px; border-bottom: 1px solid #f9f9f9; font-weight: 600; }
+        .rank-num { width: 30px; height: 30px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem; }
+        tr:nth-child(1) .rank-num { background: var(--accent); color: white; }
+        .total-col { text-align: right; color: var(--primary); font-weight: 800; font-size: 1.2rem; }
+        .sub-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .sub-tab-btn { background: #f4f4f4; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+        .sub-tab-btn.active { background: #333; color: white; }
+        .month-selector { display: flex; gap: 5px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .month-btn { padding: 5px 12px; font-size: 0.75rem; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; }
+        .month-btn.active { border-color: var(--primary); color: var(--primary); }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo-wrapper">
+                <img src="Logph.png" alt="CLB Logo" class="logo-img">
+                <span class="site-name">PHN</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
+                <li><a href="videos.html" class="nav-link">Video</a></li>
+                <li><a href="results.html" class="nav-link">Kết quả</a></li>
+                <li><a href="rankings.html" class="nav-link active">Xếp hạng</a></li>
+                <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section id="rankings">
+        <h2 class="section-title">Bảng xếp hạng mùa giải</h2>
+
+        <div class="ranking-tabs">
+            <button class="rank-tab-btn active" data-target="summary">Xếp hạng tổng</button>
+            <button class="rank-tab-btn" data-target="detail">Xếp hạng tháng</button>
+            <button class="rank-tab-btn admin-only" data-target="admin">⚙️ Quản lý</button>
+        </div>
+
+        <div id="rank-content">
+            <!-- Dynamic Content based on tabs -->
+             <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
+                <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
+            </div>
+
+            <div id="monthly-ctrl" style="display:none;">
+                <div class="month-selector">
+                    <!-- Months 1-12 -->
+                     <button class="month-btn active" data-month="1">T1</button>
+                     <!-- ... dynamically generated or just listed ... -->
+                </div>
+            </div>
+
+            <div class="ranking-container">
+                <table id="rank-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px">#</th>
+                            <th>Cầu thủ</th>
+                            <th id="stat-header" style="text-align:right;">Tổng bàn thắng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rank-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="admin-header-btn" onclick="toggleAdmin()">
+        <i data-lucide="settings"></i>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let rankingData = [];
+        let currentView = 'summary'; // summary, detail, admin
+        let currentType = 'goals'; // goals, assists
+        let currentMonth = 1;
+
+        async function initRanking() {
+            const { data, error } = await _supabase.from('player_scores').select('*').order('name', { ascending: true });
+            if (!error && data) {
+                rankingData = data.map(row => ({
+                    id: row.id, name: row.name,
+                    monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
+                    monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
+                    totalGoals: 0, totalAssists: 0
+                }));
+                updateTotals();
+                renderRanking();
+            }
+        }
+
+        function updateTotals() {
+            rankingData.forEach(p => {
+                p.totalGoals = p.monthlyGoals.reduce((a, b) => a + b, 0);
+                p.totalAssists = p.monthlyAssists.reduce((a, b) => a + b, 0);
+            });
+        }
+
+        function renderRanking() {
+            const body = document.getElementById('rank-body');
+            const header = document.getElementById('stat-header');
+            
+            let sorted = [...rankingData];
+            if (currentView === 'summary') {
+                sorted.sort((a, b) => currentType === 'goals' ? b.totalGoals - a.totalGoals : b.totalAssists - a.totalAssists);
+                header.innerText = currentType === 'goals' ? 'Tổng bàn thắng' : 'Tổng kiến tạo';
+            } else {
+                sorted.sort((a, b) => {
+                    const valA = currentType === 'goals' ? a.monthlyGoals[currentMonth - 1] : a.monthlyAssists[currentMonth - 1];
+                    const valB = currentType === 'goals' ? b.monthlyGoals[currentMonth - 1] : b.monthlyAssists[currentMonth - 1];
+                    return valB - valA;
+                });
+                header.innerText = `${currentType === 'goals' ? 'Số bàn' : 'Kiến tạo'} T${currentMonth}`;
+            }
+
+            body.innerHTML = sorted.map((p, i) => `
+                <tr>
+                    <td><div class="rank-num">${i + 1}</div></td>
+                    <td>${p.name}</td>
+                    <td class="total-col">${currentView === 'summary' 
+                        ? (currentType === 'goals' ? p.totalGoals : p.totalAssists) 
+                        : (currentType === 'goals' ? p.monthlyGoals[currentMonth - 1] : p.monthlyAssists[currentMonth - 1])}</td>
+                </tr>`).join('');
+        }
+
+        document.querySelectorAll('.rank-tab-btn').forEach(btn => btn.addEventListener('click', () => {
+             document.querySelectorAll('.rank-tab-btn').forEach(b => b.classList.remove('active'));
+             btn.classList.add('active');
+             currentView = btn.dataset.target;
+             document.getElementById('monthly-ctrl').style.display = currentView === 'detail' ? 'block' : 'none';
+             renderRanking();
+        }));
+
+        document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.addEventListener('click', () => {
+             document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+             btn.classList.add('active');
+             currentType = btn.dataset.type;
+             renderRanking();
+        }));
+
+        const monthSel = document.querySelector('.month-selector');
+        for(let i=2; i<=12; i++) {
+            const b = document.createElement('button');
+            b.className = 'month-btn';
+            b.dataset.month = i;
+            b.innerText = 'T' + i;
+            b.onclick = () => {
+                document.querySelectorAll('.month-btn').forEach(m => m.classList.remove('active'));
+                b.classList.add('active');
+                currentMonth = i;
+                renderRanking();
+            };
+            monthSel.appendChild(b);
+        }
+
+        function renderAll() { initRanking(); }
+        window.onload = initRanking;
+    </script>
+</body>
+</html>

@@ -1,828 +1,96 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Trang web chính thức của CLB Bóng Đá - Nơi cập nhật tin tức, đội hình, video và bảng xếp hạng.">
-    <title>PHÁO HÀ NỘI FC</title>
-    <link rel="stylesheet" href="vibrant-football.css">
-    <!-- Lucide Icons -->
+    <meta name="description" content="PHN FC - Đội bóng Arsenal Fans tại Hà Nội.">
+    <title>PHÁO HÀ NỘI FC | Trang chủ</title>
+    <link rel="stylesheet" href="shared.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-    <!-- Header Section -->
     <header>
         <div class="nav-container">
-            <div class="logo-wrapper">
+            <a href="index.html" class="logo-wrapper">
                 <img src="Logph.png" alt="CLB Logo" class="logo-img">
                 <span class="site-name">PHN</span>
-            </div>
+            </a>
             <ul class="nav-links">
-                <li><a href="#home" class="nav-link">Home</a></li>
-                <li><a href="#players" class="nav-link">Danh sách cầu thủ</a></li>
-                <li><a href="#videos" class="nav-link">Video xem lại</a></li>
-                <li><a href="#match-results" class="nav-link">Kết quả</a></li>
-                <li><a href="#rankings" class="nav-link">Bảng xếp hạng</a></li>
-                <li><a href="#awards" class="nav-link">Giải thưởng</a></li>
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
+                <li><a href="videos.html" class="nav-link">Video</a></li>
+                <li><a href="results.html" class="nav-link">Kết quả</a></li>
+                <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
+                <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
             </ul>
             <div class="mobile-toggle" id="mobile-toggle">
                 <i data-lucide="menu"></i>
             </div>
         </div>
-        <!-- Mobile Navigation Menu -->
-        <nav class="mobile-nav" id="mobile-nav">
-            <div class="mobile-nav-header">
-                <img src="Logph.png" alt="Logo" class="mobile-logo">
-                <div class="close-mobile" id="close-mobile">
-                    <i data-lucide="x"></i>
-                </div>
-            </div>
-            <ul class="mobile-nav-links">
-                <li><a href="#home" class="mobile-nav-link"><span>01</span> Home</a></li>
-                <li><a href="#players" class="mobile-nav-link"><span>02</span> Danh sách cầu thủ</a></li>
-                <li><a href="#videos" class="mobile-nav-link"><span>03</span> Video xem lại</a></li>
-                <li><a href="#match-results" class="mobile-nav-link"><span>04</span> Kết quả</a></li>
-                <li><a href="#rankings" class="mobile-nav-link"><span>05</span> Bảng xếp hạng</a></li>
-                <li><a href="#awards" class="mobile-nav-link"><span>06</span> Giải thưởng</a></li>
-            </ul>
-            <div class="mobile-nav-footer">
-                <p>&copy; 2026 PHN FC</p>
-            </div>
-        </nav>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content reveal">
-            <h1>PHÁO HÀ NỘI FC</h1>
-            <p>PHN (Pháo Hà Nội) là đội bóng được thành lập bởi những người hâm mộ CLB Arsenal tại Hà Nội, với mục tiêu
-                tạo ra một sân chơi vui vẻ, gắn kết và đậm tinh thần thể thao cho anh em yêu bóng đá.
-            </p>
-            <div class="social-links">
-                <a href="https://www.facebook.com/profile.php?id=61586374958119" class="social-link" target="_blank"><i
-                        data-lucide="facebook"></i></a>
-                <a href="https://www.youtube.com/@PHNFCafchn" class="social-link" target="_blank"><i
-                        data-lucide="youtube"></i></a>
-                <a href="https://www.tiktok.com/@phnfc07" class="social-link" target="_blank"><i
-                        data-lucide="music-2"></i></a>
+            <h1 class="glitch-text">PHÁO HÀ NỘI FC</h1>
+            <p>Nơi tinh thần Arsenal rực cháy giữa lòng Hà Nội. Kết nối đam mê - Lan tỏa tinh thần thể thao.</p>
+            <div class="social-links" style="display:flex; justify-content:center; gap:25px; margin-bottom:40px;">
+                <a href="https://www.facebook.com/profile.php?id=61586374958119" class="social-icon-box" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                </a>
+                <a href="https://www.youtube.com/@PHNFCafchn" class="social-icon-box" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.42a2.78 2.78 0 0 0-1.94 2C1 8.14 1 12 1 12s0 3.86.42 5.58a2.78 2.78 0 0 0 1.94 2c1.71.42 8.6.42 8.6.42s6.88 0 8.6-.42a2.78 2.78 0 0 0 1.94-2C23 15.86 23 12 23 12s0-3.86-.42-5.58z"></path><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"></polygon></svg>
+                </a>
+                <a href="https://www.tiktok.com/@phnfc07" class="social-icon-box" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+                </a>
             </div>
-            <br>
-            <a href="#players" class="btn-primary">Xem đội hình</a>
+            <a href="#social-hub" class="btn-primary">Khám phá cộng đồng</a>
         </div>
     </section>
 
-    <!-- Players Section -->
-    <section id="players">
-        <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-            <h2 class="section-title" style="margin-bottom: 0;">Danh sách cầu thủ</h2>
-            <button class="add-btn-main admin-only" onclick="openModal('player')"><i data-lucide="plus"></i> Thêm cầu thủ</button>
-        </div>
-        <div class="players-grid" id="players-grid">
-            <!-- Dynamic Content -->
-        </div>
-    </section>
-
-    <!-- Videos Section -->
-    <section id="videos">
-        <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-            <h2 class="section-title" style="margin-bottom: 0;">Video xem lại</h2>
-            <button class="add-btn-main admin-only" onclick="openModal('video')"><i data-lucide="plus"></i> Thêm Video</button>
-        </div>
-        <div class="video-categories">
-            <button class="cat-btn active" data-category="full">Full Match</button>
-            <button class="cat-btn" data-category="highlights">Highlights</button>
-        </div>
-        <div class="video-grid" id="video-grid">
-            <!-- Dynamic Content -->
-        </div>
-    </section>
-
-    <!-- Match Results Section -->
-    <section id="match-results">
-        <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-            <h2 class="section-title" style="margin-bottom: 0;">Kết quả các trận đấu</h2>
-            <button class="add-btn-main admin-only" onclick="openModal('match')"><i data-lucide="plus"></i> Thêm Kết quả</button>
-        </div>
-        <div class="match-results-tabs">
-            <div class="month-tab active" data-match-month="1">T1</div>
-            <div class="month-tab" data-match-month="2">T2</div>
-            <div class="month-tab" data-match-month="3">T3</div>
-            <div class="month-tab" data-match-month="4">T4</div>
-            <div class="month-tab" data-match-month="5">T5</div>
-            <div class="month-tab" data-match-month="6">T6</div>
-            <div class="month-tab" data-match-month="7">T7</div>
-            <div class="month-tab" data-match-month="8">T8</div>
-            <div class="month-tab" data-match-month="9">T9</div>
-            <div class="month-tab" data-match-month="10">T10</div>
-            <div class="month-tab" data-match-month="11">T11</div>
-            <div class="month-tab" data-match-month="12">T12</div>
-        </div>
-        <div id="match-list" class="match-grid">
-            <!-- JavaScript will populate this -->
-        </div>
-    </section>
-
-    <section id="rankings">
-        <h2 class="section-title">Bảng xếp hạng bàn thắng</h2>
-
-        <div class="ranking-tabs">
-            <button class="rank-tab-btn active" data-target="summary">Xếp hạng mùa giải</button>
-            <button class="rank-tab-btn" data-target="detail">Xếp hạng theo tháng</button>
-            <button class="rank-tab-btn" data-target="admin" style="border-style: dashed;">⚙️ Quản lý</button>
-        </div>
-
-        <!-- Seasonal Summary -->
-        <div id="rank-summary" class="ranking-view active">
-            <div class="sub-tabs">
-                <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
-                <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
+    <!-- Social Hub Section -->
+    <section id="social-hub" style="background: #ffffff; padding-top: 80px;">
+        <div class="container">
+            <div class="section-header-flex" style="margin-bottom: 50px; text-align: center;">
+                <h2 class="section-title" style="display:inline-block;">Media & Tiêu điểm</h2>
+                <p style="color:#666; margin-top:10px;">Cập nhật những khoảnh khắc ấn tượng nhất từ Youtube và Fanpage chính thức.</p>
             </div>
-            <div class="ranking-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 80px">Hạng</u></th>
-                            <th>Cầu thủ</th>
-                            <th class="total-col" id="summary-header">Tổng bàn thắng</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summary-body"></tbody>
-                </table>
-            </div>
-        </div>
 
-        <!-- Monthly Selector & View -->
-        <div id="rank-detail" class="ranking-view">
-            <div class="month-selector">
-                <button class="month-btn active" data-month="1">T1</button>
-                <button class="month-btn" data-month="2">T2</button>
-                <button class="month-btn" data-month="3">T3</button>
-                <button class="month-btn" data-month="4">T4</button>
-                <button class="month-btn" data-month="5">T5</button>
-                <button class="month-btn" data-month="6">T6</button>
-                <button class="month-btn" data-month="7">T7</button>
-                <button class="month-btn" data-month="8">T8</button>
-                <button class="month-btn" data-month="9">T9</button>
-                <button class="month-btn" data-month="10">T10</button>
-                <button class="month-btn" data-month="11">T11</button>
-                <button class="month-btn" data-month="12">T12</button>
-            </div>
-            <div class="sub-tabs">
-                <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
-                <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
-            </div>
-            <div class="ranking-container">
-                <table class="detail-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 80px">Hạng</th>
-                            <th>Cầu thủ</th>
-                            <th id="month-header" class="total-col">Số bàn T1</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detail-body"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Admin Input Panel -->
-        <div id="rank-admin" class="ranking-view">
-            <div class="admin-controls">
-                <div class="admin-header">
-                    <span class="admin-title">🛠 Nhập chỉ số theo tháng</span>
-                    <button onclick="saveScores()" class="save-btn">Lưu & Cập nhật BXH</button>
+            <div class="social-grid">
+                <!-- Youtube Section -->
+                <div class="social-box reveal">
+                    <div class="box-header">
+                        <img src="Logph.png" style="height:25px;" alt="Logo">
+                        <i data-lucide="youtube" style="color:#FF0000; margin-left:10px;"></i> YOUTUBE
+                    </div>
+                    <div class="video-embed">
+                        <iframe width="100%" height="400" src="https://www.youtube.com/embed?listType=user_uploads&list=PHNFCafchn" frameborder="0" allowfullscreen></iframe>
+                    </div>
                 </div>
-                <div class="month-selector" style="margin-bottom: 15px;">
-                    <button class="month-btn active admin-m-btn" data-month="1">T1</button>
-                    <button class="month-btn admin-m-btn" data-month="2">T2</button>
-                    <button class="month-btn admin-m-btn" data-month="3">T3</button>
-                    <button class="month-btn admin-m-btn" data-month="4">T4</button>
-                    <button class="month-btn admin-m-btn" data-month="5">T5</button>
-                    <button class="month-btn admin-m-btn" data-month="6">T6</button>
-                    <button class="month-btn admin-m-btn" data-month="7">T7</button>
-                    <button class="month-btn admin-m-btn" data-month="8">T8</button>
-                    <button class="month-btn admin-m-btn" data-month="9">T9</button>
-                    <button class="month-btn admin-m-btn" data-month="10">T10</button>
-                    <button class="month-btn admin-m-btn" data-month="11">T11</button>
-                    <button class="month-btn admin-m-btn" data-month="12">T12</button>
+
+                <!-- Facebook Section -->
+                <div class="social-box reveal">
+                    <div class="box-header">
+                        <img src="Logph.png" style="height:25px;" alt="Logo">
+                        <i data-lucide="facebook" style="color:#1877F2; margin-left:10px;"></i> FANPAGE
+                    </div>
+                    <div class="fb-container">
+                        <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D61586374958119&tabs=timeline&width=500&height=400&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" width="100%" height="400" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+                    </div>
                 </div>
             </div>
-            <div class="ranking-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 60px">#</th>
-                            <th>Tên cầu thủ</th>
-                            <th style="width: 100px">Số bàn</th>
-                            <th style="width: 100px">Kiến tạo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-body"></tbody>
-                </table>
-                <br>
-                <button onclick="resetData()"
-                    style="background:none; border: 1px solid red; color: red; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Xoá
-                    toàn bộ dữ liệu</button>
-            </div>
         </div>
     </section>
-
-    <!-- Awards Section -->
-    <section id="awards">
-        <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-            <h2 class="section-title" style="margin-bottom: 0;">Giải thưởng tháng</h2>
-            <button class="add-btn-main admin-only" onclick="openModal('award')"><i data-lucide="edit"></i> Cập nhật Giải thưởng</button>
-        </div>
-        <div class="awards-tabs">
-            <div class="month-tab active" data-month="1">T1</div>
-            <div class="month-tab" data-month="2">T2</div>
-            <div class="month-tab" data-month="3">T3</div>
-            <div class="month-tab" data-month="4">T4</div>
-            <div class="month-tab" data-month="5">T5</div>
-            <div class="month-tab" data-month="6">T6</div>
-            <div class="month-tab" data-month="7">T7</div>
-            <div class="month-tab" data-month="8">T8</div>
-            <div class="month-tab" data-month="9">T9</div>
-            <div class="month-tab" data-month="10">T10</div>
-            <div class="month-tab" data-month="11">T11</div>
-            <div class="month-tab" data-month="12">T12</div>
-        </div>
-        <div id="awards-content">
-            <!-- JavaScript will populate this -->
-        </div>
-    </section>
-
-    <!-- Admin Systems / Modals -->
-    <div class="overlay" id="overlay" onclick="closeModal()"></div>
-    
-    <!-- Player Modal -->
-    <div class="modal-admin" id="player-modal">
-        <h2 style="color:var(--primary); margin-bottom: 20px;">Thêm/Sửa Cầu thủ</h2>
-        <div class="form-group">
-            <label>Số áo</label>
-            <input type="number" id="p-num">
-        </div>
-        <div class="form-group">
-            <label>Tên cầu thủ</label>
-            <input type="text" id="p-name">
-        </div>
-        <div class="form-group">
-            <label>Ảnh đại diện</label>
-            <input type="file" id="p-img" accept="image/*">
-        </div>
-        <button class="btn-primary" onclick="savePlayer()" style="width: 100%;">Lưu Cầu thủ</button>
-    </div>
-
-    <!-- Video Modal -->
-    <div class="modal-admin" id="video-modal">
-        <h2 style="color:var(--primary); margin-bottom: 20px;">Thêm Video</h2>
-        <div class="form-group">
-            <label>Loại video</label>
-            <select id="v-cat">
-                <option value="full">Full Match</option>
-                <option value="highlights">Highlights</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>YouTube Video ID</label>
-            <input type="text" id="v-id" placeholder="Vd: m1eL12m9aIc">
-        </div>
-        <div class="form-group">
-            <label>Tiêu đề</label>
-            <input type="text" id="v-title" placeholder="Vd: Full Match: 26/03/2026">
-        </div>
-        <button class="btn-primary" onclick="saveVideo()" style="width: 100%;">Lưu Video</button>
-    </div>
-
-    <!-- Match Modal -->
-    <div class="modal-admin" id="match-modal">
-        <h2 style="color:var(--primary); margin-bottom: 20px;">Thêm Kết quả</h2>
-        <div class="form-group">
-            <label>Tháng</label>
-            <input type="number" id="m-month" min="1" max="12">
-        </div>
-        <div class="form-group">
-            <label>Ngày (dd/mm/yyyy)</label>
-            <input type="text" id="m-date">
-        </div>
-        <div class="form-group">
-            <label>Tên Đội 1 (Trái)</label>
-            <input type="text" id="m-team-a" placeholder="Vd: PHN A">
-        </div>
-        <div class="form-group">
-            <label>Tỉ số Đội 1</label>
-            <input type="number" id="m-score-a">
-        </div>
-        <div class="form-group">
-            <label>Tên Đội 2 (Phải)</label>
-            <input type="text" id="m-team-b" placeholder="Vd: PHN B">
-        </div>
-        <div class="form-group">
-            <label>Tỉ số Đội 2</label>
-            <input type="number" id="m-score-b">
-        </div>
-        <div class="form-group">
-            <label>Ghi chú (Sân...)</label>
-            <input type="text" id="m-note">
-        </div>
-        <button class="btn-primary" onclick="saveMatch()" style="width: 100%;">Lưu Kết quả</button>
-    </div>
-
-    <!-- Award Modal -->
-    <div class="modal-admin" id="award-modal">
-        <h2 style="color:var(--primary); margin-bottom: 20px;">Cập nhật Giải thưởng</h2>
-        <p style="margin-bottom: 15px; font-size: 0.9rem;">Đang cập nhật cho tháng <span id="award-month-display" style="color:var(--primary); font-weight:700;"></span></p>
-        <div class="form-group">
-            <label>Cầu thủ xuất sắc nhất</label>
-            <input type="text" id="a-best-player">
-        </div>
-
-        <div class="form-group">
-            <label>Vua phá lưới tháng</label>
-            <input type="text" id="a-top-scorer">
-        </div>
-        <div class="form-group">
-            <label>Vua kiến tạo tháng</label>
-            <input type="text" id="a-top-assist">
-        </div>
-        <div class="form-group">
-            <label>Thủ môn xuất sắc</label>
-            <input type="text" id="a-best-gk">
-        </div>
-        <button class="btn-primary" onclick="saveAward()" style="width: 100%;">Lưu Giải thưởng</button>
-    </div>
 
     <div class="admin-header-btn" onclick="toggleAdmin()">
         <i data-lucide="settings"></i>
     </div>
 
-    <script>
-        // Cú pháp bảo vệ API: Khi copy hãy thay bằng Key thật của bạn
-        const SUPABASE_URL = 'https://hiykohhpxogniosdowjo.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_9BGxNUPQ2XGuOH437-4PuA_lIaAzv0_';
-
-        let _supabase = null;
-        let isAdmin = false;
-
-        if (typeof supabase !== 'undefined') {
-            _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-
-        // --- Core Functions ---
-        lucide.createIcons();
-        document.body.style.overflow = 'auto';
-
-        function toggleAdmin() {
-            if (!isAdmin) {
-                const pass = prompt("Nhập mật khẩu quản lý:");
-                if (pass === 'Giao240806') {
-                    isAdmin = true;
-                    document.body.classList.add('admin-active');
-                    alert("Chế độ Admin đã được kích hoạt!");
-                    renderAll(); 
-                } else {
-                    alert("Sai mật khẩu!");
-                }
-            } else {
-                isAdmin = false;
-                document.body.classList.remove('admin-active');
-                renderAll();
-            }
-        }
-
-        function openModal(type) {
-            document.getElementById('overlay').classList.add('active');
-            document.getElementById(type + '-modal').classList.add('active');
-            if(type === 'award') {
-                const curM = document.querySelector('.awards-tabs .month-tab.active').dataset.month;
-                document.getElementById('award-month-display').innerText = curM;
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('overlay').classList.remove('active');
-            document.querySelectorAll('.modal-admin').forEach(m => m.classList.remove('active'));
-        }
-
-        // --- FETCH & RENDER LOGIC ---
-
-        async function fetchPlayers() {
-            const { data, error } = await _supabase.from('players').select('*').order('num', { ascending: true });
-            if (error) return console.error(error);
-            const grid = document.getElementById('players-grid');
-            grid.innerHTML = data.map(p => `
-                <div class="player-card">
-                    <div class="player-num">${p.num || '?'}</div>
-                    <img src="${p.img || '1-1206.jpg'}" alt="Player" class="player-img">
-                    <div class="player-info">
-                        <h3>${p.name}</h3>
-                    </div>
-                    <div class="admin-controls-overlay admin-only-flex">
-                        <button class="del-btn" onclick="deleteItem('players', '${p.id}')">Xóa</button>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        async function fetchVideos() {
-            const { data, error } = await _supabase.from('videos').select('*').order('created_at', { ascending: false });
-            if (error) return console.error(error);
-            const grid = document.getElementById('video-grid');
-            const activeCat = document.querySelector('.cat-btn.active').dataset.category;
-            
-            grid.innerHTML = data.filter(v => v.category === activeCat).map(v => `
-                <div class="video-card reveal">
-                    <div class="video-placeholder" data-video-id="${v.video_id}" onclick="playVideo(this)">
-                        <div class="video-thumb" style="background-image: url('https://img.youtube.com/vi/${v.video_id}/hqdefault.jpg')">
-                            <div class="play-overlay">
-                                <div class="play-icon"><i data-lucide="play"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h3 class="video-title">${v.title}</h3>
-                        <div class="admin-only" style="margin-top:10px;">
-                             <button class="del-btn" onclick="deleteItem('videos', '${v.id}')">Xóa Video</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function playVideo(el) {
-            el.innerHTML = `<iframe width="100%" height="250" src="https://www.youtube.com/embed/${el.dataset.videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-        }
-
-        async function renderMatches(month) {
-            const { data, error } = await _supabase.from('match_results').select('*').eq('month', month).order('match_date', { ascending: false });
-            const list = document.getElementById('match-list');
-            if (error || !data || data.length === 0) {
-                list.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.5; padding: 40px;">Đang cập nhật dữ liệu trận đấu...</p>';
-                return;
-            }
-            list.innerHTML = data.map(m => `
-                <div class="match-card">
-                    <div class="match-header"><span>${m.match_date}</span><span class="match-status">${m.status}</span></div>
-                    <div class="match-main">
-                        <div class="team"><div class="team-logo">${m.team_a || 'PHN'}</div><div class="team-name">${m.team_a || 'PHN A'}</div></div>
-                        <div class="match-score-display"><div class="score-box">${m.score_a}</div><div class="score-divider">-</div><div class="score-box">${m.score_b}</div></div>
-                        <div class="team"><div class="team-logo" style="border-color: #fff; color: #fff;">${m.team_b || 'PHN'}</div><div class="team-name">${m.team_b || 'PHN B'}</div></div>
-                    </div>
-                    <div class="match-footer">
-                        <span>${m.note}</span>
-                        <div class="admin-only" style="margin-top:10px;">
-                             <button class="del-btn" onclick="deleteItem('match_results', '${m.id}')">Xóa Trận</button>
-                        </div>
-                    </div>
-                </div>`).join('');
-        }
-
-        async function renderAward(month) {
-            const { data, error } = await _supabase.from('awards').select('*').eq('month', month).single();
-            const container = document.getElementById('awards-content');
-            const d = data || { best_player: "...", top_scorer: "...", top_assist: "...", best_gk: "..." };
-            
-            container.innerHTML = `
-                <div class="award-display active">
-                    <div class="award-card-inner">
-                        <div class="award-item"><span class="award-icon">👤</span><p class="award-label">Cầu thủ xuất sắc nhất</p><p class="award-name">${d.best_player || 'Đang cập nhật'}</p></div>
-
-                        <div class="award-item"><span class="award-icon">🔥</span><p class="award-label">Vua phá lưới tháng</p><p class="award-name">${d.top_scorer || 'Đang cập nhật'}</p></div>
-                        <div class="award-item"><span class="award-icon">🎯</span><p class="award-label">Vua kiến tạo tháng</p><p class="award-name">${d.top_assist || 'Đang cập nhật'}</p></div>
-                        <div class="award-item"><span class="award-icon">🧤</span><p class="award-label">Thủ môn xuất sắc</p><p class="award-name">${d.best_gk || 'Đang cập nhật'}</p></div>
-                    </div>
-                </div>`;
-        }
-
-        // --- SAVE ACTIONS ---
-
-        async function savePlayer() {
-            const num = document.getElementById('p-num').value;
-            const name = document.getElementById('p-name').value;
-            const file = document.getElementById('p-img').files[0];
-            let imgUrl = '';
-
-            const saveBtn = document.querySelector('#player-modal .btn-primary');
-            const originalText = saveBtn.innerText;
-            saveBtn.innerText = 'Đang tải ảnh...';
-            saveBtn.disabled = true;
-
-            try {
-                if (file) {
-                    // Sanitize Filename: remove accents and spaces
-                    let cleanName = file.name
-                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
-                        .replace(/[đĐ]/g, "d") // Fix 'd'
-                        .replace(/\s+/g, '-') // Spaces to hyphens
-                        .replace(/[^a-zA-Z0-9.-]/g, ''); // Keep only safe chars
-                    
-                    const fileName = `${Date.now()}-${cleanName}`;
-                    const { data, error: uploadError } = await _supabase.storage.from('players').upload(fileName, file);
-                    
-                    if (uploadError) {
-                        console.error("Upload Error:", uploadError);
-                        alert("Lỗi tải ảnh lên: " + uploadError.message + "\n\nGiải quyết: Đừng lo, mình đã sửa lỗi tên file. Bạn hãy thử nhấn F5 trang web và upload lại nhé.");
-                        throw uploadError;
-                    }
-
-                    if (data) {
-                        const { data: urlData } = _supabase.storage.from('players').getPublicUrl(fileName);
-                        imgUrl = urlData.publicUrl;
-                    }
-                }
-
-                const { error: dbError } = await _supabase.from('players').insert([{ num: parseInt(num), name, img: imgUrl }]);
-                if (!dbError) { 
-                    alert("Đã thêm cầu thủ thành công!"); 
-                    closeModal(); 
-                    renderAll(); 
-                } else {
-                    alert("Lỗi khi lưu vào Database: " + dbError.message);
-                }
-            } catch (err) {
-                console.error("Critical Error:", err);
-            } finally {
-                saveBtn.innerText = originalText;
-                saveBtn.disabled = false;
-            }
-        }
-
-        function extractYoutubeId(url) {
-            const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : url;
-        }
-
-        async function saveVideo() {
-            const category = document.getElementById('v-cat').value;
-            const rawId = document.getElementById('v-id').value;
-            const video_id = extractYoutubeId(rawId);
-            const title = document.getElementById('v-title').value;
-
-            const { error } = await _supabase.from('videos').insert([{ category, video_id, title }]);
-            if (!error) { 
-                alert("Đã thêm video thành công!"); 
-                closeModal(); 
-                renderAll(); 
-            } else {
-                alert("Lỗi khi thêm video: " + error.message);
-            }
-        }
-
-        async function saveMatch() {
-            const month = document.getElementById('m-month').value;
-            const match_date = document.getElementById('m-date').value;
-            const team_a = document.getElementById('m-team-a').value;
-            const score_a = document.getElementById('m-score-a').value;
-            const team_b = document.getElementById('m-team-b').value;
-            const score_b = document.getElementById('m-score-b').value;
-            const note = document.getElementById('m-note').value;
-
-            const { error } = await _supabase.from('match_results').insert([{ 
-                month: parseInt(month), 
-                match_date, 
-                team_a,
-                score_a: parseInt(score_a), 
-                team_b,
-                score_b: parseInt(score_b), 
-                note 
-            }]);
-            if (!error) { alert("Đã thêm trận đấu!"); closeModal(); renderAll(); }
-            else alert("Lỗi khi thêm trận đấu: " + error.message);
-        }
-
-        async function saveAward() {
-            const month = document.querySelector('.awards-tabs .month-tab.active').dataset.month;
-            const payload = {
-                month: parseInt(month),
-                best_player: document.getElementById('a-best-player').value,
-
-                top_scorer: document.getElementById('a-top-scorer').value,
-                top_assist: document.getElementById('a-top-assist').value,
-                best_gk: document.getElementById('a-best-gk').value
-            };
-
-            const { error } = await _supabase.from('awards').upsert(payload, { onConflict: 'month' });
-            if (!error) { alert("Đã cập nhật giải thưởng!"); closeModal(); renderAll(); }
-            else alert("Lỗi khi cập nhật giải thưởng: " + error.message);
-        }
-
-        async function deleteItem(table, id) {
-            if (confirm("Xác nhận xóa?")) {
-                const { error } = await _supabase.from(table).delete().eq('id', id);
-                if (!error) { alert("Đã xóa!"); renderAll(); }
-                else alert("Lỗi khi xóa: " + error.message);
-            }
-        }
-
-        function renderAll() {
-            fetchPlayers();
-            fetchVideos();
-            const matchTab = document.querySelector('.match-results-tabs .month-tab.active');
-            if (matchTab) renderMatches(matchTab.dataset.matchMonth);
-            const awardTab = document.querySelector('.awards-tabs .month-tab.active');
-            if (awardTab) renderAward(awardTab.dataset.month);
-            initRanking();
-        }
-
-        // --- RANKING LOGIC (Using localStorage as requested) ---
-        // --- RANKING LOGIC (Using Supabase Database) ---
-        let rankingData = [];
-        let curMonth = 1;
-        let curAdminMonth = 1;
-        let curType = 'goals';
-
-        async function initRanking() {
-            if (!_supabase) return;
-            try {
-                const { data, error } = await _supabase.from('player_scores').select('*').order('name', { ascending: true });
-                if (!error && data) {
-                    rankingData = data.map(row => ({
-                        id: row.id,
-                        name: row.name,
-                        monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
-                        monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
-                        totalGoals: 0,
-                        totalAssists: 0
-                    }));
-                    updateTotals();
-                    renderRankingViews();
-                }
-            } catch (err) { console.error("Lỗi BXH:", err); }
-        }
-
-        function updateTotals() {
-            rankingData.forEach(p => {
-                p.totalGoals = p.monthlyGoals.reduce((a, b) => a + b, 0);
-                p.totalAssists = p.monthlyAssists.reduce((a, b) => a + b, 0);
-            });
-        }
-
-        function renderRankingViews() {
-            renderSummary();
-            renderMonthly();
-            renderAdmin();
-        }
-
-        function renderSummary() {
-            const sorted = [...rankingData].sort((a, b) => curType === 'goals' ? b.totalGoals - a.totalGoals : b.totalAssists - a.totalAssists);
-            const body = document.getElementById('summary-body');
-            if (!body) return;
-            const header = document.getElementById('summary-header');
-            if (header) header.innerText = curType === 'goals' ? 'Tổng bàn thắng' : 'Tổng kiến tạo';
-            body.innerHTML = sorted.map((p, i) => `
-                <tr>
-                    <td><span class="rank-num">${(i + 1).toString().padStart(2, '0')}</span></td>
-                    <td>${p.name}</td>
-                    <td class="total-col">${curType === 'goals' ? p.totalGoals : p.totalAssists}</td>
-                </tr>`).join('');
-        }
-
-        function renderMonthly() {
-            const sorted = [...rankingData].sort((a, b) => {
-                const valA = curType === 'goals' ? a.monthlyGoals[curMonth - 1] : a.monthlyAssists[curMonth - 1];
-                const valB = curType === 'goals' ? b.monthlyGoals[curMonth - 1] : b.monthlyAssists[curMonth - 1];
-                return valB - valA;
-            });
-            const body = document.getElementById('detail-body');
-            if (!body) return;
-            const header = document.getElementById('month-header');
-            if (header) header.innerText = `${curType === 'goals' ? 'Số bàn' : 'Kiến tạo'} T${curMonth}`;
-            body.innerHTML = sorted.map((p, i) => `
-                <tr>
-                    <td><span class="rank-num">${(i + 1).toString().padStart(2, '0')}</span></td>
-                    <td>${p.name}</td>
-                    <td class="total-col">${curType === 'goals' ? p.monthlyGoals[curMonth - 1] : p.monthlyAssists[curMonth - 1]}</td>
-                </tr>`).join('');
-        }
-
-        function renderAdmin() {
-            const body = document.getElementById('admin-body');
-            if (!body) return;
-            body.innerHTML = rankingData.map((p, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${p.name}</td>
-                    <td><input type="number" class="score-input g-input" data-index="${i}" value="${p.monthlyGoals[curAdminMonth - 1]}"></td>
-                    <td><input type="number" class="score-input a-input" data-index="${i}" value="${p.monthlyAssists[curAdminMonth - 1]}"></td>
-                    <td><button onclick="removeRankPlayer('${p.id}')" style="background:none; border:none; color:red; cursor:pointer; font-size:0.8rem;">Xóa</button></td>
-                </tr>`).join('');
-            
-            // Add Row
-            if (!document.getElementById('add-rank-row')) {
-                const foot = document.createElement('tr');
-                foot.id = 'add-rank-row';
-                foot.innerHTML = `
-                    <td colspan="2"><input type="text" id="new-rank-name" placeholder="Tên cầu thủ mới..." style="width:100%; height:30px; border:1px solid #ccc; border-radius:4px; padding:0 10px;"></td>
-                    <td colspan="3"><button onclick="addRankPlayer()" style="width:100%; height:30px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer;">+ Thêm vào BXH</button></td>
-                `;
-                body.parentElement.appendChild(foot);
-            }
-        }
-
-        window.addRankPlayer = async () => {
-            const name = document.getElementById('new-rank-name').value.trim();
-            if (!name) return;
-            const { error } = await _supabase.from('player_scores').insert([{ name }]);
-            if (!error) { initRanking(); }
-            else alert("Lỗi: " + error.message);
-        };
-
-        window.removeRankPlayer = async (id) => {
-            if (confirm("Xác nhận xóa cầu thủ này khỏi BXH?")) {
-                const { error } = await _supabase.from('player_scores').delete().eq('id', id);
-                if (!error) initRanking();
-            }
-        };
-
-        window.saveScores = async () => {
-            const saveBtn = document.querySelector('.save-btn');
-            saveBtn.innerText = 'Đang lưu...';
-            
-            const promises = rankingData.map((p, idx) => {
-                const row = { name: p.name };
-                const gVal = document.querySelectorAll('.g-input')[idx].value;
-                const aVal = document.querySelectorAll('.a-input')[idx].value;
-                row[`m${curAdminMonth}`] = parseInt(gVal) || 0;
-                row[`a${curAdminMonth}`] = parseInt(aVal) || 0;
-                return _supabase.from('player_scores').update(row).eq('id', p.id);
-            });
-
-            await Promise.all(promises);
-            saveBtn.innerText = 'Lưu & Cập nhật BXH';
-            initRanking();
-            alert("Đã cập nhật Bảng xếp hạng lên Database!");
-        };
-
-        window.resetData = async () => {
-            if (confirm("CẢNH BÁO: Xóa sạch điểm số của mọi người trên Database?")) {
-                const payload = {};
-                for(let i=1; i<=12; i++) { payload[`m${i}`] = 0; payload[`a${i}`] = 0; }
-                const { error } = await _supabase.from('player_scores').update(payload).neq('name', '');
-                if (!error) initRanking();
-            }
-        };
-
-        // --- Listeners ---
-        document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click', () => {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            fetchVideos();
-        }));
-
-        document.querySelectorAll('.match-results-tabs .month-tab').forEach(tab => tab.addEventListener('click', () => {
-             document.querySelectorAll('.match-results-tabs .month-tab').forEach(t => t.classList.remove('active'));
-             tab.classList.add('active');
-             renderMatches(tab.dataset.matchMonth);
-        }));
-
-        document.querySelectorAll('.awards-tabs .month-tab').forEach(tab => tab.addEventListener('click', () => {
-            document.querySelectorAll('.awards-tabs .month-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            renderAward(tab.dataset.month);
-        }));
-
-        document.querySelectorAll('.rank-tab-btn').forEach(btn => btn.addEventListener('click', () => {
-            const target = btn.dataset.target;
-            if (target === 'admin' && prompt("Nhập mật khẩu quản lý:") !== 'Giao240806') return;
-            document.querySelectorAll('.rank-tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.ranking-view').forEach(v => v.classList.remove('active'));
-            const view = document.getElementById('rank-' + target);
-            if (view) view.classList.add('active');
-        }));
-
-        document.querySelectorAll('#rank-detail .month-btn').forEach(btn => btn.addEventListener('click', () => {
-             document.querySelectorAll('#rank-detail .month-btn').forEach(b => b.classList.remove('active'));
-             btn.classList.add('active');
-             curMonth = parseInt(btn.dataset.month);
-             renderMonthly();
-        }));
-
-        document.querySelectorAll('.admin-m-btn').forEach(btn => btn.addEventListener('click', () => {
-             document.querySelectorAll('.admin-m-btn').forEach(b => b.classList.remove('active'));
-             btn.classList.add('active');
-             curAdminMonth = parseInt(btn.dataset.month);
-             renderAdmin();
-        }));
-
-        document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.addEventListener('click', () => {
-            document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            curType = btn.dataset.type;
-            renderRankingViews();
-        }));
-
-        renderAll();
-    </script>
+    <script src="app.js"></script>
 </body>
-
 </html>

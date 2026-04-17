@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách cầu thủ | PHN FC</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .player-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: var(--transition);
+        }
+        .player-card:hover { transform: translateY(-5px); }
+        .player-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .player-info {
+            padding: 20px;
+            text-align: center;
+        }
+        .player-num {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+        .admin-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+        }
+        .admin-active .admin-actions { display: block; }
+        .del-btn {
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .modal-admin {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            z-index: 2000;
+            display: none;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-admin.active { display: block; }
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1500;
+            display: none;
+        }
+        .overlay.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo-wrapper">
+                <img src="Logph.png" alt="CLB Logo" class="logo-img">
+                <span class="site-name">PHN</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="players.html" class="nav-link active">Cầu thủ</a></li>
+                <li><a href="videos.html" class="nav-link">Video</a></li>
+                <li><a href="results.html" class="nav-link">Kết quả</a></li>
+                <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
+                <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section id="players">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <h2 class="section-title" style="margin-bottom: 0;">Danh sách cầu thủ</h2>
+            <button class="btn-primary admin-only" onclick="openModal('player')"><i data-lucide="plus"></i> Thêm cầu thủ</button>
+        </div>
+        <div class="players-grid" id="players-grid">
+            <!-- Dynamic Content -->
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    <div class="modal-admin" id="player-modal">
+        <h2>Thêm Cầu thủ</h2>
+        <div class="form-group">
+            <label>Số áo</label>
+            <input type="number" id="p-num">
+        </div>
+        <div class="form-group">
+            <label>Tên cầu thủ</label>
+            <input type="text" id="p-name">
+        </div>
+        <div class="form-group">
+            <label>Ảnh (URL hoặc chọn file)</label>
+            <input type="file" id="p-img">
+        </div>
+        <button class="btn-primary" onclick="savePlayer()" style="width: 100%;">Lưu</button>
+    </div>
+
+    <div class="admin-header-btn" onclick="toggleAdmin()">
+        <i data-lucide="settings"></i>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        async function fetchPlayers() {
+            const { data, error } = await _supabase.from('players').select('*').order('num', { ascending: true });
+            if (error) return console.error(error);
+            const grid = document.getElementById('players-grid');
+            grid.innerHTML = data.map(p => `
+                <div class="player-card">
+                    <div class="player-num">${p.num || '?'}</div>
+                    <img src="${p.img || '1-1206.jpg'}" alt="Player" class="player-img">
+                    <div class="player-info">
+                        <h3>${p.name}</h3>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="del-btn" onclick="deleteItem('players', '${p.id}')">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        async function savePlayer() {
+            const num = document.getElementById('p-num').value;
+            const name = document.getElementById('p-name').value;
+            const file = document.getElementById('p-img').files[0];
+            let imgUrl = '';
+
+            if (file) {
+                let cleanName = file.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
+                const fileName = `${Date.now()}-${cleanName}`;
+                const { data, error: uploadError } = await _supabase.storage.from('players').upload(fileName, file);
+                if (data) {
+                    const { data: urlData } = _supabase.storage.from('players').getPublicUrl(fileName);
+                    imgUrl = urlData.publicUrl;
+                }
+            }
+
+            const { error } = await _supabase.from('players').insert([{ num: parseInt(num), name, img: imgUrl }]);
+            if (!error) { closeModal(); fetchPlayers(); }
+            else alert(error.message);
+        }
+
+        function renderAll() { fetchPlayers(); }
+        window.onload = fetchPlayers;
+    </script>
+</body>
+</html>
