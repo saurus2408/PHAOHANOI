@@ -30,7 +30,29 @@
             transition: var(--transition);
         }
         .save-btn:hover { background: #218838; transform: scale(1.05); }
+        .reset-btn {
+            background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 4px;
+            font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: var(--transition);
+        }
+        .reset-btn:hover { background: #c82333; transform: scale(1.05); }
         .score-input { width: 60px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; text-align: center; font-weight: 700; color: var(--primary); }
+        .name-input { width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px; font-weight: 600; }
+        
+        .modal-admin {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 40px; border-radius: 12px; z-index: 2000;
+            display: none; width: 90%; max-width: 500px;
+        }
+        .modal-admin.active { display: block; }
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1500; display: none;
+        }
+        .overlay.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -63,9 +85,17 @@
                 <button class="rank-tab-btn active" data-target="summary">Xếp hạng tổng</button>
                 <button class="rank-tab-btn" data-target="detail">Xếp hạng tháng</button>
             </div>
-            <button class="save-btn admin-only" id="save-all-btn" onclick="saveAllRanking()" style="display: none;">
-                <i data-lucide="check"></i> LƯU TẤT CẢ
-            </button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary admin-only" onclick="openModal('rank-add')" style="display: none; padding: 10px 15px;">
+                    <i data-lucide="plus"></i> THÊM CẦU THỦ
+                </button>
+                <button class="reset-btn admin-only" id="reset-month-btn" onclick="resetMonth()" style="display: none;">
+                    <i data-lucide="refresh-cw"></i> RESET THÁNG
+                </button>
+                <button class="save-btn admin-only" id="save-all-btn" onclick="saveAllRanking()" style="display: none;">
+                    <i data-lucide="check"></i> LƯU TẤT CẢ
+                </button>
+            </div>
         </div>
 
         <div id="rank-content">
@@ -100,6 +130,17 @@
 
     <div class="admin-header-btn" onclick="toggleAdmin()">
         <i data-lucide="settings"></i>
+    </div>
+
+    <!-- Modals -->
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    <div class="modal-admin" id="rank-add-modal">
+        <h2>Thêm cầu thủ vào BXH</h2>
+        <div class="form-group">
+            <label>Họ và tên</label>
+            <input type="text" id="r-name" placeholder="Vd: Nguyễn Văn A">
+        </div>
+        <button class="btn-primary" onclick="addPlayerToRanking()" style="width: 100%;">Thêm ngay</button>
     </div>
 
     <script src="js/app.js"></script>
@@ -152,48 +193,89 @@
                     ? (currentType === 'goals' ? p.totalGoals : p.totalAssists) 
                     : (currentType === 'goals' ? p.monthlyGoals[currentMonth - 1] : p.monthlyAssists[currentMonth - 1]);
                 
-                let displayVal = score;
+                let scoreVal = score;
+                let nameVal = p.name;
+                
                 if (isAdmin && currentView === 'detail') {
-                    displayVal = `<input type="number" class="score-input" value="${score}" data-pid="${p.id}">`;
+                    scoreVal = `<input type="number" class="score-input" value="${score}" data-pid="${p.id}">`;
+                    nameVal = `<input type="text" class="name-input" value="${p.name}" data-pid="${p.id}">`;
                 }
 
                 return `
                 <tr>
                     <td><div class="rank-num">${i + 1}</div></td>
-                    <td>${p.name}</td>
-                    <td class="total-col">${displayVal}</td>
+                    <td>${nameVal}</td>
+                    <td class="total-col" style="display:flex; align-items:center; justify-content:flex-end; gap:15px;">
+                        ${scoreVal}
+                        ${isAdmin && currentView === 'detail' ? `<button class="del-btn" onclick="deleteItem('player_scores', '${p.id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>` : ''}
+                    </td>
                 </tr>`;
             }).join('');
             
-            // Show/Hide Save button based on view
+            // Show/Hide buttons based on view
             const saveBtn = document.getElementById('save-all-btn');
-            if (saveBtn) {
-                saveBtn.style.display = (isAdmin && currentView === 'detail') ? 'flex' : 'none';
-            }
+            const resetBtn = document.getElementById('reset-month-btn');
+            if (saveBtn) saveBtn.style.display = (isAdmin && currentView === 'detail') ? 'flex' : 'none';
+            if (resetBtn) resetBtn.style.display = (isAdmin && currentView === 'detail') ? 'flex' : 'none';
 
             lucide.createIcons();
         }
 
+        async function addPlayerToRanking() {
+            const name = document.getElementById('r-name').value;
+            if (!name) return alert("Vui lòng nhập tên!");
+            const { error } = await _supabase.from('player_scores').insert([{ name }]);
+            if (!error) { closeModal(); initRanking(); }
+            else alert(error.message);
+        }
+
+        async function resetMonth() {
+            if (!isAdmin) return;
+            if (confirm(`Xác nhận RESET toàn bộ bàn thắng & kiến tạo của THÁNG ${currentMonth} về 0?`)) {
+                const colM = 'm' + currentMonth;
+                const colA = 'a' + currentMonth;
+                const { error } = await _supabase.from('player_scores').update({ [colM]: 0, [colA]: 0 }).neq('id', '00000000-0000-0000-0000-000000000000'); // update all
+                if (!error) {
+                    alert("Đã reset!");
+                    initRanking();
+                } else {
+                    alert(error.message);
+                }
+            }
+        }
+
         async function saveAllRanking() {
             if (!isAdmin) return;
-            const inputs = document.querySelectorAll('.score-input');
+            const scoreInputs = document.querySelectorAll('.score-input');
+            const nameInputs = document.querySelectorAll('.name-input');
             const updates = [];
             
-            for (const input of inputs) {
+            // Map inputs by ID for batch processing (conceptually)
+            const playerUpdates = {};
+
+            scoreInputs.forEach(input => {
                 const pid = input.dataset.pid;
-                const newVal = parseInt(input.value) || 0;
+                if (!playerUpdates[pid]) playerUpdates[pid] = {};
                 const colPrefix = currentType === 'goals' ? 'm' : 'a';
-                const colName = colPrefix + currentMonth;
-                
-                updates.push(_supabase.from('player_scores').update({ [colName]: newVal }).eq('id', pid));
+                playerUpdates[pid][colPrefix + currentMonth] = parseInt(input.value) || 0;
+            });
+
+            nameInputs.forEach(input => {
+                const pid = input.dataset.pid;
+                if (!playerUpdates[pid]) playerUpdates[pid] = {};
+                playerUpdates[pid].name = input.value;
+            });
+
+            for (const pid in playerUpdates) {
+                updates.push(_supabase.from('player_scores').update(playerUpdates[pid]).eq('id', pid));
             }
 
             try {
                 await Promise.all(updates);
-                alert("Đã lưu toàn bộ điểm số!");
+                alert("Đã cập nhật dữ liệu!");
                 initRanking();
             } catch (err) {
-                alert("Lỗi khi lưu: " + err.message);
+                alert("Lỗi: " + err.message);
             }
         }
 
