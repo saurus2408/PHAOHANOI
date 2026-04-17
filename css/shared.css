@@ -300,6 +300,13 @@ section {
     transition: var(--transition);
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin-left: 10px;
+    overflow: hidden;
+}
+
+.header-admin-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .header-admin-link:hover {
@@ -309,9 +316,8 @@ section {
 }
 
 .admin-active .header-admin-link {
-    background: var(--primary);
-    color: white;
-    box-shadow: 0 0 15px rgba(239, 1, 7, 0.4);
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(239, 1, 7, 0.6);
 }
 
 /* Mobile */

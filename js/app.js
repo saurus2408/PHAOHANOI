@@ -36,12 +36,8 @@ function toggleAdmin() {
 function updateAdminUI() {
     const adminLink = document.getElementById('header-admin-btn');
     if (adminLink) {
-        if (isAdmin) {
-            adminLink.innerHTML = '<i data-lucide="user"></i>';
-        } else {
-            adminLink.innerHTML = '<i data-lucide="lock"></i>';
-        }
-        lucide.createIcons();
+        // Use custom image instead of icons
+        adminLink.innerHTML = '<img src="assets/images/icondn.jpg" alt="Admin">';
     }
 }
 
