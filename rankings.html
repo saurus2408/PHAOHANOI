@@ -136,7 +136,7 @@
     <!-- Modals -->
     <div class="overlay" id="overlay" onclick="closeModal()"></div>
     <div class="modal-admin" id="rank-add-modal">
-        <h2>Thêm cầu thủ vào BXH</h2>
+        <h2 id="modal-title">Thêm cầu thủ vào BXH</h2>
         <div class="form-group">
             <label>Họ và tên</label>
             <input type="text" id="r-name" placeholder="Vd: Nguyễn Văn A">
@@ -146,41 +146,60 @@
 
     <script src="js/app.js"></script>
     <script>
-        let rankingData = [];
+        let rankingData = []; // Players
+        let gkData = [];      // Goalkeepers
         let currentView = 'summary'; // summary, detail, admin
-        let currentType = 'goals'; // goals, assists
+        let currentType = 'goals'; // goals, assists, gk
         let currentMonth = 1;
 
         async function initRanking() {
-            const { data, error } = await _supabase.from('player_scores').select('*').order('name', { ascending: true });
-            if (!error && data) {
-                rankingData = data.map(row => ({
+            // Fetch Players
+            const { data: pData, error: pErr } = await _supabase.from('player_scores').select('*').order('name', { ascending: true });
+            if (!pErr && pData) {
+                rankingData = pData.map(row => ({
                     id: row.id, name: row.name,
                     monthlyGoals: [row.m1, row.m2, row.m3, row.m4, row.m5, row.m6, row.m7, row.m8, row.m9, row.m10, row.m11, row.m12].map(v => v || 0),
                     monthlyAssists: [row.a1, row.a2, row.a3, row.a4, row.a5, row.a6, row.a7, row.a8, row.a9, row.a10, row.a11, row.a12].map(v => v || 0),
+                    totalGoals: 0, totalAssists: 0
+                }));
+            }
+
+            // Fetch Goalkeepers
+            const { data: gData, error: gErr } = await _supabase.from('gk_scores').select('*').order('name', { ascending: true });
+            if (!gErr && gData) {
+                gkData = gData.map(row => ({
+                    id: row.id, name: row.name,
                     monthlyGames: [row.g1, row.g2, row.g3, row.g4, row.g5, row.g6, row.g7, row.g8, row.g9, row.g10, row.g11, row.g12].map(v => v || 0),
                     monthlyConceded: [row.c1, row.c2, row.c3, row.c4, row.c5, row.c6, row.c7, row.c8, row.c9, row.c10, row.c11, row.c12].map(v => v || 0),
-                    totalGoals: 0, totalAssists: 0, totalGames: 0, totalConceded: 0
+                    totalGames: 0, totalConceded: 0
                 }));
-                updateTotals();
-                renderRanking();
             }
+
+            updateTotals();
+            renderRanking();
         }
 
         function updateTotals() {
             rankingData.forEach(p => {
                 p.totalGoals = p.monthlyGoals.reduce((a, b) => a + b, 0);
                 p.totalAssists = p.monthlyAssists.reduce((a, b) => a + b, 0);
-                p.totalGames = p.monthlyGames.reduce((a, b) => a + b, 0);
-                p.totalConceded = p.monthlyConceded.reduce((a, b) => a + b, 0);
+            });
+            gkData.forEach(g => {
+                g.totalGames = g.monthlyGames.reduce((a, b) => a + b, 0);
+                g.totalConceded = g.monthlyConceded.reduce((a, b) => a + b, 0);
             });
         }
 
         function renderRanking() {
             const body = document.getElementById('rank-body');
             const headRow = document.getElementById('table-head-row');
+            const modalTitle = document.getElementById('modal-title');
             
-            let sorted = [...rankingData];
+            let sorted = currentType === 'gk' ? [...gkData] : [...rankingData];
+            
+            if (modalTitle) {
+                modalTitle.innerText = currentType === 'gk' ? 'Thêm thủ môn' : 'Thêm cầu thủ';
+            }
             
             // Build Head
             if (currentType === 'gk') {
@@ -253,7 +272,7 @@
                     <td><div class="rank-num">${i + 1}</div></td>
                     <td>${nameVal}</td>
                     ${statHTML}
-                    ${isAdmin && currentView === 'detail' ? `<td><button class="del-btn" onclick="deleteItem('player_scores', '${p.id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></td>` : ''}
+                    ${isAdmin && currentView === 'detail' ? `<td><button class="del-btn" onclick="deleteItem('${currentType === 'gk' ? 'gk_scores' : 'player_scores'}', '${p.id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></td>` : ''}
                 </tr>`;
             }).join('');
             
@@ -269,21 +288,27 @@
         async function addPlayerToRanking() {
             const name = document.getElementById('r-name').value;
             if (!name) return alert("Vui lòng nhập tên!");
-            const { error } = await _supabase.from('player_scores').insert([{ name }]);
+            const table = currentType === 'gk' ? 'gk_scores' : 'player_scores';
+            const { error } = await _supabase.from(table).insert([{ name }]);
             if (!error) { closeModal(); initRanking(); }
             else alert(error.message);
         }
 
         async function resetMonth() {
             if (!isAdmin) return;
-            if (confirm(`Xác nhận RESET toàn bộ bàn thắng, kiến tạo, số trận, bàn thua của THÁNG ${currentMonth} về 0?`)) {
-                const updates = {
-                    ['m' + currentMonth]: 0,
-                    ['a' + currentMonth]: 0,
+            const table = currentType === 'gk' ? 'gk_scores' : 'player_scores';
+            const msg = currentType === 'gk' ? `Xác nhận RESET toàn bộ số trận và bàn thua THÁNG ${currentMonth}?` : `Xác nhận RESET toàn bộ bàn thắng & kiến tạo THÁNG ${currentMonth}?`;
+
+            if (confirm(msg)) {
+                const updates = currentType === 'gk' ? {
                     ['g' + currentMonth]: 0,
                     ['c' + currentMonth]: 0
+                } : {
+                    ['m' + currentMonth]: 0,
+                    ['a' + currentMonth]: 0
                 };
-                const { error } = await _supabase.from('player_scores').update(updates).neq('id', '00000000-0000-0000-0000-000000000000');
+                
+                const { error } = await _supabase.from(table).update(updates).neq('id', '00000000-0000-0000-0000-000000000000');
                 if (!error) {
                     alert("Đã reset!");
                     initRanking();
@@ -298,6 +323,7 @@
             
             const playerUpdates = {};
             const pidSet = new Set();
+            const table = currentType === 'gk' ? 'gk_scores' : 'player_scores';
 
             document.querySelectorAll('[data-pid]').forEach(el => pidSet.add(el.dataset.pid));
 
@@ -319,7 +345,7 @@
             });
 
             const updates = Object.keys(playerUpdates).map(pid => 
-                _supabase.from('player_scores').update(playerUpdates[pid]).eq('id', pid)
+                _supabase.from(table).update(playerUpdates[pid]).eq('id', pid)
             );
 
             try {
