@@ -1,0 +1,13 @@
+{
+  "name": "phn-fc-web",
+  "version": "1.0.0",
+  "description": "PHN FC Website",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y serve .",
+    "start": "npx -y serve ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -330,7 +330,33 @@ section {
 .mobile-toggle { display: none; }
 
 @media (max-width: 768px) {
-    .nav-links { display: none; }
-    .mobile-toggle { display: block; cursor: pointer; color: var(--secondary); }
+    .nav-links { 
+        display: none; 
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(15, 15, 15, 0.95);
+        padding: 20px;
+        gap: 15px;
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+    }
+    
+    .nav-links.active {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .mobile-toggle { 
+        display: block; 
+        cursor: pointer; 
+        color: var(--secondary); 
+        font-size: 1.5rem;
+        padding: 5px;
+    }
+    
     .hero-content h1 { font-size: 3.5rem; }
 }

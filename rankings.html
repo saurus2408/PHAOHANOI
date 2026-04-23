@@ -77,6 +77,9 @@
                     <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
                 </div>
             </ul>
+            <div class="mobile-toggle" id="mobile-toggle">
+                <i data-lucide="menu"></i>
+            </div>
         </div>
     </header>
 
@@ -208,6 +211,7 @@
                     <th>Thủ môn</th>
                     <th style="text-align:right;">Số trận</th>
                     <th style="text-align:right;">Bàn thua</th>
+                    <th style="text-align:right;">Hiệu suất</th>
                 `;
             } else {
                 const headText = currentView === 'summary' 
@@ -224,14 +228,21 @@
                 sorted.sort((a, b) => {
                     if (currentType === 'goals') return b.totalGoals - a.totalGoals;
                     if (currentType === 'assists') return b.totalAssists - a.totalAssists;
-                    return a.totalConceded - b.totalConceded; // Fewer goals is better for GK
+                    
+                    // Formula: Conceded / Games (GAA). Lower is better.
+                    const ratioA = a.totalGames > 0 ? a.totalConceded / a.totalGames : 999;
+                    const ratioB = b.totalGames > 0 ? b.totalConceded / b.totalGames : 999;
+                    return ratioA - ratioB;
                 });
             } else {
                 sorted.sort((a, b) => {
                     const idx = currentMonth - 1;
                     if (currentType === 'goals') return b.monthlyGoals[idx] - a.monthlyGoals[idx];
                     if (currentType === 'assists') return b.monthlyAssists[idx] - a.monthlyAssists[idx];
-                    return a.monthlyConceded[idx] - b.monthlyConceded[idx];
+                    
+                    const ratA = a.monthlyGames[idx] > 0 ? a.monthlyConceded[idx] / a.monthlyGames[idx] : 999;
+                    const ratB = b.monthlyGames[idx] > 0 ? b.monthlyConceded[idx] / b.monthlyGames[idx] : 999;
+                    return ratA - ratB;
                 });
             }
 
@@ -255,9 +266,11 @@
                     if (currentType === 'gk') {
                         const games = currentView === 'summary' ? p.totalGames : p.monthlyGames[currentMonth-1];
                         const conceded = currentView === 'summary' ? p.totalConceded : p.monthlyConceded[currentMonth-1];
+                        const ratio = games > 0 ? (conceded / games).toFixed(2) : '-';
                         statHTML = `
                             <td style="text-align:right;">${games}</td>
-                            <td style="text-align:right; color:var(--primary); font-weight:800;">${conceded}</td>
+                            <td style="text-align:right;">${conceded}</td>
+                            <td style="text-align:right; color:var(--primary); font-weight:800;">${ratio}</td>
                         `;
                     } else {
                         const score = currentView === 'summary' 
