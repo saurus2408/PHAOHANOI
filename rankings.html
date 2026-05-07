@@ -110,13 +110,13 @@
                 <button class="sub-tab-btn active" data-type="goals">Bàn thắng</button>
                 <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
                 <button class="sub-tab-btn" data-type="gk">Thủ môn</button>
+                <button class="sub-tab-btn" data-type="teams">Đội bóng</button>
             </div>
 
             <div id="monthly-ctrl" style="display:none;">
                 <div class="month-selector">
                     <!-- Months 1-12 -->
                      <button class="month-btn active" data-month="1">T1</button>
-                     <!-- ... dynamically generated or just listed ... -->
                 </div>
             </div>
 
@@ -152,8 +152,9 @@
         let rankingData = []; // Players
         let gkData = [];      // Goalkeepers
         let currentView = 'summary'; // summary, detail, admin
-        let currentType = 'goals'; // goals, assists, gk
+        let currentType = 'goals'; // goals, assists, gk, teams
         let currentMonth = 1;
+        let teamData = []; // Calculated from matches
 
         async function initRanking() {
             // Fetch Players
@@ -179,7 +180,58 @@
             }
 
             updateTotals();
+            await fetchTeamRankings();
             renderRanking();
+        }
+
+        async function fetchTeamRankings() {
+            let query = _supabase.from('match_results').select('*');
+            if (currentView === 'detail') {
+                query = query.eq('month', currentMonth);
+            }
+            
+            const { data, error } = await query;
+            if (error || !data) return;
+
+            const stats = {};
+            data.forEach(m => {
+                const teams = [m.team_a, m.team_b];
+                teams.forEach(t => {
+                    if (!stats[t]) {
+                        stats[t] = { name: t, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
+                    }
+                });
+
+                const sA = parseInt(m.score_a) || 0;
+                const sB = parseInt(m.score_b) || 0;
+
+                stats[m.team_a].p += 1;
+                stats[m.team_b].p += 1;
+                stats[m.team_a].gf += sA;
+                stats[m.team_a].ga += sB;
+                stats[m.team_b].gf += sB;
+                stats[m.team_b].ga += sA;
+
+                if (sA > sB) {
+                    stats[m.team_a].w += 1;
+                    stats[m.team_a].pts += 3;
+                    stats[m.team_b].l += 1;
+                } else if (sA < sB) {
+                    stats[m.team_b].w += 1;
+                    stats[m.team_b].pts += 3;
+                    stats[m.team_a].l += 1;
+                } else {
+                    stats[m.team_a].d += 1;
+                    stats[m.team_a].pts += 1;
+                    stats[m.team_b].d += 1;
+                    stats[m.team_b].pts += 1;
+                }
+            });
+
+            teamData = Object.values(stats).map(s => ({
+                ...s,
+                gd: s.gf - s.ga
+            }));
         }
 
         function updateTotals() {
@@ -213,6 +265,19 @@
                     <th style="text-align:right;">Bàn thua</th>
                     <th style="text-align:right;">Hiệu suất</th>
                 `;
+            } else if (currentType === 'teams') {
+                headRow.innerHTML = `
+                    <th style="width: 50px">#</th>
+                    <th>Đội bóng</th>
+                    <th style="text-align:right;">Trận</th>
+                    <th style="text-align:right;">T</th>
+                    <th style="text-align:right;">H</th>
+                    <th style="text-align:right;">B</th>
+                    <th style="text-align:right;">BT</th>
+                    <th style="text-align:right;">BB</th>
+                    <th style="text-align:right;">HS</th>
+                    <th style="text-align:right;">Điểm</th>
+                `;
             } else {
                 const headText = currentView === 'summary' 
                     ? (currentType === 'goals' ? 'Tổng bàn thắng' : 'Tổng kiến tạo')
@@ -224,12 +289,16 @@
                 `;
             }
 
-            if (currentView === 'summary') {
+            if (currentType === 'teams') {
+                sorted = [...teamData].sort((a, b) => {
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    if (b.gd !== a.gd) return b.gd - a.gd;
+                    return b.gf - a.gf;
+                });
+            } else if (currentView === 'summary') {
                 sorted.sort((a, b) => {
                     if (currentType === 'goals') return b.totalGoals - a.totalGoals;
                     if (currentType === 'assists') return b.totalAssists - a.totalAssists;
-                    
-                    // Formula: Conceded / Games (GAA). Lower is better.
                     const ratioA = a.totalGames > 0 ? a.totalConceded / a.totalGames : 999;
                     const ratioB = b.totalGames > 0 ? b.totalConceded / b.totalGames : 999;
                     return ratioA - ratioB;
@@ -239,7 +308,6 @@
                     const idx = currentMonth - 1;
                     if (currentType === 'goals') return b.monthlyGoals[idx] - a.monthlyGoals[idx];
                     if (currentType === 'assists') return b.monthlyAssists[idx] - a.monthlyAssists[idx];
-                    
                     const ratA = a.monthlyGames[idx] > 0 ? a.monthlyConceded[idx] / a.monthlyGames[idx] : 999;
                     const ratB = b.monthlyGames[idx] > 0 ? b.monthlyConceded[idx] / b.monthlyGames[idx] : 999;
                     return ratA - ratB;
@@ -250,9 +318,19 @@
                 let nameVal = p.name;
                 let statHTML = '';
 
-                if (isAdmin && currentView === 'detail') {
+                if (currentType === 'teams') {
+                    statHTML = `
+                        <td style="text-align:right;">${p.p}</td>
+                        <td style="text-align:right;">${p.w}</td>
+                        <td style="text-align:right;">${p.d}</td>
+                        <td style="text-align:right;">${p.l}</td>
+                        <td style="text-align:right;">${p.gf}</td>
+                        <td style="text-align:right;">${p.ga}</td>
+                        <td style="text-align:right;">${p.gd > 0 ? '+' + p.gd : p.gd}</td>
+                        <td class="total-col" style="text-align:right;">${p.pts}</td>
+                    `;
+                } else if (isAdmin && currentView === 'detail') {
                     nameVal = `<input type="text" class="name-input" value="${p.name}" data-pid="${p.id}">`;
-                    
                     if (currentType === 'gk') {
                         statHTML = `
                             <td style="text-align:right;"><input type="number" class="score-input gk-game" value="${p.monthlyGames[currentMonth-1]}" data-pid="${p.id}"></td>
@@ -285,16 +363,14 @@
                     <td><div class="rank-num">${i + 1}</div></td>
                     <td>${nameVal}</td>
                     ${statHTML}
-                    ${isAdmin && currentView === 'detail' ? `<td><button class="del-btn" onclick="deleteItem('${currentType === 'gk' ? 'gk_scores' : 'player_scores'}', '${p.id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></td>` : ''}
+                    ${isAdmin && currentView === 'detail' && currentType !== 'teams' ? `<td><button class="del-btn" onclick="deleteItem('${currentType === 'gk' ? 'gk_scores' : 'player_scores'}', '${p.id}')" style="background:#ff4757; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></td>` : ''}
                 </tr>`;
             }).join('');
             
-            // Show/Hide buttons based on view
             const saveBtn = document.getElementById('save-all-btn');
             const resetBtn = document.getElementById('reset-month-btn');
             if (saveBtn) saveBtn.style.display = (isAdmin && currentView === 'detail') ? 'flex' : 'none';
             if (resetBtn) resetBtn.style.display = (isAdmin && currentView === 'detail') ? 'flex' : 'none';
-
             lucide.createIcons();
         }
 
@@ -311,40 +387,23 @@
             if (!isAdmin) return;
             const table = currentType === 'gk' ? 'gk_scores' : 'player_scores';
             const msg = currentType === 'gk' ? `Xác nhận RESET toàn bộ số trận và bàn thua THÁNG ${currentMonth}?` : `Xác nhận RESET toàn bộ bàn thắng & kiến tạo THÁNG ${currentMonth}?`;
-
             if (confirm(msg)) {
-                const updates = currentType === 'gk' ? {
-                    ['g' + currentMonth]: 0,
-                    ['c' + currentMonth]: 0
-                } : {
-                    ['m' + currentMonth]: 0,
-                    ['a' + currentMonth]: 0
-                };
-                
+                const updates = currentType === 'gk' ? { ['g' + currentMonth]: 0, ['c' + currentMonth]: 0 } : { ['m' + currentMonth]: 0, ['a' + currentMonth]: 0 };
                 const { error } = await _supabase.from(table).update(updates).neq('id', '00000000-0000-0000-0000-000000000000');
-                if (!error) {
-                    alert("Đã reset!");
-                    initRanking();
-                } else {
-                    alert(error.message);
-                }
+                if (!error) { alert("Đã reset!"); initRanking(); } else { alert(error.message); }
             }
         }
 
         async function saveAllRanking() {
             if (!isAdmin) return;
-            
             const playerUpdates = {};
             const pidSet = new Set();
             const table = currentType === 'gk' ? 'gk_scores' : 'player_scores';
-
             document.querySelectorAll('[data-pid]').forEach(el => pidSet.add(el.dataset.pid));
-
             pidSet.forEach(pid => {
                 playerUpdates[pid] = {};
                 const nameInp = document.querySelector(`.name-input[data-pid="${pid}"]`);
                 if (nameInp) playerUpdates[pid].name = nameInp.value;
-
                 if (currentType === 'gk') {
                     const gInp = document.querySelector(`.gk-game[data-pid="${pid}"]`);
                     const cInp = document.querySelector(`.gk-conceded[data-pid="${pid}"]`);
@@ -356,45 +415,61 @@
                     if (sInp) playerUpdates[pid][colPrefix + currentMonth] = parseInt(sInp.value) || 0;
                 }
             });
-
-            const updates = Object.keys(playerUpdates).map(pid => 
-                _supabase.from(table).update(playerUpdates[pid]).eq('id', pid)
-            );
-
-            try {
-                await Promise.all(updates);
-                alert("Đã cập nhật dữ liệu!");
-                initRanking();
-            } catch (err) {
-                alert("Lỗi: " + err.message);
-            }
+            const updates = Object.keys(playerUpdates).map(pid => _supabase.from(table).update(playerUpdates[pid]).eq('id', pid));
+            try { await Promise.all(updates); alert("Đã cập nhật dữ liệu!"); initRanking(); } catch (err) { alert("Lỗi: " + err.message); }
         }
 
-        document.querySelectorAll('.rank-tab-btn').forEach(btn => btn.addEventListener('click', () => {
+        document.querySelectorAll('.rank-tab-btn').forEach(btn => btn.addEventListener('click', async () => {
+             if (currentType === 'teams' && btn.dataset.target === 'summary') {
+                 alert("Bảng xếp hạng đội bóng chỉ hỗ trợ xem theo tháng.");
+                 return;
+             }
              document.querySelectorAll('.rank-tab-btn').forEach(b => b.classList.remove('active'));
              btn.classList.add('active');
              currentView = btn.dataset.target;
              document.getElementById('monthly-ctrl').style.display = currentView === 'detail' ? 'block' : 'none';
+             if (currentType === 'teams') await fetchTeamRankings();
              renderRanking();
         }));
 
-        document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.addEventListener('click', () => {
+        document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.addEventListener('click', async () => {
              document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
              btn.classList.add('active');
              currentType = btn.dataset.type;
+
+             if (currentType === 'teams' && currentView === 'summary') {
+                 currentView = 'detail';
+                 document.querySelectorAll('.rank-tab-btn').forEach(b => {
+                     b.classList.toggle('active', b.dataset.target === 'detail');
+                 });
+                 document.getElementById('monthly-ctrl').style.display = 'block';
+             }
+
+             if (currentType === 'teams') await fetchTeamRankings();
              renderRanking();
         }));
 
         const monthSel = document.querySelector('.month-selector');
+        const t1Btn = document.querySelector('.month-btn[data-month="1"]');
+        if (t1Btn) {
+            t1Btn.onclick = async () => {
+                document.querySelectorAll('.month-btn').forEach(m => m.classList.remove('active'));
+                t1Btn.classList.add('active');
+                currentMonth = 1;
+                if (currentType === 'teams') await fetchTeamRankings();
+                renderRanking();
+            };
+        }
         for(let i=2; i<=12; i++) {
             const b = document.createElement('button');
             b.className = 'month-btn';
             b.dataset.month = i;
             b.innerText = 'T' + i;
-            b.onclick = () => {
+            b.onclick = async () => {
                 document.querySelectorAll('.month-btn').forEach(m => m.classList.remove('active'));
                 b.classList.add('active');
                 currentMonth = i;
+                if (currentType === 'teams') await fetchTeamRankings();
                 renderRanking();
             };
             monthSel.appendChild(b);
