@@ -124,7 +124,6 @@
             Bàn thắng
           </button>
           <button class="sub-tab-btn" data-type="assists">Kiến tạo</button>
-          <button class="sub-tab-btn" data-type="gk">Thủ môn</button>
           <button class="sub-tab-btn" data-type="teams">Đội bóng</button>
         </div>
 
@@ -204,9 +203,8 @@
     <script src="js/app.js"></script>
     <script>
       let rankingData = []; // Players
-      let gkData = []; // Goalkeepers
       let currentView = "summary"; // summary, detail
-      let currentType = "goals"; // goals, assists, gk, teams
+      let currentType = "goals"; // goals, assists, teams
       let currentMonth = 1;
       let teamData = []; // Calculated from matches
       let activeEditingPlayerId = null;
@@ -245,15 +243,10 @@
         const { data: psData, error: psErr } = await _supabase
           .from("player_scores")
           .select("*");
-        const { data: gsData, error: gsErr } = await _supabase
-          .from("gk_scores")
-          .select("*");
 
         const psList = psErr ? [] : psData || [];
-        const gsList = gsErr ? [] : gsData || [];
 
         rankingData = parsedPlayers
-          .filter((p) => p.position !== "Thủ môn")
           .map((p) => {
             const scoreRow = psList.find((row) => matchScoreRow(p, row));
             return {
@@ -294,51 +287,6 @@
                 : Array(12).fill(0),
               totalGoals: 0,
               totalAssists: 0,
-            };
-          });
-
-        gkData = parsedPlayers
-          .filter((p) => p.position === "Thủ môn")
-          .map((p) => {
-            const scoreRow = gsList.find((row) => matchScoreRow(p, row));
-            return {
-              id: p.id,
-              scoreId: scoreRow ? scoreRow.id : null,
-              name: p.name,
-              monthlyGames: scoreRow
-                ? [
-                    scoreRow.g1,
-                    scoreRow.g2,
-                    scoreRow.g3,
-                    scoreRow.g4,
-                    scoreRow.g5,
-                    scoreRow.g6,
-                    scoreRow.g7,
-                    scoreRow.g8,
-                    scoreRow.g9,
-                    scoreRow.g10,
-                    scoreRow.g11,
-                    scoreRow.g12,
-                  ].map((v) => v || 0)
-                : Array(12).fill(0),
-              monthlyConceded: scoreRow
-                ? [
-                    scoreRow.c1,
-                    scoreRow.c2,
-                    scoreRow.c3,
-                    scoreRow.c4,
-                    scoreRow.c5,
-                    scoreRow.c6,
-                    scoreRow.c7,
-                    scoreRow.c8,
-                    scoreRow.c9,
-                    scoreRow.c10,
-                    scoreRow.c11,
-                    scoreRow.c12,
-                  ].map((v) => v || 0)
-                : Array(12).fill(0),
-              totalGames: 0,
-              totalConceded: 0,
             };
           });
 
@@ -419,29 +367,16 @@
           p.totalGoals = p.monthlyGoals.reduce((a, b) => a + b, 0);
           p.totalAssists = p.monthlyAssists.reduce((a, b) => a + b, 0);
         });
-        gkData.forEach((g) => {
-          g.totalGames = g.monthlyGames.reduce((a, b) => a + b, 0);
-          g.totalConceded = g.monthlyConceded.reduce((a, b) => a + b, 0);
-        });
       }
 
       function renderRanking() {
         const body = document.getElementById("rank-body");
         const headRow = document.getElementById("table-head-row");
 
-        let sorted = currentType === "gk" ? [...gkData] : [...rankingData];
+        let sorted = [...rankingData];
 
         // Build Table Head Row
-        if (currentType === "gk") {
-          headRow.innerHTML = `
-                    <th style="width: 50px">#</th>
-                    <th>Thủ môn</th>
-                    <th style="text-align:right;">Số trận</th>
-                    <th style="text-align:right;">Bàn thua</th>
-                    <th style="text-align:right;">Hiệu suất</th>
-                    ${isAdmin && currentView === "detail" ? '<th style="text-align:center; width:150px;">Thao tác</th>' : ""}
-                `;
-        } else if (currentType === "teams") {
+        if (currentType === "teams") {
           headRow.innerHTML = `
                     <th style="width: 50px">#</th>
                     <th>Đội bóng</th>
@@ -481,30 +416,14 @@
         } else if (currentView === "summary") {
           sorted.sort((a, b) => {
             if (currentType === "goals") return b.totalGoals - a.totalGoals;
-            if (currentType === "assists")
-              return b.totalAssists - a.totalAssists;
-            const ratioA =
-              a.totalGames > 0 ? a.totalConceded / a.totalGames : 999;
-            const ratioB =
-              b.totalGames > 0 ? b.totalConceded / b.totalGames : 999;
-            return ratioA - ratioB;
+            return b.totalAssists - a.totalAssists;
           });
         } else {
           sorted.sort((a, b) => {
             const idx = currentMonth - 1;
             if (currentType === "goals")
               return b.monthlyGoals[idx] - a.monthlyGoals[idx];
-            if (currentType === "assists")
-              return b.monthlyAssists[idx] - a.monthlyAssists[idx];
-            const ratA =
-              a.monthlyGames[idx] > 0
-                ? a.monthlyConceded[idx] / a.monthlyGames[idx]
-                : 999;
-            const ratB =
-              b.monthlyGames[idx] > 0
-                ? b.monthlyConceded[idx] / b.monthlyGames[idx]
-                : 999;
-            return ratA - ratB;
+            return b.monthlyAssists[idx] - a.monthlyAssists[idx];
           });
         }
 
@@ -525,32 +444,15 @@
                         <td class="total-col" style="text-align:right;">${p.pts}</td>
                     `;
             } else {
-              if (currentType === "gk") {
-                const games =
-                  currentView === "summary"
-                    ? p.totalGames
-                    : p.monthlyGames[currentMonth - 1];
-                const conceded =
-                  currentView === "summary"
-                    ? p.totalConceded
-                    : p.monthlyConceded[currentMonth - 1];
-                const ratio = games > 0 ? (conceded / games).toFixed(2) : "-";
-                statHTML = `
-                            <td style="text-align:right;">${games}</td>
-                            <td style="text-align:right;">${conceded}</td>
-                            <td style="text-align:right; color:var(--primary); font-weight:800;">${ratio}</td>
-                        `;
-              } else {
-                const score =
-                  currentView === "summary"
-                    ? currentType === "goals"
-                      ? p.totalGoals
-                      : p.totalAssists
-                    : currentType === "goals"
-                      ? p.monthlyGoals[currentMonth - 1]
-                      : p.monthlyAssists[currentMonth - 1];
-                statHTML = `<td class="total-col" style="text-align:right;">${score}</td>`;
-              }
+              const score =
+                currentView === "summary"
+                  ? currentType === "goals"
+                    ? p.totalGoals
+                    : p.totalAssists
+                  : currentType === "goals"
+                    ? p.monthlyGoals[currentMonth - 1]
+                    : p.monthlyAssists[currentMonth - 1];
+              statHTML = `<td class="total-col" style="text-align:right;">${score}</td>`;
             }
 
             // Render actions in admin mode when viewing details
@@ -593,10 +495,7 @@
         }
         const modalTitle = document.getElementById("modal-title");
         if (modalTitle) {
-          modalTitle.innerText =
-            currentType === "gk"
-              ? "Thêm Thủ môn vào BXH"
-              : "Thêm Cầu thủ vào BXH";
+          modalTitle.innerText = "Thêm Cầu thủ vào BXH";
         }
         document.getElementById("r-name").value = "";
         openModal("rank-add");
@@ -611,7 +510,7 @@
         if (!name) return alert("Vui lòng nhập tên!");
 
         // Insert player into main players table with the correct position
-        const position = currentType === "gk" ? "Thủ môn" : "Hậu vệ";
+        const position = "Hậu vệ";
         const namePayload = JSON.stringify({
           name,
           position,
@@ -636,18 +535,11 @@
           alert("Bạn không có quyền thực hiện hành động này!");
           return;
         }
-        const table = currentType === "gk" ? "gk_scores" : "player_scores";
-        const msg =
-          currentType === "gk"
-            ? `Xác nhận RESET toàn bộ số trận và bàn thua THÁNG ${currentMonth}?`
-            : `Xác nhận RESET toàn bộ bàn thắng & kiến tạo THÁNG ${currentMonth}?`;
+        const msg = `Xác nhận RESET toàn bộ bàn thắng & kiến tạo THÁNG ${currentMonth}?`;
         if (confirm(msg)) {
-          const updates =
-            currentType === "gk"
-              ? { ["g" + currentMonth]: 0, ["c" + currentMonth]: 0 }
-              : { ["m" + currentMonth]: 0, ["a" + currentMonth]: 0 };
+          const updates = { ["m" + currentMonth]: 0, ["a" + currentMonth]: 0 };
           const { error } = await _supabase
-            .from(table)
+            .from("player_scores")
             .update(updates)
             .neq("id", "00000000-0000-0000-0000-000000000000");
           if (!error) {
@@ -665,9 +557,7 @@
           return;
         }
         activeEditingPlayerId = String(id);
-        const isGk = currentType === "gk";
-        const table = isGk ? gkData : rankingData;
-        const item = table.find((p) => String(p.id) === String(id));
+        const item = rankingData.find((p) => String(p.id) === String(id));
 
         if (!item) {
           alert("Không tìm thấy cầu thủ để sửa.");
@@ -677,25 +567,14 @@
         document.getElementById("edit-score-name").value = item.name;
         const idx = currentMonth - 1;
 
-        if (isGk) {
-          document.getElementById("edit-score-title").innerText =
-            `Sửa số liệu Thủ môn - T${currentMonth}`;
-          document.getElementById("edit-score-label1").innerText = "Số trận";
-          document.getElementById("edit-score-label2").innerText = "Bàn thua";
-          document.getElementById("edit-score-input1").value =
-            item.monthlyGames[idx];
-          document.getElementById("edit-score-input2").value =
-            item.monthlyConceded[idx];
-        } else {
-          document.getElementById("edit-score-title").innerText =
-            `Sửa số liệu Cầu thủ - T${currentMonth}`;
-          document.getElementById("edit-score-label1").innerText = "Bàn thắng";
-          document.getElementById("edit-score-label2").innerText = "Kiến tạo";
-          document.getElementById("edit-score-input1").value =
-            item.monthlyGoals[idx];
-          document.getElementById("edit-score-input2").value =
-            item.monthlyAssists[idx];
-        }
+        document.getElementById("edit-score-title").innerText =
+          `Sửa số liệu Cầu thủ - T${currentMonth}`;
+        document.getElementById("edit-score-label1").innerText = "Bàn thắng";
+        document.getElementById("edit-score-label2").innerText = "Kiến tạo";
+        document.getElementById("edit-score-input1").value =
+          item.monthlyGoals[idx];
+        document.getElementById("edit-score-input2").value =
+          item.monthlyAssists[idx];
 
         openModal("edit-score");
       }
@@ -706,13 +585,9 @@
           return;
         }
 
-        const isGk = currentType === "gk";
-        const table = isGk ? "gk_scores" : "player_scores";
-        const item = isGk
-          ? gkData.find((p) => String(p.id) === String(activeEditingPlayerId))
-          : rankingData.find(
-              (p) => String(p.id) === String(activeEditingPlayerId),
-            );
+        const item = rankingData.find(
+          (p) => String(p.id) === String(activeEditingPlayerId),
+        );
 
         if (!item) {
           alert("Không tìm thấy cầu thủ để lưu.");
@@ -724,20 +599,16 @@
         const val2 =
           parseInt(document.getElementById("edit-score-input2").value) || 0;
 
-        const updates = {};
-        if (isGk) {
-          updates["g" + currentMonth] = val1;
-          updates["c" + currentMonth] = val2;
-        } else {
-          updates["m" + currentMonth] = val1;
-          updates["a" + currentMonth] = val2;
-        }
+        const updates = {
+          ["m" + currentMonth]: val1,
+          ["a" + currentMonth]: val2,
+        };
 
         let result;
         if (item.scoreId) {
           // Update existing record
           result = await _supabase
-            .from(table)
+            .from("player_scores")
             .update(updates)
             .eq("id", item.scoreId);
         } else {
@@ -747,7 +618,7 @@
             player_id: item.id,
             ...updates,
           };
-          result = await _supabase.from(table).insert([insertPayload]);
+          result = await _supabase.from("player_scores").insert([insertPayload]);
         }
 
         if (!result.error) {
