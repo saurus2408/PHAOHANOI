@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -7,86 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách cầu thủ | PHN FC</title>
     <link rel="stylesheet" href="css/shared.css">
-    <style>
-        .players-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        .player-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            position: relative;
-            transition: var(--transition);
-        }
-        .player-card:hover { transform: translateY(-5px); }
-        .player-img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-        }
-        .player-info {
-            padding: 20px;
-            text-align: center;
-        }
-        .player-num {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--primary);
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-        }
-        .admin-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: none;
-        }
-        .admin-active .admin-actions { display: block; }
-        .del-btn {
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        .modal-admin {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            z-index: 2000;
-            display: none;
-            width: 90%;
-            max-width: 500px;
-        }
-        .modal-admin.active { display: block; }
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1500;
-            display: none;
-        }
-        .overlay.active { display: block; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-    </style>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -94,24 +13,40 @@
 <body>
 
     <header>
-        <div class="nav-container">
-            <a href="index.html" class="logo-wrapper">
-                <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
-                <span class="site-name">PHN</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="players.html" class="nav-link active">Cầu thủ</a></li>
-                <li><a href="videos.html" class="nav-link">Video</a></li>
-                <li><a href="results.html" class="nav-link">Kết quả</a></li>
-                <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
-                <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
-                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
-                    <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+        <!-- Tier 1: Deep Crimson utility bar -->
+        <div class="header-top">
+            <div class="header-top-container">
+                <div class="header-top-left">
+                    <span>PHÁO HÀ NỘI FOOTBALL CLUB - TRANG WEB CHÍNH THỨC</span>
                 </div>
-            </ul>
-            <div class="mobile-toggle" id="mobile-toggle">
-                <i data-lucide="menu"></i>
+                <div class="header-top-right">
+                    <a href="https://www.facebook.com/profile.php?id=61586374958119" class="header-top-link" target="_blank">Facebook</a>
+                    <a href="https://www.youtube.com/@PHNFCafchn" class="header-top-link" target="_blank">Youtube</a>
+                    <a href="https://www.tiktok.com/@phnfc07" class="header-top-link" target="_blank">TikTok</a>
+                    <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                        <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tier 2: Bright Red navigation bar -->
+        <div class="header-bottom">
+            <div class="header-bottom-container">
+                <a href="index.html" class="logo-wrapper">
+                    <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
+                    <span class="site-name">PHN</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="players.html" class="nav-link active">Cầu thủ</a></li>
+                    <li><a href="videos.html" class="nav-link">Video</a></li>
+                    <li><a href="results.html" class="nav-link">Kết quả</a></li>
+                    <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
+                    <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+                </ul>
+                <div class="mobile-toggle" id="mobile-toggle">
+                    <i data-lucide="menu"></i>
+                </div>
             </div>
         </div>
     </header>
@@ -119,7 +54,7 @@
     <section id="players">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
             <h2 class="section-title" style="margin-bottom: 0;">Danh sách cầu thủ</h2>
-            <button class="btn-primary admin-only" onclick="openModal('player')"><i data-lucide="plus"></i> Thêm cầu thủ</button>
+            <button class="btn-primary admin-only" onclick="openAddPlayerModal()"><i data-lucide="plus"></i> Thêm cầu thủ</button>
         </div>
         <div class="players-grid" id="players-grid">
             <!-- Dynamic Content -->
@@ -128,70 +63,306 @@
 
     <!-- Modals -->
     <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    
+    <!-- Player Creation/Edition Modal -->
     <div class="modal-admin" id="player-modal">
-        <h2>Thêm Cầu thủ</h2>
+        <h2 id="player-modal-title">Thêm Cầu thủ</h2>
         <div class="form-group">
             <label>Số áo</label>
             <input type="number" id="p-num">
         </div>
         <div class="form-group">
             <label>Tên cầu thủ</label>
-            <input type="text" id="p-name">
+            <input type="text" id="p-name" placeholder="Vd: Nguyễn Văn A">
         </div>
         <div class="form-group">
-            <label>Ảnh (URL hoặc chọn file)</label>
+            <label>Vị trí</label>
+            <select id="p-position">
+                <option value="Thủ môn">Thủ môn</option>
+                <option value="Hậu vệ">Hậu vệ</option>
+                <option value="Tiền vệ">Tiền vệ</option>
+                <option value="Tiền đạo">Tiền đạo</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Ngày sinh</label>
+            <input type="date" id="p-dob">
+        </div>
+        <div class="form-group">
+            <label>Quê quán</label>
+            <input type="text" id="p-hometown" placeholder="Vd: Hà Nội">
+        </div>
+        <div class="form-group">
+            <label>Nghề nghiệp</label>
+            <input type="text" id="p-career" placeholder="Vd: Kỹ sư, Học sinh...">
+        </div>
+        <div class="form-group">
+            <label>Ảnh (Chọn file)</label>
             <input type="file" id="p-img">
         </div>
         <button class="btn-primary" onclick="savePlayer()" style="width: 100%;">Lưu</button>
     </div>
 
+    <!-- Player Detail Modal -->
+    <div class="modal-admin" id="player-detail-modal">
+        <div id="player-detail-content">
+            <!-- Dynamic Detail Content -->
+        </div>
+        <button class="btn-primary" onclick="closeModal()" style="width: 100%; margin-top: 20px;">Đóng</button>
+    </div>
 
     <script src="js/app.js"></script>
     <script>
+        let editingPlayerId = null;
+        let currentEditingImg = '';
+
         async function fetchPlayers() {
             const { data, error } = await _supabase.from('players').select('*').order('num', { ascending: true });
             if (error) return console.error(error);
             const grid = document.getElementById('players-grid');
-            grid.innerHTML = data.map(p => `
-                <div class="player-card">
-                    <div class="player-num">${p.num || '?'}</div>
-                    <img src="${p.img || 'assets/images/1-1206.jpg'}" alt="Player" class="player-img">
-                    <div class="player-info">
-                        <h3>${p.name}</h3>
+            
+            grid.innerHTML = data.map(p => {
+                let name = p.name;
+                let position = 'Hậu vệ'; 
+                let hometown = 'Chưa cập nhật';
+                
+                if (p.name && p.name.startsWith('{') && p.name.endsWith('}')) {
+                    try {
+                        const meta = JSON.parse(p.name);
+                        name = meta.name || '';
+                        position = meta.position || 'Hậu vệ';
+                        hometown = meta.hometown || 'Chưa cập nhật';
+                    } catch(e) {}
+                }
+
+                // Dynamic First and Last name split
+                const words = name.trim().split(' ');
+                let firstName = '';
+                let lastName = '';
+                if (words.length > 1) {
+                    lastName = words[words.length - 1].toUpperCase();
+                    firstName = words.slice(0, words.length - 1).join(' ').toUpperCase();
+                } else {
+                    firstName = '';
+                    lastName = name.toUpperCase();
+                }
+
+                const escapedName = p.name.replace(/"/g, '&quot;');
+                const escapedImg = (p.img || 'assets/images/1-1206.jpg').replace(/"/g, '&quot;');
+
+                // Display hometown with Vietnam Flag
+                const hometownDisplay = hometown !== 'Chưa cập nhật' ? `${hometown} 🇻🇳` : hometown;
+
+                return `
+                <div class="player-card" onclick="showPlayerDetails('${escapedName}', ${p.num || 0}, '${escapedImg}', event)">
+                    <div class="player-img-wrapper">
+                        <img src="${p.img || 'assets/images/1-1206.jpg'}" alt="Player" class="player-img">
+                    </div>
+                    <div class="player-info-container">
+                        <div class="player-details-left">
+                            <span class="player-first-name">${firstName}</span>
+                            <span class="player-last-name">${lastName}</span>
+                            <div class="player-card-meta">
+                                <i data-lucide="map-pin" style="width:11px; height:11px; color:var(--primary);"></i>
+                                <span>${hometownDisplay}</span>
+                            </div>
+                        </div>
+                        <div class="player-card-number">${p.num || '?'}</div>
                     </div>
                     <div class="admin-actions">
+                        <button class="edit-btn-card" onclick="openEditPlayerModal('${p.id}', ${p.num || 0}, '${escapedName}', '${escapedImg}')">
+                            <i data-lucide="edit-3" style="width:12px; height:12px;"></i> Sửa
+                        </button>
                         <button class="del-btn" onclick="deleteItem('players', '${p.id}')">
-                            <i data-lucide="trash-2" style="width:14px; height:14px;"></i> Xóa cầu thủ
+                            <i data-lucide="trash-2" style="width:12px; height:12px;"></i> Xóa
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             lucide.createIcons();
         }
 
+        function openAddPlayerModal() {
+            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
+            editingPlayerId = null;
+            currentEditingImg = '';
+            document.getElementById('player-modal-title').innerText = 'Thêm Cầu thủ';
+            document.getElementById('p-num').value = '';
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-position').value = 'Hậu vệ';
+            document.getElementById('p-dob').value = '';
+            document.getElementById('p-hometown').value = '';
+            document.getElementById('p-career').value = '';
+            document.getElementById('p-img').value = '';
+            openModal('player');
+        }
+
+        function openEditPlayerModal(pId, num, nameJson, img) {
+            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
+            editingPlayerId = pId;
+            currentEditingImg = img;
+            document.getElementById('player-modal-title').innerText = 'Chỉnh sửa Cầu thủ';
+            
+            let name = nameJson;
+            let position = 'Hậu vệ';
+            let dob = '';
+            let hometown = '';
+            let career = '';
+
+            if (nameJson.startsWith('{') && nameJson.endsWith('}')) {
+                try {
+                    const meta = JSON.parse(nameJson);
+                    name = meta.name || '';
+                    position = meta.position || 'Hậu vệ';
+                    dob = meta.dob || '';
+                    hometown = meta.hometown || '';
+                    career = meta.career || '';
+                } catch(e) {}
+            }
+
+            document.getElementById('p-num').value = num;
+            document.getElementById('p-name').value = name;
+            document.getElementById('p-position').value = position;
+            document.getElementById('p-dob').value = dob;
+            document.getElementById('p-hometown').value = hometown;
+            document.getElementById('p-career').value = career;
+            document.getElementById('p-img').value = ''; // Reset file input
+            openModal('player');
+        }
+
+        function showPlayerDetails(nameJson, num, img, event) {
+            // Prevent showing details modal if clicking on admin action buttons
+            if (event.target.closest('.admin-actions')) {
+                return;
+            }
+
+            let name = nameJson;
+            let position = 'Chưa cập nhật';
+            let dob = 'Chưa cập nhật';
+            let hometown = 'Chưa cập nhật';
+            let career = 'Chưa cập nhật';
+
+            if (nameJson.startsWith('{') && nameJson.endsWith('}')) {
+                try {
+                    const meta = JSON.parse(nameJson);
+                    name = meta.name || '';
+                    position = meta.position || position;
+                    dob = meta.dob || dob;
+                    hometown = meta.hometown || hometown;
+                    career = meta.career || career;
+                } catch(e) {}
+            }
+
+            let dobFormatted = dob;
+            if (dob && dob !== 'Chưa cập nhật') {
+                const parts = dob.split('-');
+                if (parts.length === 3) {
+                    dobFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            }
+
+            const detailContent = document.getElementById('player-detail-content');
+            detailContent.innerHTML = `
+                <div class="player-modal-detail">
+                    <div class="modal-player-header">
+                        <img src="${img || 'assets/images/1-1206.jpg'}" alt="${name}" class="modal-player-img">
+                        <div class="modal-player-title">
+                            <span class="modal-player-num-large">#${num}</span>
+                            <h2 style="border:none; margin-bottom: 2px;">${name}</h2>
+                            <span class="player-position-badge" style="position:static; display:inline-block; margin-top:5px;">${position}</span>
+                        </div>
+                    </div>
+                    <div class="modal-player-grid" style="grid-template-columns: 1fr; gap: 12px; margin-top: 10px;">
+                        <div>
+                            <div class="detail-item-label">Ngày sinh</div>
+                            <div class="detail-item-value">${dobFormatted}</div>
+                        </div>
+                        <div>
+                            <div class="detail-item-label">Số áo</div>
+                            <div class="detail-item-value">#${num}</div>
+                        </div>
+                        <div>
+                            <div class="detail-item-label">Vị trí thi đấu</div>
+                            <div class="detail-item-value">${position}</div>
+                        </div>
+                        <div>
+                            <div class="detail-item-label">Quê quán</div>
+                            <div class="detail-item-value">🇻🇳 ${hometown}</div>
+                        </div>
+                        <div>
+                            <div class="detail-item-label">Nghề nghiệp</div>
+                            <div class="detail-item-value">${career}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            openModal('player-detail');
+        }
+
         async function savePlayer() {
+            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
             const num = document.getElementById('p-num').value;
             const name = document.getElementById('p-name').value;
+            const position = document.getElementById('p-position').value;
+            const dob = document.getElementById('p-dob').value;
+            const hometown = document.getElementById('p-hometown').value;
+            const career = document.getElementById('p-career').value;
             const file = document.getElementById('p-img').files[0];
-            let imgUrl = '';
+            
+            if (!num || !name) {
+                alert("Vui lòng điền số áo và tên cầu thủ!");
+                return;
+            }
+
+            let imgUrl = currentEditingImg || '';
 
             if (file) {
                 let cleanName = file.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
                 const fileName = `${Date.now()}-${cleanName}`;
                 const { data, error: uploadError } = await _supabase.storage.from('players').upload(fileName, file);
+                if (uploadError) {
+                    alert("Lỗi upload ảnh: " + uploadError.message);
+                    return;
+                }
                 if (data) {
                     const { data: urlData } = _supabase.storage.from('players').getPublicUrl(fileName);
                     imgUrl = urlData.publicUrl;
                 }
             }
 
-            const { error } = await _supabase.from('players').insert([{ num: parseInt(num), name, img: imgUrl }]);
-            if (!error) { closeModal(); fetchPlayers(); }
-            else alert(error.message);
+            // Encode additional fields inside name field as JSON, excluding strength
+            const namePayload = JSON.stringify({
+                name,
+                position,
+                dob,
+                hometown,
+                career
+            });
+
+            const payload = { num: parseInt(num), name: namePayload, img: imgUrl };
+
+            if (editingPlayerId) {
+                const { error } = await _supabase.from('players').update(payload).eq('id', editingPlayerId);
+                if (!error) { 
+                    closeModal(); 
+                    fetchPlayers(); 
+                } else {
+                    alert("Lỗi khi cập nhật cầu thủ: " + error.message);
+                }
+            } else {
+                const { error } = await _supabase.from('players').insert([payload]);
+                if (!error) { 
+                    closeModal(); 
+                    fetchPlayers(); 
+                } else {
+                    alert("Lỗi khi tạo cầu thủ: " + error.message);
+                }
+            }
         }
 
         function renderAll() { fetchPlayers(); }
         window.onload = fetchPlayers;
     </script>
 </body>
+
 </html>

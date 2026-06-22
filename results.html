@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -8,44 +7,41 @@
     <title>Kết quả thi đấu | PHN FC</title>
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        .match-results-tabs {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; margin-bottom: 30px;
+        .results-category-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #EAECEF;
+            padding-bottom: 12px;
         }
-        .month-tab {
-            padding: 10px 20px; background: #f0f0f0; border-radius: 4px; cursor: pointer;
-            white-space: nowrap; font-weight: 600; transition: var(--transition);
+        .match-type-btn {
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            text-transform: uppercase;
         }
-        .month-tab.active { background: var(--primary); color: white; }
-        .match-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px;
+        .match-type-btn:hover {
+            color: var(--primary);
         }
-        .match-card {
-            background: white; border-radius: 12px; padding: 25px; box-shadow: var(--shadow);
-            border: 1px solid #eee; transition: var(--transition);
+        .match-type-btn.active {
+            color: var(--primary);
         }
-        .match-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 0.85rem; color: #666; font-weight: 700; }
-        .match-main { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .team { text-align: center; flex: 1; }
-        .team-logo { width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 800; font-size: 0.8rem; }
-        .team-name { font-weight: 700; font-size: 0.95rem; }
-        .score-display { display: flex; align-items: center; gap: 15px; font-size: 2rem; font-weight: 900; }
-        .score-box { background: #f4f4f4; padding: 5px 15px; border-radius: 6px; min-width: 50px; text-align: center; }
-        .match-footer { text-align: center; font-size: 0.9rem; color: #888; border-top: 1px solid #eee; padding-top: 15px; }
-
-        .modal-admin {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 40px; border-radius: 12px; z-index: 2000;
-            display: none; width: 90%; max-width: 500px;
+        .match-type-btn.active:after {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
         }
-        .modal-admin.active { display: block; }
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1500; display: none;
-        }
-        .overlay.active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -54,32 +50,54 @@
 <body>
 
     <header>
-        <div class="nav-container">
-            <a href="index.html" class="logo-wrapper">
-                <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
-                <span class="site-name">PHN</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
-                <li><a href="videos.html" class="nav-link">Video</a></li>
-                <li><a href="results.html" class="nav-link active">Kết quả</a></li>
-                <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
-                <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
-                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
-                    <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+        <!-- Tier 1: Deep Crimson utility bar -->
+        <div class="header-top">
+            <div class="header-top-container">
+                <div class="header-top-left">
+                    <span>PHÁO HÀ NỘI FOOTBALL CLUB - TRANG WEB CHÍNH THỨC</span>
                 </div>
-            </ul>
-            <div class="mobile-toggle" id="mobile-toggle">
-                <i data-lucide="menu"></i>
+                <div class="header-top-right">
+                    <a href="https://www.facebook.com/profile.php?id=61586374958119" class="header-top-link" target="_blank">Facebook</a>
+                    <a href="https://www.youtube.com/@PHNFCafchn" class="header-top-link" target="_blank">Youtube</a>
+                    <a href="https://www.tiktok.com/@phnfc07" class="header-top-link" target="_blank">TikTok</a>
+                    <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                        <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tier 2: Bright Red navigation bar -->
+        <div class="header-bottom">
+            <div class="header-bottom-container">
+                <a href="index.html" class="logo-wrapper">
+                    <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
+                    <span class="site-name">PHN</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
+                    <li><a href="videos.html" class="nav-link">Video</a></li>
+                    <li><a href="results.html" class="nav-link active">Kết quả</a></li>
+                    <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
+                    <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+                </ul>
+                <div class="mobile-toggle" id="mobile-toggle">
+                    <i data-lucide="menu"></i>
+                </div>
             </div>
         </div>
     </header>
 
     <section id="results">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h2 class="section-title" style="margin-bottom: 0;">Kết quả thi đấu</h2>
-            <button class="btn-primary admin-only" onclick="openModal('match')"><i data-lucide="plus"></i> Thêm kết quả</button>
+            <button class="btn-primary admin-only" onclick="openAddMatchModal()"><i data-lucide="plus"></i> Thêm kết quả</button>
+        </div>
+
+        <!-- Category selector (Internal vs Friendly) -->
+        <div class="results-category-tabs">
+            <button class="match-type-btn active" data-type="internal" onclick="changeMatchType('internal')">Thi đấu nội bộ</button>
+            <button class="match-type-btn" data-type="friendly" onclick="changeMatchType('friendly')">Thi đấu giao hữu</button>
         </div>
 
         <div class="match-results-tabs">
@@ -106,51 +124,218 @@
     <div class="overlay" id="overlay" onclick="closeModal()"></div>
     <div class="modal-admin" id="match-modal">
         <h2>Thêm Kết quả</h2>
-        <div class="form-group"><label>Tháng</label><input type="number" id="m-month" min="1" max="12"></div>
-        <div class="form-group"><label>Ngày (dd/mm/yyyy)</label><input type="text" id="m-date"></div>
-        <div class="form-group"><label>Đội 1</label><input type="text" id="m-team-a"></div>
-        <div class="form-group"><label>Tỉ số 1</label><input type="number" id="m-score-a"></div>
-        <div class="form-group"><label>Đội 2</label><input type="text" id="m-team-b"></div>
-        <div class="form-group"><label>Tỉ số 2</label><input type="number" id="m-score-b"></div>
-        <div class="form-group"><label>Ghi chú</label><input type="text" id="m-note"></div>
+        <div class="form-group">
+            <label>Loại trận đấu</label>
+            <select id="m-type">
+                <option value="internal">Thi đấu nội bộ</option>
+                <option value="friendly">Thi đấu giao hữu</option>
+            </select>
+        </div>
+        <div class="form-row-grid">
+            <div class="form-group">
+                <label>Tháng</label>
+                <input type="number" id="m-month" min="1" max="12">
+            </div>
+            <div class="form-group">
+                <label>Ngày (dd/mm/yyyy)</label>
+                <input type="text" id="m-date" placeholder="Vd: 17/06/2026">
+            </div>
+        </div>
+        <div class="form-row-grid">
+            <div class="form-group">
+                <label>Đội 1 (Nhà)</label>
+                <input type="text" id="m-team-a" placeholder="Vd: PHN Đỏ">
+            </div>
+            <div class="form-group">
+                <label>Tỉ số 1</label>
+                <input type="number" id="m-score-a" value="0" min="0">
+            </div>
+        </div>
+        <div class="form-row-grid">
+            <div class="form-group">
+                <label>Đội 2 (Khách)</label>
+                <input type="text" id="m-team-b" placeholder="Vd: PHN Xanh">
+            </div>
+            <div class="form-group">
+                <label>Tỉ số 2</label>
+                <input type="number" id="m-score-b" value="0" min="0">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Ghi chú (Sân bãi / Mô tả)</label>
+            <input type="text" id="m-note" placeholder="Vd: Sân Đức An">
+        </div>
         <button class="btn-primary" onclick="saveMatch()" style="width: 100%;">Lưu</button>
     </div>
 
-
     <script src="js/app.js"></script>
     <script>
+        let fetchedMatches = [];
+        let currentMatchType = 'internal';
+
+        function getTeamAbbreviation(name) {
+            if (!name) return "???";
+            const cleanName = name.trim().replace(/\s+/g, ' ');
+            const words = cleanName.split(' ');
+            if (words.length >= 3) {
+                return (words[0][0] + words[1][0] + words[2][0]).toUpperCase();
+            } else if (words.length === 2) {
+                const first = words[0][0] || '';
+                const second = words[1].substring(0, 2) || '';
+                return (first + second).toUpperCase().padEnd(3, 'X').substring(0, 3);
+            } else {
+                return cleanName.substring(0, 3).toUpperCase();
+            }
+        }
+
         async function fetchMatches(month) {
             const { data, error } = await _supabase.from('match_results').select('*').eq('month', month).order('match_date', { ascending: false });
+            if (error) {
+                console.error(error);
+                fetchedMatches = [];
+            } else {
+                fetchedMatches = data || [];
+            }
+            renderMatchList();
+        }
+
+        function renderMatchList() {
             const list = document.getElementById('match-list');
-            if (error || !data || data.length === 0) {
-                list.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.5;">Chưa có dữ liệu trận đấu tháng này.</p>';
+            
+            // Filter matches locally based on active tab
+            const filtered = fetchedMatches.filter(m => {
+                const isFriendly = m.status === 'friendly';
+                return currentMatchType === 'friendly' ? isFriendly : !isFriendly;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<p style="text-align:center; grid-column: 1/-1; opacity:0.5; padding: 40px 0;">Chưa có dữ liệu trận đấu ${currentMatchType === 'friendly' ? 'giao hữu' : 'nội bộ'} tháng này.</p>`;
                 return;
             }
-            list.innerHTML = data.map(m => `
+
+            list.innerHTML = filtered.map(m => {
+                const teamA = m.team_a || 'PHN FC';
+                const teamB = m.team_b || 'Đối thủ';
+                const logoA = getTeamAbbreviation(teamA);
+                const logoB = getTeamAbbreviation(teamB);
+
+                // Highlight PHN team logos with club gradient, and others with a dark slate background
+                const bgA = logoA === 'PHN' ? 'var(--primary-gradient)' : '#2C3E50';
+                const bgB = logoB === 'PHN' ? 'var(--primary-gradient)' : '#2C3E50';
+
+                return `
                 <div class="match-card">
-                    <div class="match-header"><span>${m.match_date}</span><span>PHN FC</span></div>
-                    <div class="match-main">
-                        <div class="team"><div class="team-logo">PHN</div><div class="team-name">${m.team_a}</div></div>
-                        <div class="score-display"><div class="score-box">${m.score_a}</div><span>-</span><div class="score-box">${m.score_b}</div></div>
-                        <div class="team"><div class="team-logo" style="background:#333;">OPP</div><div class="team-name">${m.team_b}</div></div>
+                    <div class="match-header">
+                        <span>${m.match_date}</span>
+                        <span>${currentMatchType === 'friendly' ? 'Giao Hữu' : 'Nội Bộ'}</span>
                     </div>
-                    <div class="match-footer">${m.note}</div>
-                    <button class="del-btn admin-only" onclick="deleteItem('match_results', '${m.id}')" style="margin-top:10px; background:red; color:white; border:none; padding:5px 10px; border-radius:4px; width:100%;">Xóa</button>
-                </div>`).join('');
+                    <div class="match-main">
+                        <div class="team">
+                            <div class="team-logo" style="background:${bgA};">${logoA}</div>
+                            <div class="team-name" title="${teamA}">${teamA}</div>
+                        </div>
+                        <div class="score-display">
+                            <div class="score-box">${m.score_a}</div>
+                            <span>-</span>
+                            <div class="score-box">${m.score_b}</div>
+                        </div>
+                        <div class="team">
+                            <div class="team-logo" style="background:${bgB};">${logoB}</div>
+                            <div class="team-name" title="${teamB}">${teamB}</div>
+                        </div>
+                    </div>
+                    <div class="match-footer">${m.note || ''}</div>
+                    <button class="del-btn admin-only" onclick="deleteItem('match_results', '${m.id}')" style="margin-top:15px; border-radius:4px; width:100%; justify-content: center; padding: 8px 12px; display: none;">
+                        <i data-lucide="trash-2" style="width:14px; height:14px; margin-right:4px;"></i> Xóa trận đấu
+                    </button>
+                </div>`;
+            }).join('');
+
+            if (isAdmin) {
+                document.querySelectorAll('.match-card .del-btn').forEach(btn => btn.style.display = 'inline-flex');
+            }
+            lucide.createIcons();
+        }
+
+        function changeMatchType(type) {
+            currentMatchType = type;
+            document.querySelectorAll('.match-type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            renderMatchList();
+        }
+
+        function openAddMatchModal() {
+            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
+            const activeTab = document.querySelector('.month-tab.active');
+            const activeMonth = activeTab ? parseInt(activeTab.dataset.month) : 1;
+            
+            // Set defaults
+            document.getElementById('m-month').value = activeMonth;
+            
+            // Format current date as dd/mm/yyyy
+            const now = new Date();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            document.getElementById('m-date').value = `${dd}/${mm}/${yyyy}`;
+            
+            document.getElementById('m-team-a').value = 'PHN FC';
+            document.getElementById('m-score-a').value = '0';
+            document.getElementById('m-team-b').value = '';
+            document.getElementById('m-score-b').value = '0';
+            document.getElementById('m-note').value = '';
+            document.getElementById('m-type').value = currentMatchType;
+            
+            openModal('match');
         }
 
         async function saveMatch() {
+            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
+            const month = parseInt(document.getElementById('m-month').value);
+            const date = document.getElementById('m-date').value;
+            const teamA = document.getElementById('m-team-a').value;
+            const scoreA = parseInt(document.getElementById('m-score-a').value);
+            const teamB = document.getElementById('m-team-b').value;
+            const scoreB = parseInt(document.getElementById('m-score-b').value);
+            const note = document.getElementById('m-note').value;
+            const type = document.getElementById('m-type').value;
+
+            if (!month || !date || !teamA || !teamB) {
+                alert("Vui lòng điền đầy đủ các thông tin bắt buộc!");
+                return;
+            }
+
             const payload = {
-                month: parseInt(document.getElementById('m-month').value),
-                match_date: document.getElementById('m-date').value,
-                team_a: document.getElementById('m-team-a').value,
-                score_a: parseInt(document.getElementById('m-score-a').value),
-                team_b: document.getElementById('m-team-b').value,
-                score_b: parseInt(document.getElementById('m-score-b').value),
-                note: document.getElementById('m-note').value
+                month,
+                match_date: date,
+                team_a: teamA,
+                score_a: scoreA,
+                team_b: teamB,
+                score_b: scoreB,
+                note,
+                status: type // Storing the match category in status
             };
+
             const { error } = await _supabase.from('match_results').insert([payload]);
-            if (!error) { closeModal(); fetchMatches(payload.month); }
+            if (!error) {
+                closeModal();
+                currentMatchType = type;
+                
+                // Update match type active tabs
+                document.querySelectorAll('.match-type-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.type === type);
+                });
+                
+                // Select active month tab
+                document.querySelectorAll('.month-tab').forEach(tab => {
+                    tab.classList.toggle('active', parseInt(tab.dataset.month) === month);
+                });
+
+                fetchMatches(month);
+            } else {
+                alert("Lỗi khi thêm trận đấu: " + error.message);
+            }
         }
 
         document.querySelectorAll('.month-tab').forEach(tab => tab.addEventListener('click', () => {

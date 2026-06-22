@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -8,34 +7,7 @@
     <title>Giải thưởng tháng | PHN FC</title>
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        .awards-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; margin-bottom: 30px; }
-        .month-tab { padding: 10px 20px; background: #f0f0f0; border-radius: 4px; cursor: pointer; white-space: nowrap; font-weight: 600; }
-        .month-tab.active { background: var(--primary); color: white; }
-        .award-display { 
-            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
-            border-radius: 20px; padding: 40px; box-shadow: var(--shadow);
-            border: 1px solid rgba(239, 1, 7, 0.1); text-align: center;
-        }
-        .award-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-top: 40px; }
-        .award-item { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .award-icon { font-size: 3rem; margin-bottom: 15px; display: block; }
-        .award-label { font-size: 0.8rem; color: #888; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
-        .award-name { font-size: 1.25rem; font-weight: 800; color: var(--text-dark); margin-top: 5px; }
-
-        .modal-admin {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 40px; border-radius: 12px; z-index: 2000;
-            display: none; width: 90%; max-width: 500px;
-        }
-        .modal-admin.active { display: block; }
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1500; display: none;
-        }
-        .overlay.active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        /* All styles moved to shared.css */
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -44,24 +16,40 @@
 <body>
 
     <header>
-        <div class="nav-container">
-            <a href="index.html" class="logo-wrapper">
-                <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
-                <span class="site-name">PHN</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
-                <li><a href="videos.html" class="nav-link">Video</a></li>
-                <li><a href="results.html" class="nav-link">Kết quả</a></li>
-                <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
-                <li><a href="awards.html" class="nav-link active">Giải thưởng</a></li>
-                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
-                    <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+        <!-- Tier 1: Deep Crimson utility bar -->
+        <div class="header-top">
+            <div class="header-top-container">
+                <div class="header-top-left">
+                    <span>PHÁO HÀ NỘI FOOTBALL CLUB - TRANG WEB CHÍNH THỨC</span>
                 </div>
-            </ul>
-            <div class="mobile-toggle" id="mobile-toggle">
-                <i data-lucide="menu"></i>
+                <div class="header-top-right">
+                    <a href="https://www.facebook.com/profile.php?id=61586374958119" class="header-top-link" target="_blank">Facebook</a>
+                    <a href="https://www.youtube.com/@PHNFCafchn" class="header-top-link" target="_blank">Youtube</a>
+                    <a href="https://www.tiktok.com/@phnfc07" class="header-top-link" target="_blank">TikTok</a>
+                    <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                        <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tier 2: Bright Red navigation bar -->
+        <div class="header-bottom">
+            <div class="header-bottom-container">
+                <a href="index.html" class="logo-wrapper">
+                    <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
+                    <span class="site-name">PHN</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
+                    <li><a href="videos.html" class="nav-link">Video</a></li>
+                    <li><a href="results.html" class="nav-link">Kết quả</a></li>
+                    <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
+                    <li><a href="awards.html" class="nav-link active">Giải thưởng</a></li>
+                </ul>
+                <div class="mobile-toggle" id="mobile-toggle">
+                    <i data-lucide="menu"></i>
+                </div>
             </div>
         </div>
     </header>
@@ -69,7 +57,8 @@
     <section id="awards">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
             <h2 class="section-title" style="margin-bottom: 0;">Giải thưởng danh giá</h2>
-            <button class="btn-primary admin-only" onclick="openModal('award')"><i data-lucide="edit-3"></i> Cập nhật</button>
+            <button class="btn-primary admin-only" onclick="openModal('award')"><i data-lucide="edit-3"></i> Cập
+                nhật</button>
         </div>
 
         <div class="awards-tabs">
@@ -102,9 +91,9 @@
             const { data, error } = await _supabase.from('awards').select('*').eq('month', month).single();
             const container = document.getElementById('award-content');
             const d = data || { best_player: "...", top_scorer: "...", top_assist: "...", best_gk: "..." };
-            
+
             container.innerHTML = `
-                <h3 style="color:var(--primary); font-size:1.5rem;">🎭 Vin vinh danh: Tháng ${month}</h3>
+                <h3 style="color:var(--primary); font-size:1.5rem;">🎭 Bảng vinh danh: Tháng ${month}</h3>
                 <div class="award-grid">
                     <div class="award-item"><span class="award-icon">🏆</span><p class="award-label">MVP</p><p class="award-name">${d.best_player || '...'}</p></div>
                     <div class="award-item"><span class="award-icon">⚽</span><p class="award-label">Top Scorer</p><p class="award-name">${d.top_scorer || '...'}</p></div>
@@ -128,25 +117,26 @@
         }
 
         const tabsSelection = document.querySelector('.awards-tabs');
-        for(let i=4; i<=12; i++) {
-             const t = document.createElement('div');
-             t.className = 'month-tab';
-             t.dataset.month = i;
-             t.innerText = 'Tháng ' + i;
-             tabsSelection.appendChild(t);
+        for (let i = 4; i <= 12; i++) {
+            const t = document.createElement('div');
+            t.className = 'month-tab';
+            t.dataset.month = i;
+            t.innerText = 'Tháng ' + i;
+            tabsSelection.appendChild(t);
         }
 
         document.querySelectorAll('.month-tab').forEach(tab => tab.addEventListener('click', () => {
-             document.querySelectorAll('.month-tab').forEach(t => t.classList.remove('active'));
-             tab.classList.add('active');
-             fetchAward(tab.dataset.month);
+            document.querySelectorAll('.month-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            fetchAward(tab.dataset.month);
         }));
 
-        function renderAll() { 
+        function renderAll() {
             const activeTab = document.querySelector('.month-tab.active');
-            if(activeTab) fetchAward(activeTab.dataset.month);
+            if (activeTab) fetchAward(activeTab.dataset.month);
         }
         window.onload = renderAll;
     </script>
 </body>
+
 </html>

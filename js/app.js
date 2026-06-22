@@ -33,6 +33,14 @@ function toggleAdmin() {
     }
 }
 
+function openAddPlayerModal() {
+    if (!isAdmin) { alert('Bạn không có quyền thêm cầu thủ!'); return; }
+    editingPlayerId = null;
+    currentEditingImg = '';
+    document.getElementById('player-modal-title').innerText = 'Thêm Cầu thủ';
+    openModal('player');
+}
+
 function updateAdminUI() {
     const adminLink = document.getElementById('header-admin-btn');
     if (adminLink) {

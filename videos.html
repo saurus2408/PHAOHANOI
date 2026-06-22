@@ -8,64 +8,7 @@
     <title>Video xem lại | PHN FC</title>
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
-        }
-        .video-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        .video-card:hover { transform: translateY(-5px); }
-        .video-thumb {
-            width: 100%;
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            cursor: pointer;
-        }
-        .play-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: var(--transition);
-        }
-        .video-card:hover .play-overlay { opacity: 1; }
-        .video-info { padding: 20px; }
-        .video-title { font-weight: 700; font-size: 1.1rem; }
-        .cat-tabs { display: flex; gap: 15px; margin-bottom: 30px; }
-        .cat-btn {
-            padding: 8px 20px;
-            border: 1px solid var(--primary);
-            border-radius: 20px;
-            background: transparent;
-            color: var(--primary);
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .cat-btn.active { background: var(--primary); color: white; }
-        .modal-admin {
-            position: fixed;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 40px; border-radius: 12px; z-index: 2000;
-            display: none; width: 90%; max-width: 500px;
-        }
-        .modal-admin.active { display: block; }
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1500; display: none;
-        }
-        .overlay.active { display: block; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        /* All styles moved to shared.css */
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -74,24 +17,40 @@
 <body>
 
     <header>
-        <div class="nav-container">
-            <a href="index.html" class="logo-wrapper">
-                <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
-                <span class="site-name">PHN</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
-                <li><a href="videos.html" class="nav-link active">Video</a></li>
-                <li><a href="results.html" class="nav-link">Kết quả</a></li>
-                <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
-                <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
-                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
-                    <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+        <!-- Tier 1: Deep Crimson utility bar -->
+        <div class="header-top">
+            <div class="header-top-container">
+                <div class="header-top-left">
+                    <span>PHÁO HÀ NỘI FOOTBALL CLUB - TRANG WEB CHÍNH THỨC</span>
                 </div>
-            </ul>
-            <div class="mobile-toggle" id="mobile-toggle">
-                <i data-lucide="menu"></i>
+                <div class="header-top-right">
+                    <a href="https://www.facebook.com/profile.php?id=61586374958119" class="header-top-link" target="_blank">Facebook</a>
+                    <a href="https://www.youtube.com/@PHNFCafchn" class="header-top-link" target="_blank">Youtube</a>
+                    <a href="https://www.tiktok.com/@phnfc07" class="header-top-link" target="_blank">TikTok</a>
+                    <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                        <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tier 2: Bright Red navigation bar -->
+        <div class="header-bottom">
+            <div class="header-bottom-container">
+                <a href="index.html" class="logo-wrapper">
+                    <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
+                    <span class="site-name">PHN</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
+                    <li><a href="videos.html" class="nav-link active">Video</a></li>
+                    <li><a href="results.html" class="nav-link">Kết quả</a></li>
+                    <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
+                    <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+                </ul>
+                <div class="mobile-toggle" id="mobile-toggle">
+                    <i data-lucide="menu"></i>
+                </div>
             </div>
         </div>
     </header>
@@ -168,6 +127,7 @@
         }
 
         async function saveVideo() {
+            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
             const category = document.getElementById('v-cat').value;
             let video_id = document.getElementById('v-id').value.trim();
             const title = document.getElementById('v-title').value;

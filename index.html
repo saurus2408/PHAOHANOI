@@ -15,24 +15,40 @@
 <body>
 
     <header>
-        <div class="nav-container">
-            <a href="index.html" class="logo-wrapper">
-                <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
-                <span class="site-name">PHN</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link active">Home</a></li>
-                <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
-                <li><a href="videos.html" class="nav-link">Video</a></li>
-                <li><a href="results.html" class="nav-link">Kết quả</a></li>
-                <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
-                <li><a href="awards.html" class="nav-link">Giải thưởng tháng</a></li>
-                <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
-                    <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+        <!-- Tier 1: Deep Crimson utility bar -->
+        <div class="header-top">
+            <div class="header-top-container">
+                <div class="header-top-left">
+                    <span>PHÁO HÀ NỘI FOOTBALL CLUB - TRANG WEB CHÍNH THỨC</span>
                 </div>
-            </ul>
-            <div class="mobile-toggle" id="mobile-toggle">
-                <i data-lucide="menu"></i>
+                <div class="header-top-right">
+                    <a href="https://www.facebook.com/profile.php?id=61586374958119" class="header-top-link" target="_blank">Facebook</a>
+                    <a href="https://www.youtube.com/@PHNFCafchn" class="header-top-link" target="_blank">Youtube</a>
+                    <a href="https://www.tiktok.com/@phnfc07" class="header-top-link" target="_blank">TikTok</a>
+                    <div class="header-admin-link" id="header-admin-btn" onclick="toggleAdmin()">
+                        <img src="assets/images/icondn.jpg" alt="Login" style="pointer-events: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tier 2: Bright Red navigation bar -->
+        <div class="header-bottom">
+            <div class="header-bottom-container">
+                <a href="index.html" class="logo-wrapper">
+                    <img src="assets/images/Logph.png" alt="CLB Logo" class="logo-img">
+                    <span class="site-name">PHN</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link active">Home</a></li>
+                    <li><a href="players.html" class="nav-link">Cầu thủ</a></li>
+                    <li><a href="videos.html" class="nav-link">Video</a></li>
+                    <li><a href="results.html" class="nav-link">Kết quả</a></li>
+                    <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
+                    <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
+                </ul>
+                <div class="mobile-toggle" id="mobile-toggle">
+                    <i data-lucide="menu"></i>
+                </div>
             </div>
         </div>
     </header>
