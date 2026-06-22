@@ -902,19 +902,19 @@ tr:nth-child(3) .rank-num {
 
 /* Admin Actions & Triggers */
 .admin-actions {
-  /* Hidden globally: remove floating Edit/Delete controls shown at page top */
   position: absolute;
   top: 12px;
   right: 12px;
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+  display: none;
   z-index: 5;
 }
 
-/* Prevent re-enabling via JS toggles */
+/* Show per-card admin buttons only when admin mode is active */
 .admin-active .admin-actions {
-  display: none !important;
+  display: flex;
+  gap: 6px;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .del-btn,
