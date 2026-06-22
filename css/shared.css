@@ -134,15 +134,15 @@ header {
   min-height: 68px;
   gap: 24px;
   position: relative;
-  z-index: 10;
-}
 }
 
 .logo-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
-  text-decoration: none;
+  text-decoration: none !important;
+  border: none !important;
+  outline: none !important;
   transition: var(--transition);
 }
 
@@ -158,14 +158,23 @@ header {
 
 .site-name {
   font-weight: 900;
-  font-size: 1.5rem;
-  color: var(--text-light);
-  letter-spacing: -1px;
+  font-size: 1.65rem;
+  color: #ffffff; /* Safe default fallback color */
+  letter-spacing: -0.5px;
   text-transform: uppercase;
-  background: linear-gradient(90deg, #ffffff, #ffd700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   font-family: "DVN - Sport", sans-serif;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .site-name {
+    background: linear-gradient(90deg, #ffffff 30%, #ffd700 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
 }
 
 .nav-links {
