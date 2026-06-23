@@ -1,15 +1,21 @@
 :root {
-  --primary: #ef0107; /* Arsenal Red */
+  --primary: #ef0107;
+  /* Arsenal Red */
   --primary-gradient: linear-gradient(135deg, #ef0107 0%, #c10008 100%);
   --primary-dark: #b30105;
   --secondary: #ffffff;
-  --text-dark: #f4f6f9; /* Light text */
-  --text-muted: #b0bccf; /* Softer muted text */
+  --text-dark: #f4f6f9;
+  /* Light text */
+  --text-muted: #b0bccf;
+  /* Softer muted text */
   --text-light: #f8f9fa;
-  --bg-light: #090b12; /* Dark canvas */
+  --bg-light: #090b12;
+  /* Dark canvas */
   --bg-dark: #05070d;
-  --bg-card: #10131e; /* Dark card background */
-  --accent: #ffd700; /* Gold accent */
+  --bg-card: #10131e;
+  /* Dark card background */
+  --accent: #ffd700;
+  /* Gold accent */
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --border-radius: 8px;
   --shadow-sm: 0 6px 20px rgba(0, 0, 0, 0.2);
@@ -43,13 +49,16 @@ body {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-light);
 }
+
 ::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
@@ -60,6 +69,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -159,7 +169,8 @@ header {
 .site-name {
   font-weight: 900;
   font-size: 1.65rem;
-  color: #ffffff; /* Safe default fallback color */
+  color: #ffffff;
+  /* Safe default fallback color */
   letter-spacing: -0.5px;
   text-transform: uppercase;
   font-family: "DVN - Sport", sans-serif;
@@ -275,7 +286,7 @@ section {
   justify-content: center;
   text-align: center;
   background:
-    linear-gradient(180deg, rgba(7, 8, 16, 0.85), rgba(8, 10, 18, 0.95)),
+    linear-gradient(180deg, rgba(7, 8, 12, 0.65), rgba(8, 10, 18, 0.95)),
     url("../assets/images/abc.jpg");
   background-size: cover;
   background-position: center;
@@ -475,7 +486,8 @@ section {
   width: 100%;
   height: 320px;
   overflow: hidden;
-  background: #20212c; /* Studio grey background */
+  background: #20212c;
+  /* Studio grey background */
 }
 
 .player-img {
@@ -950,6 +962,7 @@ tr:nth-child(3) .rank-num {
   border: none;
   box-shadow: 0 6px 18px rgba(183, 28, 28, 0.25);
 }
+
 .del-btn:hover {
   background: linear-gradient(180deg, #cf3a3f 0%, #b72226 100%);
   transform: translateY(-2px);
@@ -958,6 +971,7 @@ tr:nth-child(3) .rank-num {
 .edit-btn-card {
   background: rgba(40, 167, 69, 0.9);
 }
+
 .edit-btn-card:hover {
   background: rgb(40, 167, 69);
 }
@@ -981,6 +995,7 @@ tr:nth-child(3) .rank-num {
   gap: 8px;
   transition: var(--transition);
 }
+
 .save-btn:hover {
   background: #218838;
   transform: translateY(-1px);
@@ -997,6 +1012,7 @@ tr:nth-child(3) .rank-num {
   gap: 8px;
   transition: var(--transition);
 }
+
 .reset-btn:hover {
   background: linear-gradient(180deg, #e96469 0%, #d94a4f 100%);
   transform: translateY(-2px);
@@ -1008,11 +1024,9 @@ tr:nth-child(3) .rank-num {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.92);
-  background: linear-gradient(
-    180deg,
-    rgba(24, 25, 34, 0.98),
-    rgba(16, 17, 24, 0.96)
-  );
+  background: linear-gradient(180deg,
+      rgba(24, 25, 34, 0.98),
+      rgba(16, 17, 24, 0.96));
   padding: 28px;
   border-radius: 12px;
   z-index: 2000;
@@ -1309,13 +1323,16 @@ tr:nth-child(3) .rank-num {
 .admin-active .admin-only {
   display: inline-flex !important;
 }
+
 .admin-active div.admin-only,
 .admin-active p.admin-only {
   display: block !important;
 }
+
 .admin-active tr.admin-only {
   display: table-row !important;
 }
+
 .admin-active th.admin-only,
 .admin-active td.admin-only {
   display: table-cell !important;

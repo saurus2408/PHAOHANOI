@@ -1,0 +1,242 @@
+[
+  {
+    "id": 55,
+    "num": 20,
+    "name": "{\"name\":\"VŨ TẤN LỘC\",\"position\":\"Tiền đạo\",\"dob\":\"2004-10-10\",\"hometown\":\"HÀ NỘI\",\"career\":\"SINH VIÊN\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782150833017-1-(31).jpg"
+  },
+  {
+    "id": 56,
+    "num": 37,
+    "name": "{\"name\":\"VÕ PHI THỨC\",\"position\":\"Hậu vệ\",\"dob\":\"2004-05-15\",\"hometown\":\"NGHỆ AN\",\"career\":\"SINH VIÊN\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782150946615-1-(25).jpg"
+  },
+  {
+    "id": 57,
+    "num": 14,
+    "name": "{\"name\":\"VIỆT HIẾP VIỆT\",\"position\":\"Tiền vệ\",\"dob\":\"1996-03-07\",\"hometown\":\"LÀO CAI\",\"career\":\"NHIẾP ẢNH GIA\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151080189-1-(20).jpg"
+  },
+  {
+    "id": 58,
+    "num": 12,
+    "name": "{\"name\":\"NGUYỄN THÁI ĐỨC\",\"position\":\"Tiền vệ\",\"dob\":\"2004-02-01\",\"hometown\":\"HÀ NỘI\",\"career\":\"DEV\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151147583-1-(19).jpg"
+  },
+  {
+    "id": 59,
+    "num": 28,
+    "name": "{\"name\":\"CHIỀU\",\"position\":\"Tiền đạo\",\"dob\":\"1997-12-01\",\"hometown\":\"HÒA BÌNH\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151212829-1-(13).jpg"
+  },
+  {
+    "id": 61,
+    "num": 10,
+    "name": "{\"name\":\"DUY NAM\",\"position\":\"Hậu vệ\",\"dob\":\"1998-12-01\",\"hometown\":\"HÀ NỘI\",\"career\":\"BUÔN BÁN ÁO ĐÁ BÓNG\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151404226-1-(6).jpg"
+  },
+  {
+    "id": 64,
+    "num": 48,
+    "name": "{\"name\":\"VŨ HÙNG\",\"position\":\"Hậu vệ\",\"dob\":\"1998-01-28\",\"hometown\":\"HÀ NỘI\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151671349-1-(26).jpg"
+  },
+  {
+    "id": 65,
+    "num": 19,
+    "name": "{\"name\":\"PHẠM HỒNG QUÂN\",\"position\":\"Tiền đạo\",\"dob\":\"2004-03-01\",\"hometown\":\"VIỆT NAM\",\"career\":\"SINH VIÊN\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151743624-1-(24).jpg"
+  },
+  {
+    "id": 67,
+    "num": 92,
+    "name": "{\"name\":\"NGUYỄN TÚ\",\"position\":\"Tiền đạo\",\"dob\":\"1992-08-21\",\"hometown\":\"THÁI NGUYÊN\",\"career\":\"KTV IN ẤN\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151925177-1-(22).jpg"
+  },
+  {
+    "id": 68,
+    "num": 27,
+    "name": "{\"name\":\"PHẠM THẾ DUY\",\"position\":\"Tiền đạo\",\"dob\":\"1997-10-27\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151991134-1-(21).jpg"
+  },
+  {
+    "id": 66,
+    "num": 8,
+    "name": "{\"name\":\"ĐỖ VIỆT HOÀNG\",\"position\":\"Tiền vệ\",\"dob\":\"2000-08-21\",\"hometown\":\"HÀ NAM\",\"career\":\"BÁC SĨ ĐẺ\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151847293-1-(23).jpg"
+  },
+  {
+    "id": 69,
+    "num": 9,
+    "name": "{\"name\":\"LÊ BÁ TÙNG\",\"position\":\"Hậu vệ\",\"dob\":\"1994-12-08\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152058604-1-(16).jpg"
+  },
+  {
+    "id": 71,
+    "num": 5,
+    "name": "{\"name\":\"NGUYÊN MẠNH\",\"position\":\"Thủ môn\",\"dob\":\"1998-06-13\",\"hometown\":\"THÁI NGUYÊN\",\"career\":\"KTV IN ẤN\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152174415-1-(4).jpg"
+  },
+  {
+    "id": 73,
+    "num": 2,
+    "name": "{\"name\":\"NGUYỄN TIẾN THÀNH\",\"position\":\"Hậu vệ\",\"dob\":\"1996-10-06\",\"hometown\":\"THÁI NGUYÊN\",\"career\":\"NHÂN VIÊN KINH DOANH\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152288726-1-(2).jpg"
+  },
+  {
+    "id": 75,
+    "num": 29,
+    "name": "{\"name\":\"DUY TIÊN\",\"position\":\"Tiền vệ\",\"dob\":\"2000-01-01\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152411170-1-(14).jpg"
+  },
+  {
+    "id": 60,
+    "num": 23,
+    "name": "{\"name\":\"PHẠM HẢI PHONG\",\"position\":\"Hậu vệ\",\"dob\":\"2003-12-23\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151303652-1-(7).jpg"
+  },
+  {
+    "id": 63,
+    "num": 18,
+    "name": "{\"name\":\"HẠNH\",\"position\":\"Tiền vệ\",\"dob\":\"2000-11-03\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782151590874-1-(28).jpg"
+  },
+  {
+    "id": 72,
+    "num": 16,
+    "name": "{\"name\":\"QUANG PHƯƠNG\",\"position\":\"Hậu vệ\",\"dob\":\"1996-06-07\",\"hometown\":\"VIỆT NAM\",\"career\":\"KTV MÁY TÍNH\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152233136-1-(3).jpg"
+  },
+  {
+    "id": 77,
+    "num": 97,
+    "name": "{\"name\":\"NGUYỄN CÔNG MINH\",\"position\":\"Hậu vệ\",\"dob\":\"1997-04-01\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152611702-1-(10).jpg"
+  },
+  {
+    "id": 78,
+    "num": 58,
+    "name": "{\"name\":\"BÙI NIÊM\",\"position\":\"Thủ môn\",\"dob\":\"1998-02-23\",\"hometown\":\"HÒA BÌNH\",\"career\":\"HÀN QUỐC\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152675902-1-(8).jpg"
+  },
+  {
+    "id": 79,
+    "num": 83,
+    "name": "{\"name\":\"TRẦN QUANG THÁI\",\"position\":\"Tiền đạo\",\"dob\":\"1983-10-01\",\"hometown\":\"\",\"career\":\"NHÀ BÁO\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152748964-1-(5).jpg"
+  },
+  {
+    "id": 80,
+    "num": 25,
+    "name": "{\"name\":\"PHẠM KIÊN\",\"position\":\"Tiền đạo\",\"dob\":\"2004-10-18\",\"hometown\":\"HÀ NỘI\",\"career\":\"THỢ XĂM\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152804689-1-(30).jpg"
+  },
+  {
+    "id": 81,
+    "num": 3,
+    "name": "{\"name\":\"LÊ HƯNG\",\"position\":\"Thủ môn\",\"dob\":\"1994-09-14\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152839697-1-(29).jpg"
+  },
+  {
+    "id": 84,
+    "num": 91,
+    "name": "{\"name\":\"ĐÀM HẢI YẾN\",\"position\":\"Tiền đạo\",\"dob\":\"\",\"hometown\":\"HÀ NỘI\",\"career\":\"GIẢNG VIÊN VÕ\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782153034281-z7965451103093_5a99a5ae2f6b3df1307d5d35139af676.jpg"
+  },
+  {
+    "id": 82,
+    "num": 1,
+    "name": "{\"name\":\"HOÀNG XUÂN GIAO\",\"position\":\"Thủ môn\",\"dob\":\"2006-08-24\",\"hometown\":\"HÀ NỘI\",\"career\":\"DEV\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782153044198-z7965451135804_b02930acfa23c5152c83c555e7268d79.jpg"
+  },
+  {
+    "id": 85,
+    "num": 6,
+    "name": "{\"name\":\"TUẤN\",\"position\":\"Hậu vệ\",\"dob\":\"\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782154833805-f2e38211-18f7-4049-a334-dbc08ebdfe83.png"
+  },
+  {
+    "id": 62,
+    "num": 11,
+    "name": "{\"name\":\"NGUYỄN TRUNG KIÊN\",\"position\":\"Tiền đạo\",\"dob\":\"1995-04-28\",\"hometown\":\"HẢI PHÒNG\",\"career\":\"BUÔN BÁN LOA\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782155207263-1-(1).jpg"
+  },
+  {
+    "id": 70,
+    "num": 34,
+    "name": "{\"name\":\"PHÙNG ĐỨC HUỲNH\",\"position\":\"Tiền đạo\",\"dob\":\"1997-07-06\",\"hometown\":\"HÀI DƯƠNG\",\"career\":\"NGÂN \"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782155248608-1-(15).jpg"
+  },
+  {
+    "id": 76,
+    "num": 4,
+    "name": "{\"name\":\"ĐÀM MINH TUẤN\",\"position\":\"Hậu vệ\",\"dob\":\"1987-04-01\",\"hometown\":\"VIỆT NAM\",\"career\":\"KINH DOANH\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152544850-1-(12).jpg"
+  },
+  {
+    "id": 74,
+    "num": 82,
+    "name": "{\"name\":\"ĐỨC ANH \",\"position\":\"Tiền đạo\",\"dob\":\"2002-10-28\",\"hometown\":\"HÒA BÌNH\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782152364679-1-(17).jpg"
+  },
+  {
+    "id": 86,
+    "num": 33,
+    "name": "{\"name\":\"TÔ MINH TUẤN\",\"position\":\"Hậu vệ\",\"dob\":\"1992-12-30\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782153664489-2fb5a97b-2c83-4739-b9cb-fa07007289c8.png"
+  },
+  {
+    "id": 87,
+    "num": 98,
+    "name": "{\"name\":\"NGUYỄN HỒNG QUÂN\",\"position\":\"Hậu vệ\",\"dob\":\"1998-11-15\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782153757230-1-(9).jpg"
+  },
+  {
+    "id": 89,
+    "num": 35,
+    "name": "{\"name\":\"ĐẶNG HOÀNG NAM\",\"position\":\"Hậu vệ\",\"dob\":\"1993-11-11\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": ""
+  },
+  {
+    "id": 91,
+    "num": 23,
+    "name": "{\"name\":\"ĐẶNG HÙNG LĨNH\",\"position\":\"Tiền vệ\",\"dob\":\"1994-12-30\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": ""
+  },
+  {
+    "id": 92,
+    "num": 15,
+    "name": "{\"name\":\"LÊ ĐỨC\",\"position\":\"Hậu vệ\",\"dob\":\"2006-10-03\",\"hometown\":\"VIỆT NAM\",\"career\":\"SINH VIÊN\"}",
+    "img": ""
+  },
+  {
+    "id": 93,
+    "num": 30,
+    "name": "{\"name\":\"VIỆT ANH\",\"position\":\"Hậu vệ\",\"dob\":\"2000-12-24\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "assets/images/1-1206.jpg"
+  },
+  {
+    "id": 90,
+    "num": 22,
+    "name": "{\"name\":\"NGUYỄN ĐỨC ANH\",\"position\":\"Hậu vệ\",\"dob\":\"2004-11-22\",\"hometown\":\"VIỆT NAM\",\"career\":\"SINH VIÊN\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782154799948-1-(11).jpg"
+  },
+  {
+    "id": 88,
+    "num": 0,
+    "name": "{\"name\":\"LÊ GIA LINH\",\"position\":\"Hậu vệ\",\"dob\":\"\",\"hometown\":\"VIỆT NAM\",\"career\":\"\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782154868141-1-(18).jpg"
+  },
+  {
+    "id": 94,
+    "num": 77,
+    "name": "{\"name\":\"LÊ HIẾU\",\"position\":\"Tiền vệ\",\"dob\":\"1994-08-19\",\"hometown\":\"LÀO CAI\",\"career\":\"BÁC SĨ CHỈNH HÌNH\"}",
+    "img": "https://hiykohhpxogniosdowjo.supabase.co/storage/v1/object/public/players/1782154951560-015cb502-52de-4e01-abab-f497c0dcfb97.png"
+  },
+  {
+    "id": 95,
+    "num": 7,
+    "name": "{\"name\":\"NGUYỄN XUÂN ĐẠT\",\"position\":\"Tiền đạo\",\"dob\":\"1992-07-11\",\"hometown\":\"\",\"career\":\"\"}",
+    "img": ""
+  }
+]
