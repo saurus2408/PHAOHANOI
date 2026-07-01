@@ -615,7 +615,6 @@
           // Insert new record
           const insertPayload = {
             name: item.name,
-            player_id: item.id,
             ...updates,
           };
           result = await _supabase.from("player_scores").insert([insertPayload]);
