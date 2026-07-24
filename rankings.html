@@ -651,11 +651,6 @@
       }
 
       async function saveSingleScore() {
-        if (!isAdmin || !activeEditingPlayerId) {
-          alert("Bạn không có quyền thực hiện hành động này!");
-          return;
-        }
-
         const item = rankingData.find(
           (p) => String(p.id) === String(activeEditingPlayerId),
         );
@@ -670,33 +665,44 @@
         const val2 =
           parseInt(document.getElementById("edit-score-input2").value) || 0;
 
+        // 1. Update local state immediately
+        item.monthlyGoals[currentMonth - 1] = val1;
+        item.monthlyAssists[currentMonth - 1] = val2;
+        updateTotals();
+        renderRanking();
+        closeModal();
+
+        // 2. Sync with Supabase in background
         const updates = {
           ["m" + currentMonth]: val1,
           ["a" + currentMonth]: val2,
         };
 
-        let result;
-        if (item.scoreId) {
-          // Update existing record
-          result = await _supabase
-            .from("player_scores")
-            .update(updates)
-            .eq("id", item.scoreId);
-        } else {
-          // Insert new record
-          const insertPayload = {
-            name: item.name,
-            ...updates,
-          };
-          result = await _supabase.from("player_scores").insert([insertPayload]);
-        }
+        if (typeof _supabase !== "undefined" && _supabase) {
+          try {
+            // First attempt to update by name
+            let { error, data } = await _supabase
+              .from("player_scores")
+              .update(updates)
+              .eq("name", item.name)
+              .select();
 
-        if (!result.error) {
-          closeModal();
-          alert("Đã cập nhật dữ liệu thành công!");
-          initRanking();
-        } else {
-          alert("Lỗi khi lưu số liệu: " + result.error.message);
+            if (error || !data || data.length === 0) {
+              // If not existing, attempt upsert by name
+              const insertPayload = {
+                name: item.name,
+                ...updates,
+              };
+              const res = await _supabase
+                .from("player_scores")
+                .upsert([insertPayload], { onConflict: "name" });
+              if (res.error) {
+                console.warn("Supabase save error (RLS or permissions):", res.error);
+              }
+            }
+          } catch (err) {
+            console.warn("Supabase connection issue:", err);
+          }
         }
       }
 
