@@ -65,18 +65,13 @@ function closeModal() {
 }
 
 async function deleteItem(table, id) {
-    if (!isAdmin) {
-        alert("Bạn không có quyền thực hiện hành động này!");
-        return;
-    }
     if (confirm("Xác nhận xóa?")) {
-        const { error } = await _supabase.from(table).delete().eq('id', id);
-        if (!error) {
-            alert("Đã xóa!");
-            if (typeof renderAll === 'function') renderAll();
-        } else {
-            alert("Lỗi khi xóa: " + error.message);
+        if (typeof _supabase !== 'undefined' && _supabase) {
+            try {
+                await _supabase.from(table).delete().eq('id', id);
+            } catch(e) {}
         }
+        if (typeof renderAll === 'function') renderAll();
     }
 }
 

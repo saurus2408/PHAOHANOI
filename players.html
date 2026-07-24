@@ -259,6 +259,34 @@
             }
         }
 
+        async function deletePlayer(idx, event) {
+            if (event) event.stopPropagation();
+            if (!confirm("Xác nhận xóa cầu thủ này?")) return;
+
+            const p = allPlayersList[idx];
+            if (!p) return;
+
+            const deletedId = p.id;
+            const deletedNum = p.num;
+
+            // 1. Remove from local memory & update table immediately
+            allPlayersList.splice(idx, 1);
+            renderPlayerList(allPlayersList);
+
+            // 2. Sync deletion with Supabase in background
+            if (typeof _supabase !== 'undefined' && _supabase) {
+                try {
+                    if (deletedId && typeof deletedId === 'string' && !deletedId.startsWith('p-') && isNaN(deletedId)) {
+                        await _supabase.from('players').delete().eq('id', deletedId);
+                    } else if (deletedNum) {
+                        await _supabase.from('players').delete().eq('num', deletedNum);
+                    }
+                } catch(e) {
+                    console.warn("Supabase delete sync warning:", e);
+                }
+            }
+        }
+
         function renderPlayerList(playersToRender) {
             const body = document.getElementById('players-list-body');
             const adminHeader = document.getElementById('admin-col-header');
@@ -302,7 +330,7 @@
                             <button type="button" class="edit-btn-card" onclick="handleEditPlayerClick(${idx})" style="padding:4px 8px;">
                                 <i data-lucide="edit-3" style="width:12px; height:12px;"></i> Sửa
                             </button>
-                            <button type="button" class="del-btn" onclick="deleteItem('players', '${p.id}')" style="padding:4px 8px;">
+                            <button type="button" class="del-btn" onclick="deletePlayer(${idx}, event)" style="padding:4px 8px;">
                                 <i data-lucide="trash-2" style="width:12px; height:12px;"></i> Xóa
                             </button>
                         </div>
