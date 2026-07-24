@@ -181,63 +181,82 @@
 
         let editingPlayerId = null;
         let currentEditingImg = '';
-        let allPlayersList = [];
+        let allPlayersList = DEFAULT_PLAYERS.map(p => ({
+            id: p.num,
+            num: p.num,
+            rawName: p.name,
+            name: p.name,
+            position: p.position,
+            dob: p.dob,
+            hometown: p.hometown,
+            career: p.career,
+            img: ''
+        }));
 
         async function fetchPlayers() {
+            let fetchedList = [];
             try {
-                const { data: pList, error: pErr } = await _supabase.from('players').select('*').order('num', { ascending: true });
-                
-                if (pErr || !pList || pList.length === 0) {
-                    // Fallback to default players list if Supabase is empty or RLS blocks
-                    allPlayersList = DEFAULT_PLAYERS.map(p => ({
-                        id: p.num,
-                        num: p.num,
-                        rawName: p.name,
-                        name: p.name,
-                        position: p.position,
-                        dob: p.dob,
-                        hometown: p.hometown,
-                        career: p.career,
-                        img: ''
-                    }));
-                } else {
-                    allPlayersList = pList.map(p => {
-                        let rawName = p.name || '';
-                        let name = rawName;
-                        let position = 'Hậu vệ';
-                        let dob = 'Chưa cập nhật';
-                        let hometown = 'Chưa cập nhật';
-                        let career = 'Chưa cập nhật';
-
-                        if (rawName && rawName.startsWith('{') && rawName.endsWith('}')) {
-                            try {
-                                const meta = JSON.parse(rawName);
-                                name = meta.name || '';
-                                position = meta.position || 'Hậu vệ';
-                                dob = meta.dob || 'Chưa cập nhật';
-                                hometown = meta.hometown || 'Chưa cập nhật';
-                                career = meta.career || 'Chưa cập nhật';
-                            } catch(e) {}
-                        }
-
-                        return {
-                            id: p.id,
-                            num: p.num || 0,
-                            rawName: rawName,
-                            name: name || 'Cầu thủ',
-                            position: position,
-                            dob: dob,
-                            hometown: hometown,
-                            career: career,
-                            img: p.img || ''
-                        };
-                    });
+                if (typeof _supabase !== 'undefined' && _supabase) {
+                    const { data: pList, error: pErr } = await _supabase.from('players').select('*').order('num', { ascending: true });
+                    if (!pErr && pList && pList.length > 0) {
+                        fetchedList = pList;
+                    }
                 }
-            } catch (err) {
-                allPlayersList = DEFAULT_PLAYERS;
+            } catch (e) {
+                console.warn("Supabase fetch error, using default list:", e);
             }
 
-            renderPlayerList(allPlayersList);
+            if (fetchedList.length > 0) {
+                allPlayersList = fetchedList.map(p => {
+                    let rawName = p.name || '';
+                    let name = rawName;
+                    let position = 'Hậu vệ';
+                    let dob = 'Chưa cập nhật';
+                    let hometown = 'Chưa cập nhật';
+                    let career = 'Chưa cập nhật';
+
+                    if (rawName && rawName.startsWith('{') && rawName.endsWith('}')) {
+                        try {
+                            const meta = JSON.parse(rawName);
+                            name = meta.name || '';
+                            position = meta.position || 'Hậu vệ';
+                            dob = meta.dob || 'Chưa cập nhật';
+                            hometown = meta.hometown || 'Chưa cập nhật';
+                            career = meta.career || 'Chưa cập nhật';
+                        } catch(e) {}
+                    }
+
+                    return {
+                        id: p.id,
+                        num: p.num || 0,
+                        rawName: rawName,
+                        name: name || 'Cầu thủ',
+                        position: position,
+                        dob: dob,
+                        hometown: hometown,
+                        career: career,
+                        img: p.img || ''
+                    };
+                });
+                renderPlayerList(allPlayersList);
+            }
+        }
+
+        function handlePlayerRowClick(idx, event) {
+            if (event && event.target && (event.target.closest('button') || event.target.closest('.del-btn') || event.target.closest('.edit-btn-card'))) {
+                return;
+            }
+            const p = allPlayersList[idx];
+            if (p) {
+                showPlayerDetails(p);
+            }
+        }
+
+        function handleEditPlayerClick(idx) {
+            const p = allPlayersList[idx];
+            if (p) {
+                openEditPlayerModal(p);
+            }
         }
 
         function renderPlayerList(playersToRender) {
@@ -247,12 +266,14 @@
                 adminHeader.style.display = isAdmin ? 'table-cell' : 'none';
             }
 
+            if (!body) return;
+
             if (!playersToRender || playersToRender.length === 0) {
                 body.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" style="text-align:center; padding:30px; color:var(--text-muted);">Chưa có dữ liệu cầu thủ. Vui lòng chạy script SQL trên Supabase hoặc nhấn "Thêm cầu thủ".</td></tr>`;
                 return;
             }
 
-            body.innerHTML = playersToRender.map(p => {
+            body.innerHTML = playersToRender.map((p, idx) => {
                 let dobFormatted = p.dob;
                 if (p.dob && p.dob !== 'Chưa cập nhật') {
                     const parts = p.dob.split('-');
@@ -262,11 +283,9 @@
                 }
 
                 const hometownDisplay = p.hometown !== 'Chưa cập nhật' ? `${p.hometown} 🇻🇳` : p.hometown;
-                const escapedRawName = (p.rawName || '').replace(/"/g, '&quot;');
-                const escapedImg = (p.img || '').replace(/"/g, '&quot;');
 
                 return `
-                <tr class="player-row" onclick="showPlayerDetails('${escapedRawName}', ${p.num}, '${escapedImg}', event)">
+                <tr class="player-row" onclick="handlePlayerRowClick(${idx}, event)">
                     <td style="text-align: center;"><span class="player-num-pill">${p.num || '?'}</span></td>
                     <td>
                         <div class="player-name-cell">
@@ -280,7 +299,7 @@
                     ${isAdmin ? `
                     <td style="text-align: center;" onclick="event.stopPropagation();">
                         <div style="display:flex; justify-content:center; gap:6px;">
-                            <button type="button" class="edit-btn-card" onclick="openEditPlayerModal('${p.id}', ${p.num}, '${escapedRawName}')" style="padding:4px 8px;">
+                            <button type="button" class="edit-btn-card" onclick="handleEditPlayerClick(${idx})" style="padding:4px 8px;">
                                 <i data-lucide="edit-3" style="width:12px; height:12px;"></i> Sửa
                             </button>
                             <button type="button" class="del-btn" onclick="deleteItem('players', '${p.id}')" style="padding:4px 8px;">
@@ -292,7 +311,9 @@
                 `;
             }).join('');
 
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                try { lucide.createIcons(); } catch(e){}
+            }
         }
 
         function filterPlayers() {
@@ -324,187 +345,138 @@
             openModal('player');
         }
 
-        function openEditPlayerModal(pId, num, nameJson) {
+        function openEditPlayerModal(p) {
             if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
-            editingPlayerId = pId;
+            editingPlayerId = p.id || null;
             document.getElementById('player-modal-title').innerText = 'Chỉnh sửa Cầu thủ';
-            
-            let name = nameJson;
-            let position = 'Hậu vệ';
-            let dob = '';
-            let hometown = '';
-            let career = '';
 
-            if (nameJson.startsWith('{') && nameJson.endsWith('}')) {
-                try {
-                    const meta = JSON.parse(nameJson);
-                    name = meta.name || '';
-                    position = meta.position || 'Hậu vệ';
-                    dob = meta.dob || '';
-                    hometown = meta.hometown || '';
-                    career = meta.career || '';
-                } catch(e) {}
-            }
-
-            document.getElementById('p-num').value = num;
-            document.getElementById('p-name').value = name;
-            document.getElementById('p-position').value = position;
-            document.getElementById('p-dob').value = dob;
-            document.getElementById('p-hometown').value = hometown;
-            document.getElementById('p-career').value = career;
+            document.getElementById('p-num').value = p.num || '';
+            document.getElementById('p-name').value = p.name || '';
+            document.getElementById('p-position').value = p.position || 'Hậu vệ';
+            document.getElementById('p-dob').value = p.dob === 'Chưa cập nhật' ? '' : (p.dob || '');
+            document.getElementById('p-hometown').value = p.hometown === 'Chưa cập nhật' ? '' : (p.hometown || '');
+            document.getElementById('p-career').value = p.career === 'Chưa cập nhật' ? '' : (p.career || '');
             openModal('player');
         }
 
-        function showPlayerDetails(nameJson, num, img, event) {
-            if (event && event.target && (event.target.closest('button') || event.target.closest('.del-btn') || event.target.closest('.edit-btn-card'))) {
-                return;
-            }
-
-            let name = nameJson;
-            let position = 'Chưa cập nhật';
-            let dob = 'Chưa cập nhật';
-            let hometown = 'Chưa cập nhật';
-            let career = 'Chưa cập nhật';
-
-            if (nameJson.startsWith('{') && nameJson.endsWith('}')) {
-                try {
-                    const meta = JSON.parse(nameJson);
-                    name = meta.name || '';
-                    position = meta.position || position;
-                    dob = meta.dob || dob;
-                    hometown = meta.hometown || hometown;
-                    career = meta.career || career;
-                } catch(e) {}
-            }
-
-            let dobFormatted = dob;
-            if (dob && dob !== 'Chưa cập nhật') {
-                const parts = dob.split('-');
+        function showPlayerDetails(p) {
+            let dobFormatted = p.dob;
+            if (p.dob && p.dob !== 'Chưa cập nhật') {
+                const parts = p.dob.split('-');
                 if (parts.length === 3) {
                     dobFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
                 }
             }
 
             const detailContent = document.getElementById('player-detail-content');
-            detailContent.innerHTML = `
-                <div class="player-modal-detail">
-                    <div class="modal-player-header" style="align-items: center; gap: 15px; margin-bottom: 20px;">
-                        <div class="player-num-pill" style="min-width:50px; height:50px; font-size:1.5rem; border-radius:12px;">#${num}</div>
-                        <div class="modal-player-title">
-                            <h2 style="border:none; margin-bottom: 2px;">${name}</h2>
-                            <span class="player-position-pill">${position}</span>
+            if (detailContent) {
+                detailContent.innerHTML = `
+                    <div class="player-modal-detail">
+                        <div class="modal-player-header" style="align-items: center; gap: 15px; margin-bottom: 20px;">
+                            <div class="player-num-pill" style="min-width:50px; height:50px; font-size:1.5rem; border-radius:12px;">#${p.num || '?'}</div>
+                            <div class="modal-player-title">
+                                <h2 style="border:none; margin-bottom: 2px;">${p.name}</h2>
+                                <span class="player-position-pill">${p.position}</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="modal-player-grid" style="grid-template-columns: 1fr; gap: 12px;">
-                        <div>
-                            <div class="detail-item-label">Ngày sinh</div>
-                            <div class="detail-item-value">${dobFormatted}</div>
-                        </div>
-                        <div>
-                            <div class="detail-item-label">Số áo</div>
-                            <div class="detail-item-value">#${num}</div>
-                        </div>
-                        <div>
-                            <div class="detail-item-label">Vị trí thi đấu</div>
-                            <div class="detail-item-value">${position}</div>
-                        </div>
-                        <div>
-                            <div class="detail-item-label">Quê quán</div>
-                            <div class="detail-item-value">🇻🇳 ${hometown}</div>
-                        </div>
-                        <div>
-                            <div class="detail-item-label">Nghề nghiệp</div>
-                            <div class="detail-item-value">${career}</div>
+                        <div class="modal-player-grid" style="grid-template-columns: 1fr; gap: 12px;">
+                            <div>
+                                <div class="detail-item-label">Ngày sinh</div>
+                                <div class="detail-item-value">${dobFormatted}</div>
+                            </div>
+                            <div>
+                                <div class="detail-item-label">Số áo</div>
+                                <div class="detail-item-value">#${p.num || '?'}</div>
+                            </div>
+                            <div>
+                                <div class="detail-item-label">Vị trí thi đấu</div>
+                                <div class="detail-item-value">${p.position}</div>
+                            </div>
+                            <div>
+                                <div class="detail-item-label">Quê quán</div>
+                                <div class="detail-item-value">🇻🇳 ${p.hometown}</div>
+                            </div>
+                            <div>
+                                <div class="detail-item-label">Nghề nghiệp</div>
+                                <div class="detail-item-value">${p.career}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-            openModal('player-detail');
+                `;
+                openModal('player-detail');
+            }
         }
 
         async function savePlayer() {
-            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
-            const num = document.getElementById('p-num').value;
-            const name = document.getElementById('p-name').value;
-            const position = document.getElementById('p-position').value;
-            const dob = document.getElementById('p-dob').value;
-            const hometown = document.getElementById('p-hometown').value;
-            const career = document.getElementById('p-career').value;
+            const numInput = document.getElementById('p-num');
+            const nameInput = document.getElementById('p-name');
+            const posInput = document.getElementById('p-position');
+            const dobInput = document.getElementById('p-dob');
+            const hometownInput = document.getElementById('p-hometown');
+            const careerInput = document.getElementById('p-career');
+
+            const num = numInput ? numInput.value : '';
+            const name = nameInput ? nameInput.value : '';
+            const position = posInput ? posInput.value : 'Hậu vệ';
+            const dob = dobInput && dobInput.value ? dobInput.value : 'Chưa cập nhật';
+            const hometown = hometownInput && hometownInput.value ? hometownInput.value : 'Chưa cập nhật';
+            const career = careerInput && careerInput.value ? careerInput.value : 'Chưa cập nhật';
             
             if (!num || !name) {
                 alert("Vui lòng điền số áo và tên cầu thủ!");
                 return;
             }
 
-            const namePayload = JSON.stringify({
-                name,
-                position,
-                dob,
-                hometown,
-                career
-            });
-
-            const payload = { num: parseInt(num), name: namePayload, img: '' };
-
-            if (editingPlayerId) {
-                const { error } = await _supabase.from('players').update(payload).eq('id', editingPlayerId);
-                if (!error) { 
-                    closeModal(); 
-                    fetchPlayers(); 
-                } else {
-                    alert("Lỗi khi cập nhật cầu thủ: " + error.message);
-                }
-            } else {
-                const { error } = await _supabase.from('players').insert([payload]);
-                if (!error) { 
-                    closeModal(); 
-                    fetchPlayers(); 
-                } else {
-                    alert("Lỗi khi tạo cầu thủ: " + error.message);
-                }
-            }
-        }dError) {
-                    alert("Lỗi upload ảnh: " + uploadError.message);
-                    return;
-                }
-                if (data) {
-                    const { data: urlData } = _supabase.storage.from('players').getPublicUrl(fileName);
-                    imgUrl = urlData.publicUrl;
-                }
-            }
-
-            const namePayload = JSON.stringify({
-                name,
-                position,
-                dob,
-                hometown,
-                career
-            });
-
-            const payload = { num: parseInt(num), name: namePayload, img: imgUrl };
+            const playerItem = {
+                id: editingPlayerId || `p-${Date.now()}`,
+                num: parseInt(num),
+                rawName: name,
+                name: name,
+                position: position,
+                dob: dob,
+                hometown: hometown,
+                career: career,
+                img: ''
+            };
 
             if (editingPlayerId) {
-                const { error } = await _supabase.from('players').update(payload).eq('id', editingPlayerId);
-                if (!error) { 
-                    closeModal(); 
-                    fetchPlayers(); 
+                const idx = allPlayersList.findIndex(p => String(p.id) === String(editingPlayerId) || p.num === parseInt(num));
+                if (idx !== -1) {
+                    allPlayersList[idx] = playerItem;
                 } else {
-                    alert("Lỗi khi cập nhật cầu thủ: " + error.message);
+                    allPlayersList.unshift(playerItem);
                 }
             } else {
-                const { error } = await _supabase.from('players').insert([payload]);
-                if (!error) { 
-                    closeModal(); 
-                    fetchPlayers(); 
-                } else {
-                    alert("Lỗi khi tạo cầu thủ: " + error.message);
-                }
+                allPlayersList.unshift(playerItem);
+            }
+
+            closeModal();
+            renderPlayerList(allPlayersList);
+
+            if (typeof _supabase !== 'undefined' && _supabase) {
+                try {
+                    const namePayload = JSON.stringify({ name, position, dob, hometown, career });
+                    const payload = { num: parseInt(num), name: namePayload, img: '' };
+                    if (editingPlayerId && typeof editingPlayerId === 'string' && !editingPlayerId.startsWith('p-')) {
+                        await _supabase.from('players').update(payload).eq('id', editingPlayerId);
+                    } else {
+                        await _supabase.from('players').insert([payload]);
+                    }
+                } catch(e) {}
             }
         }
 
         function renderAll() { fetchPlayers(); }
-        window.onload = fetchPlayers;
+        renderPlayerList(allPlayersList);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPlayerList(allPlayersList);
+            fetchPlayers();
+        });
+        window.onload = function() {
+            renderPlayerList(allPlayersList);
+            fetchPlayers();
+        };
     </script>
 </body>
 
