@@ -209,26 +209,96 @@
       let teamData = []; // Calculated from matches
       let activeEditingPlayerId = null;
 
-      async function initRanking() {
-        // Fetch Players from unified table
-        const { data: pList, error: pErr } = await _supabase
-          .from("players")
-          .select("*")
-          .order("num", { ascending: true });
-        if (pErr) return console.error(pErr);
+      const DEFAULT_SCORES = [
+        { name: 'LÊ GIA LINH', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'HOÀNG XUÂN GIAO', m3: 2, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'NGUYỄN TIẾN THÀNH', m3: 2, a3: 2, m4: 3, a4: 1, m5: 2, a5: 1, m6: 0, a6: 0, m7: 2, a7: 2 },
+        { name: 'LÊ HƯNG', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'ĐÀM MINH TUẤN', m3: 1, a3: 0, m4: 2, a4: 4, m5: 1, a5: 3, m6: 1, a6: 0, m7: 0, a7: 1 },
+        { name: 'NGUYÊN MẠNH', m3: 0, a3: 2, m4: 0, a4: 0, m5: 0, a5: 4, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'TUẤN', m3: 0, a3: 0, m4: 0, a4: 1, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'NGUYỄN XUÂN ĐẠT', m3: 1, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'ĐỖ VIỆT HOÀNG', m3: 1, a3: 0, m4: 2, a4: 1, m5: 2, a5: 2, m6: 1, a6: 0, m7: 1, a7: 3 },
+        { name: 'LÊ BÁ TÙNG', m3: 0, a3: 2, m4: 0, a4: 3, m5: 0, a5: 1, m6: 1, a6: 0, m7: 1, a7: 2 },
+        { name: 'DUY NAM', m3: 3, a3: 5, m4: 0, a4: 0, m5: 2, a5: 1, m6: 2, a6: 0, m7: 0, a7: 0 },
+        { name: 'NGUYỄN TRUNG KIÊN', m3: 1, a3: 0, m4: 0, a4: 0, m5: 0, a5: 1, m6: 2, a6: 0, m7: 0, a7: 0 },
+        { name: 'NGUYỄN THÁI ĐỨC', m3: 0, a3: 1, m4: 0, a4: 0, m5: 1, a5: 0, m6: 0, a6: 0, m7: 1, a7: 0 },
+        { name: 'HIỆP VIẾT HIỆP', m3: 4, a3: 3, m4: 0, a4: 0, m5: 3, a5: 1, m6: 1, a6: 1, m7: 1, a7: 1 },
+        { name: 'LÊ ĐỨC', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'QUANG PHƯƠNG', m3: 0, a3: 1, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'HẠNH', m3: 0, a3: 0, m4: 0, a4: 0, m5: 1, a5: 1, m6: 0, a6: 1, m7: 1, a7: 0 },
+        { name: 'PHẠM HỒNG QUÂN', m3: 1, a3: 3, m4: 3, a4: 0, m5: 5, a5: 2, m6: 1, a6: 1, m7: 2, a7: 0 },
+        { name: 'VŨ TẤN LỘC', m3: 6, a3: 3, m4: 1, a4: 2, m5: 5, a5: 0, m6: 7, a6: 1, m7: 3, a7: 0 },
+        { name: 'NGUYỄN ĐỨC ANH', m3: 0, a3: 0, m4: 0, a4: 0, m5: 1, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'ĐẶNG HÙNG LĨNH', m3: 0, a3: 0, m4: 0, a4: 1, m5: 1, a5: 2, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'PHẠM HẢI PHONG', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 1, m7: 0, a7: 0 },
+        { name: 'PHẠM KIÊN', m3: 2, a3: 0, m4: 1, a4: 2, m5: 3, a5: 2, m6: 5, a6: 1, m7: 4, a7: 0 },
+        { name: 'PHẠM THẾ DUY', m3: 0, a3: 0, m4: 0, a4: 0, m5: 2, a5: 1, m6: 3, a6: 6, m7: 1, a7: 4 },
+        { name: 'CHIỀU', m3: 4, a3: 0, m4: 1, a4: 0, m5: 0, a5: 1, m6: 1, a6: 0, m7: 2, a7: 0 },
+        { name: 'DUY TIÊN', m3: 0, a3: 0, m4: 3, a4: 0, m5: 1, a5: 0, m6: 3, a6: 1, m7: 2, a7: 0 },
+        { name: 'VIỆT ANH', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 1, a7: 0 },
+        { name: 'TÔ MINH TUẤN', m3: 2, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'PHÙNG ĐỨC HUỲNH', m3: 0, a3: 0, m4: 3, a4: 0, m5: 5, a5: 4, m6: 6, a6: 0, m7: 3, a7: 1 },
+        { name: 'ĐẶNG HOÀNG NAM', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 1, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'VÕ PHI THỨC', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'VŨ HÙNG', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 1, m6: 0, a6: 1, m7: 0, a7: 0 },
+        { name: 'BÙI NIÊM', m3: 0, a3: 0, m4: 0, a4: 0, m5: 1, a5: 0, m6: 1, a6: 1, m7: 0, a7: 0 },
+        { name: 'LÊ HIẾU', m3: 0, a3: 0, m4: 1, a4: 0, m5: 1, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'ANH ĐỨC', m3: 0, a3: 0, m4: 1, a4: 0, m5: 7, a5: 1, m6: 2, a6: 3, m7: 0, a7: 1 },
+        { name: 'TRẦN QUANG THÁI', m3: 0, a3: 0, m4: 0, a4: 1, m5: 0, a5: 0, m6: 1, a6: 0, m7: 1, a7: 0 },
+        { name: 'ĐÀM HẢI YẾN', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'NGUYỄN TÚ', m3: 0, a3: 2, m4: 0, a4: 1, m5: 0, a5: 1, m6: 2, a6: 0, m7: 0, a7: 0 },
+        { name: 'NGUYỄN CÔNG MINH', m3: 0, a3: 0, m4: 0, a4: 0, m5: 1, a5: 1, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'NGUYỄN HỒNG QUÂN', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 },
+        { name: 'HOÀNG ANH', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 1 },
+        { name: 'THẠC BẢO', m3: 0, a3: 3, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 1 },
+        { name: 'QUANG ĐẠO', m3: 0, a3: 0, m4: 0, a4: 0, m5: 0, a5: 0, m6: 0, a6: 0, m7: 0, a7: 0 }
+      ];
 
-        const parsedPlayers = pList.map((p) => {
-          let name = p.name;
-          let position = "Hậu vệ";
-          if (p.name && p.name.startsWith("{") && p.name.endsWith("}")) {
-            try {
-              const meta = JSON.parse(p.name);
-              name = meta.name || "";
-              position = meta.position || "Hậu vệ";
-            } catch (e) {}
+      async function initRanking() {
+        let parsedPlayers = [];
+        let psList = [];
+
+        try {
+          const { data: pList, error: pErr } = await _supabase
+            .from("players")
+            .select("*")
+            .order("num", { ascending: true });
+
+          if (!pErr && pList && pList.length > 0) {
+            parsedPlayers = pList.map((p) => {
+              let name = p.name;
+              let position = "Hậu vệ";
+              if (p.name && p.name.startsWith("{") && p.name.endsWith("}")) {
+                try {
+                  const meta = JSON.parse(p.name);
+                  name = meta.name || "";
+                  position = meta.position || "Hậu vệ";
+                } catch (e) {}
+              }
+              return { id: p.id, name, position };
+            });
           }
-          return { id: p.id, name, position };
-        });
+        } catch (e) {}
+
+        // Fallback to DEFAULT_SCORES names if players table is empty or blocked
+        if (parsedPlayers.length === 0) {
+          parsedPlayers = DEFAULT_SCORES.map((s, idx) => ({
+            id: `p-${idx+1}`,
+            name: s.name,
+            position: 'Cầu thủ'
+          }));
+        }
+
+        try {
+          const { data: psData, error: psErr } = await _supabase
+            .from("player_scores")
+            .select("*");
+
+          if (!psErr && psData && psData.length > 0) {
+            psList = psData;
+          }
+        } catch (e) {}
 
         function matchScoreRow(player, row) {
           if (!row) return false;
@@ -239,56 +309,57 @@
           );
         }
 
-        // Fetch Scores
-        const { data: psData, error: psErr } = await _supabase
-          .from("player_scores")
-          .select("*");
+        rankingData = parsedPlayers.map((p) => {
+          let scoreRow = psList.find((row) => matchScoreRow(p, row));
+          
+          // Fallback to DEFAULT_SCORES if no score row from Supabase
+          if (!scoreRow) {
+            const def = DEFAULT_SCORES.find(ds => ds.name.trim().toLowerCase() === p.name.trim().toLowerCase());
+            if (def) {
+              scoreRow = def;
+            }
+          }
 
-        const psList = psErr ? [] : psData || [];
-
-        rankingData = parsedPlayers
-          .map((p) => {
-            const scoreRow = psList.find((row) => matchScoreRow(p, row));
-            return {
-              id: p.id,
-              scoreId: scoreRow ? scoreRow.id : null,
-              name: p.name,
-              monthlyGoals: scoreRow
-                ? [
-                    scoreRow.m1,
-                    scoreRow.m2,
-                    scoreRow.m3,
-                    scoreRow.m4,
-                    scoreRow.m5,
-                    scoreRow.m6,
-                    scoreRow.m7,
-                    scoreRow.m8,
-                    scoreRow.m9,
-                    scoreRow.m10,
-                    scoreRow.m11,
-                    scoreRow.m12,
-                  ].map((v) => v || 0)
-                : Array(12).fill(0),
-              monthlyAssists: scoreRow
-                ? [
-                    scoreRow.a1,
-                    scoreRow.a2,
-                    scoreRow.a3,
-                    scoreRow.a4,
-                    scoreRow.a5,
-                    scoreRow.a6,
-                    scoreRow.a7,
-                    scoreRow.a8,
-                    scoreRow.a9,
-                    scoreRow.a10,
-                    scoreRow.a11,
-                    scoreRow.a12,
-                  ].map((v) => v || 0)
-                : Array(12).fill(0),
-              totalGoals: 0,
-              totalAssists: 0,
-            };
-          });
+          return {
+            id: p.id,
+            scoreId: scoreRow ? scoreRow.id || null : null,
+            name: p.name,
+            monthlyGoals: scoreRow
+              ? [
+                  scoreRow.m1 || 0,
+                  scoreRow.m2 || 0,
+                  scoreRow.m3 || 0,
+                  scoreRow.m4 || 0,
+                  scoreRow.m5 || 0,
+                  scoreRow.m6 || 0,
+                  scoreRow.m7 || 0,
+                  scoreRow.m8 || 0,
+                  scoreRow.m9 || 0,
+                  scoreRow.m10 || 0,
+                  scoreRow.m11 || 0,
+                  scoreRow.m12 || 0,
+                ]
+              : Array(12).fill(0),
+            monthlyAssists: scoreRow
+              ? [
+                  scoreRow.a1 || 0,
+                  scoreRow.a2 || 0,
+                  scoreRow.a3 || 0,
+                  scoreRow.a4 || 0,
+                  scoreRow.a5 || 0,
+                  scoreRow.a6 || 0,
+                  scoreRow.a7 || 0,
+                  scoreRow.a8 || 0,
+                  scoreRow.a9 || 0,
+                  scoreRow.a10 || 0,
+                  scoreRow.a11 || 0,
+                  scoreRow.a12 || 0,
+                ]
+              : Array(12).fill(0),
+            totalGoals: 0,
+            totalAssists: 0,
+          };
+        });
 
         updateTotals();
         await fetchTeamRankings();
