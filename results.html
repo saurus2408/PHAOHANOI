@@ -42,6 +42,33 @@
             background: var(--primary-gradient);
             border-radius: 2px;
         }
+        .results-time-mode-tabs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .time-mode-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--text-light);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+        .time-mode-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .time-mode-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(239, 1, 7, 0.25);
+        }
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -100,7 +127,13 @@
             <button class="match-type-btn" data-type="friendly" onclick="changeMatchType('friendly')">Thi đấu giao hữu</button>
         </div>
 
-        <div class="match-results-tabs">
+        <div class="results-time-mode-tabs">
+            <span style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Chế độ lọc:</span>
+            <button class="time-mode-btn active" data-mode="month" onclick="changeTimeMode('month')">Tháng</button>
+            <button class="time-mode-btn" data-mode="quarter" onclick="changeTimeMode('quarter')">Quý</button>
+        </div>
+
+        <div id="month-tabs-container" class="match-results-tabs">
             <div class="month-tab active" data-month="1">T1</div>
             <div class="month-tab" data-month="2">T2</div>
             <div class="month-tab" data-month="3">T3</div>
@@ -113,6 +146,13 @@
             <div class="month-tab" data-month="10">T10</div>
             <div class="month-tab" data-month="11">T11</div>
             <div class="month-tab" data-month="12">T12</div>
+        </div>
+
+        <div id="quarter-tabs-container" class="match-results-tabs" style="display: none;">
+            <div class="quarter-tab active" data-quarter="1">Q1 (T1 - T3)</div>
+            <div class="quarter-tab" data-quarter="2">Q2 (T4 - T6)</div>
+            <div class="quarter-tab" data-quarter="3">Q3 (T7 - T9)</div>
+            <div class="quarter-tab" data-quarter="4">Q4 (T10 - T12)</div>
         </div>
 
         <div id="match-list" class="match-grid">
@@ -172,6 +212,9 @@
     <script>
         let fetchedMatches = [];
         let currentMatchType = 'internal';
+        let currentTimeMode = 'month';
+        let currentMonthVal = 1;
+        let currentQuarterVal = 1;
 
         function getTeamAbbreviation(name) {
             if (!name) return "???";
@@ -188,8 +231,16 @@
             }
         }
 
-        async function fetchMatches(month) {
-            const { data, error } = await _supabase.from('match_results').select('*').eq('month', month).order('match_date', { ascending: false });
+        async function fetchMatches() {
+            let query = _supabase.from('match_results').select('*');
+            if (currentTimeMode === 'quarter') {
+                const months = [(currentQuarterVal - 1) * 3 + 1, (currentQuarterVal - 1) * 3 + 2, (currentQuarterVal - 1) * 3 + 3];
+                query = query.in('month', months);
+            } else {
+                query = query.eq('month', currentMonthVal);
+            }
+
+            const { data, error } = await query.order('match_date', { ascending: false });
             if (error) {
                 console.error(error);
                 fetchedMatches = [];
@@ -209,7 +260,8 @@
             });
 
             if (filtered.length === 0) {
-                list.innerHTML = `<p style="text-align:center; grid-column: 1/-1; opacity:0.5; padding: 40px 0;">Chưa có dữ liệu trận đấu ${currentMatchType === 'friendly' ? 'giao hữu' : 'nội bộ'} tháng này.</p>`;
+                const periodLabel = currentTimeMode === 'quarter' ? `Quý ${currentQuarterVal}` : `tháng ${currentMonthVal}`;
+                list.innerHTML = `<p style="text-align:center; grid-column: 1/-1; opacity:0.5; padding: 40px 0;">Chưa có dữ liệu trận đấu ${currentMatchType === 'friendly' ? 'giao hữu' : 'nội bộ'} ${periodLabel}.</p>`;
                 return;
             }
 
@@ -263,6 +315,16 @@
                 btn.classList.toggle('active', btn.dataset.type === type);
             });
             renderMatchList();
+        }
+
+        function changeTimeMode(mode) {
+            currentTimeMode = mode;
+            document.querySelectorAll('.time-mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            document.getElementById('month-tabs-container').style.display = mode === 'month' ? 'flex' : 'none';
+            document.getElementById('quarter-tabs-container').style.display = mode === 'quarter' ? 'flex' : 'none';
+            fetchMatches();
         }
 
         function openAddMatchModal() {
@@ -331,8 +393,9 @@
                 document.querySelectorAll('.month-tab').forEach(tab => {
                     tab.classList.toggle('active', parseInt(tab.dataset.month) === month);
                 });
+                currentMonthVal = month;
 
-                fetchMatches(month);
+                fetchMatches();
             } else {
                 alert("Lỗi khi thêm trận đấu: " + error.message);
             }
@@ -341,12 +404,19 @@
         document.querySelectorAll('.month-tab').forEach(tab => tab.addEventListener('click', () => {
              document.querySelectorAll('.month-tab').forEach(t => t.classList.remove('active'));
              tab.classList.add('active');
-             fetchMatches(tab.dataset.month);
+             currentMonthVal = parseInt(tab.dataset.month);
+             fetchMatches();
+        }));
+
+        document.querySelectorAll('.quarter-tab').forEach(tab => tab.addEventListener('click', () => {
+             document.querySelectorAll('.quarter-tab').forEach(t => t.classList.remove('active'));
+             tab.classList.add('active');
+             currentQuarterVal = parseInt(tab.dataset.quarter);
+             fetchMatches();
         }));
 
         function renderAll() { 
-            const activeTab = document.querySelector('.month-tab.active');
-            if(activeTab) fetchMatches(activeTab.dataset.month);
+            fetchMatches();
         }
         window.onload = renderAll;
     </script>

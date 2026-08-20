@@ -778,6 +778,7 @@ section {
 }
 
 .month-tab,
+.quarter-tab,
 .cat-btn,
 .rank-tab-btn,
 .sub-tab-btn,
@@ -798,18 +799,22 @@ section {
 }
 
 .month-tab:hover,
+.quarter-tab:hover,
 .cat-btn:hover,
 .rank-tab-btn:hover,
 .sub-tab-btn:hover,
-.month-btn:hover {
+.month-btn:hover,
+.quarter-btn:hover {
   background: rgba(255, 255, 255, 0.16);
 }
 
 .month-tab.active,
+.quarter-tab.active,
 .cat-btn.active,
 .rank-tab-btn.active,
 .sub-tab-btn.active,
-.month-btn.active {
+.month-btn.active,
+.quarter-btn.active {
   background: var(--primary);
   color: white;
   border-color: transparent;
@@ -818,13 +823,17 @@ section {
 
 /* Custom styles for smaller sub-tabs */
 .sub-tabs,
-.month-selector {
+.month-selector,
+.quarter-selector {
   margin-bottom: 18px;
   gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .sub-tab-btn,
-.month-btn {
+.month-btn,
+.quarter-btn {
   padding: 8px 14px;
   font-size: 0.78rem;
   background: rgba(255, 255, 255, 0.08);
@@ -832,15 +841,18 @@ section {
   color: var(--text-light);
   border-radius: 999px;
   transition: var(--transition);
+  cursor: pointer;
 }
 
 .sub-tab-btn:hover,
-.month-btn:hover {
+.month-btn:hover,
+.quarter-btn:hover {
   background: rgba(255, 255, 255, 0.18);
 }
 
 .sub-tab-btn.active,
-.month-btn.active {
+.month-btn.active,
+.quarter-btn.active {
   background: #ea1f26;
   color: white;
   border-color: #ea1f26;
