@@ -215,6 +215,7 @@
         let currentTimeMode = 'month';
         let currentMonthVal = 1;
         let currentQuarterVal = 1;
+        let activeEditingMatchId = null;
 
         function getTeamAbbreviation(name) {
             if (!name) return "???";
@@ -297,16 +298,32 @@
                         </div>
                     </div>
                     <div class="match-footer">${m.note || ''}</div>
-                    <button class="del-btn admin-only" onclick="deleteItem('match_results', '${m.id}')" style="margin-top:15px; border-radius:4px; width:100%; justify-content: center; padding: 8px 12px; display: none;">
-                        <i data-lucide="trash-2" style="width:14px; height:14px; margin-right:4px;"></i> Xóa trận đấu
-                    </button>
+                    <div class="admin-only match-admin-actions" style="margin-top:15px; display:none; gap:6px;">
+                        <button type="button" class="edit-btn-card" onclick="openEditMatchModal('${m.id}')" style="padding:6px 12px; flex:1; justify-content:center;">
+                            <i data-lucide="edit-3" style="width:14px; height:14px; margin-right:4px;"></i> Sửa
+                        </button>
+                        <button type="button" class="del-btn" onclick="deleteMatchItem('${m.id}')" style="padding:6px 12px; flex:1; justify-content:center;">
+                            <i data-lucide="trash-2" style="width:14px; height:14px; margin-right:4px;"></i> Xóa
+                        </button>
+                    </div>
                 </div>`;
             }).join('');
 
             if (isAdmin) {
-                document.querySelectorAll('.match-card .del-btn').forEach(btn => btn.style.display = 'inline-flex');
+                document.querySelectorAll('.match-admin-actions').forEach(btn => btn.style.display = 'flex');
             }
             lucide.createIcons();
+        }
+
+        async function deleteMatchItem(id) {
+            if (confirm("Xác nhận xóa trận đấu này?")) {
+                if (typeof _supabase !== 'undefined' && _supabase) {
+                    try {
+                        await _supabase.from('match_results').delete().eq('id', id);
+                    } catch(e) {}
+                }
+                fetchMatches();
+            }
         }
 
         function changeMatchType(type) {
@@ -329,6 +346,9 @@
 
         function openAddMatchModal() {
             if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
+            activeEditingMatchId = null;
+            const modalTitle = document.querySelector('#match-modal h2');
+            if (modalTitle) modalTitle.innerText = "Thêm Kết quả";
             const activeTab = document.querySelector('.month-tab.active');
             const activeMonth = activeTab ? parseInt(activeTab.dataset.month) : 1;
             
@@ -352,20 +372,56 @@
             openModal('match');
         }
 
+        function openEditMatchModal(id) {
+            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
+            const item = fetchedMatches.find(m => String(m.id) === String(id));
+            if (!item) return alert("Không tìm thấy thông tin trận đấu!");
+
+            activeEditingMatchId = String(id);
+            const modalTitle = document.querySelector('#match-modal h2');
+            if (modalTitle) modalTitle.innerText = "Sửa Kết quả Trận đấu";
+
+            document.getElementById('m-month').value = item.month || 1;
+            document.getElementById('m-date').value = item.match_date || '';
+            document.getElementById('m-team-a').value = item.team_a || '';
+            document.getElementById('m-score-a').value = item.score_a || 0;
+            document.getElementById('m-team-b').value = item.team_b || '';
+            document.getElementById('m-score-b').value = item.score_b || 0;
+            document.getElementById('m-note').value = item.note || '';
+            document.getElementById('m-type').value = item.status === 'friendly' ? 'friendly' : 'internal';
+
+            openModal('match');
+        }
+
         async function saveMatch() {
             if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
             const month = parseInt(document.getElementById('m-month').value);
-            const date = document.getElementById('m-date').value;
-            const teamA = document.getElementById('m-team-a').value;
-            const scoreA = parseInt(document.getElementById('m-score-a').value);
-            const teamB = document.getElementById('m-team-b').value;
-            const scoreB = parseInt(document.getElementById('m-score-b').value);
-            const note = document.getElementById('m-note').value;
+            const date = document.getElementById('m-date').value.trim();
+            const teamA = document.getElementById('m-team-a').value.trim();
+            const scoreA = parseInt(document.getElementById('m-score-a').value) || 0;
+            const teamB = document.getElementById('m-team-b').value.trim();
+            const scoreB = parseInt(document.getElementById('m-score-b').value) || 0;
+            const note = document.getElementById('m-note').value.trim();
             const type = document.getElementById('m-type').value;
 
             if (!month || !date || !teamA || !teamB) {
                 alert("Vui lòng điền đầy đủ các thông tin bắt buộc!");
                 return;
+            }
+
+            // Duplicate prevention check when adding new match
+            if (!activeEditingMatchId) {
+                const existing = fetchedMatches.find(m => 
+                    m.match_date === date && 
+                    (m.team_a || '').trim().toLowerCase() === teamA.toLowerCase() &&
+                    (m.team_b || '').trim().toLowerCase() === teamB.toLowerCase() &&
+                    m.status === type
+                );
+                if (existing) {
+                    if (!confirm(`Trận đấu giữa "${teamA}" và "${teamB}" vào ngày ${date} đã tồn tại trên hệ thống với tỉ số ${existing.score_a}-${existing.score_b}.\n\nBạn có chắc chắn muốn thêm trùng trận đấu này không?`)) {
+                        return;
+                    }
+                }
             }
 
             const payload = {
@@ -376,20 +432,24 @@
                 team_b: teamB,
                 score_b: scoreB,
                 note,
-                status: type // Storing the match category in status
+                status: type
             };
 
-            const { error } = await _supabase.from('match_results').insert([payload]);
-            if (!error) {
+            let res = null;
+            if (activeEditingMatchId) {
+                res = await _supabase.from('match_results').update(payload).eq('id', activeEditingMatchId);
+            } else {
+                res = await _supabase.from('match_results').insert([payload]);
+            }
+
+            if (!res.error) {
                 closeModal();
                 currentMatchType = type;
                 
-                // Update match type active tabs
                 document.querySelectorAll('.match-type-btn').forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.type === type);
                 });
                 
-                // Select active month tab
                 document.querySelectorAll('.month-tab').forEach(tab => {
                     tab.classList.toggle('active', parseInt(tab.dataset.month) === month);
                 });
@@ -397,7 +457,7 @@
 
                 fetchMatches();
             } else {
-                alert("Lỗi khi thêm trận đấu: " + error.message);
+                alert("Lỗi khi lưu trận đấu: " + res.error.message);
             }
         }
 

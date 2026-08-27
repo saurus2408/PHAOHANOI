@@ -438,8 +438,18 @@
 
         const stats = {};
 
-        // Only count internal matches (ignore friendly matches)
-        const internalMatches = data.filter((m) => m.status !== "friendly");
+        // Only count internal matches (ignore friendly matches) & deduplicate exact records
+        const seenMatches = new Set();
+        const internalMatches = data.filter((m) => {
+          if (m.status === "friendly") return false;
+
+          const key = `${m.month}_${m.match_date}_${(m.team_a||'').trim().toUpperCase()}_${(m.team_b||'').trim().toUpperCase()}_${m.score_a}_${m.score_b}`;
+          if (seenMatches.has(key)) {
+            return false; // Skip duplicate record
+          }
+          seenMatches.add(key);
+          return true;
+        });
 
         internalMatches.forEach((m) => {
           const teamAName = m.team_a || "PHN FC";
