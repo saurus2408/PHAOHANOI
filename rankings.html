@@ -111,6 +111,13 @@
             <i data-lucide="plus"></i> THÊM CẦU THỦ
           </button>
           <button
+            class="btn-primary admin-only"
+            onclick="syncAllToSupabase()"
+            style="display: none; padding: 10px 15px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);"
+          >
+            <i data-lucide="cloud-upload"></i> ĐỒNG BỘ LÊN MÁY CHỦ
+          </button>
+          <button
             class="reset-btn admin-only"
             id="reset-month-btn"
             onclick="resetMonth()"
@@ -611,6 +618,78 @@
           resetBtn.style.display =
             isAdmin && currentView === "detail" ? "flex" : "none";
         lucide.createIcons();
+      }
+
+      async function syncAllToSupabase() {
+        if (!isAdmin) {
+          alert("Bạn không có quyền thực hiện hành động này!");
+          return;
+        }
+        if (typeof _supabase === 'undefined' || !_supabase) {
+          alert("Không tìm thấy kết nối Supabase!");
+          return;
+        }
+
+        if (!confirm("Bạn có chắc chắn muốn đẩy toàn bộ số liệu của tất cả cầu thủ hiện có lên cơ sở dữ liệu Supabase không?")) {
+          return;
+        }
+
+        let successCount = 0;
+        let failCount = 0;
+        let lastError = null;
+
+        for (const p of rankingData) {
+          const updates = {};
+          for (let m = 1; m <= 12; m++) {
+            updates['m' + m] = p.monthlyGoals[m - 1] || 0;
+            updates['a' + m] = p.monthlyAssists[m - 1] || 0;
+          }
+
+          try {
+            let res = await _supabase
+              .from("player_scores")
+              .update(updates)
+              .eq("name", p.name)
+              .select();
+
+            if (res.error) {
+              failCount++;
+              lastError = res.error;
+            } else if (!res.data || res.data.length === 0) {
+              const insertRes = await _supabase
+                .from("player_scores")
+                .insert([{
+                  name: p.name,
+                  player_id: p.id && !String(p.id).startsWith("p-") ? p.id : null,
+                  ...updates
+                }])
+                .select();
+
+              if (insertRes.error) {
+                failCount++;
+                lastError = insertRes.error;
+              } else {
+                successCount++;
+                if (insertRes.data && insertRes.data.length > 0) {
+                  p.scoreId = insertRes.data[0].id;
+                }
+              }
+            } else {
+              successCount++;
+              p.scoreId = res.data[0].id;
+            }
+          } catch (e) {
+            failCount++;
+            lastError = e;
+          }
+        }
+
+        if (failCount > 0) {
+          alert(`⚠️ Đã đồng bộ ${successCount} cầu thủ, nhưng gặp lỗi ở ${failCount} cầu thủ.\nLỗi: ${lastError ? (lastError.message || JSON.stringify(lastError)) : "Không xác định"}\nVui lòng kiểm tra quyền RLS Policy của bảng 'player_scores' trong Supabase Dashboard.`);
+        } else {
+          alert(`🎉 Đã đồng bộ thành công toàn bộ số liệu của ${successCount} cầu thủ lên máy chủ Supabase!\nBây giờ tất cả mọi người có đường link đều sẽ xem được số liệu mới.`);
+        }
+        initRanking();
       }
 
       function openAddPlayerModal() {
