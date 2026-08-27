@@ -388,14 +388,16 @@
               ]
             : Array(12).fill(0);
 
-          // Apply local storage overrides if available
-          const playerKey = p.name ? p.name.trim().toLowerCase() : "";
-          if (playerKey && localOverrides[playerKey]) {
-            if (Array.isArray(localOverrides[playerKey].monthlyGoals)) {
-              mGoals = [...localOverrides[playerKey].monthlyGoals];
-            }
-            if (Array.isArray(localOverrides[playerKey].monthlyAssists)) {
-              mAssists = [...localOverrides[playerKey].monthlyAssists];
+          // Apply local storage overrides only if Supabase data is empty
+          if (psList.length === 0) {
+            const playerKey = p.name ? p.name.trim().toLowerCase() : "";
+            if (playerKey && localOverrides[playerKey]) {
+              if (Array.isArray(localOverrides[playerKey].monthlyGoals)) {
+                mGoals = [...localOverrides[playerKey].monthlyGoals];
+              }
+              if (Array.isArray(localOverrides[playerKey].monthlyAssists)) {
+                mAssists = [...localOverrides[playerKey].monthlyAssists];
+              }
             }
           }
 
@@ -644,10 +646,19 @@
 
         if (typeof _supabase !== "undefined" && _supabase) {
           try {
-            await _supabase
+            const { data, error } = await _supabase
               .from("players")
-              .insert([{ name: namePayload, num: 0 }]);
-          } catch (e) {}
+              .insert([{ name: namePayload, num: 0 }])
+              .select();
+
+            if (error) {
+              alert(`⚠️ Lỗi thêm cầu thủ lên Supabase:\n${error.message}\nVui lòng kiểm tra quyền RLS (Row Level Security) của bảng 'players' trong Supabase Dashboard.`);
+              return;
+            }
+          } catch (e) {
+            alert("⚠️ Lỗi kết nối Supabase: " + (e.message || e));
+            return;
+          }
         }
         
         closeModal();
@@ -661,28 +672,33 @@
         }
         const msg = `Xác nhận RESET toàn bộ bàn thắng & kiến tạo THÁNG ${currentMonth}?`;
         if (confirm(msg)) {
+          const updates = { ["m" + currentMonth]: 0, ["a" + currentMonth]: 0 };
+          if (typeof _supabase !== "undefined" && _supabase) {
+            try {
+              const { error } = await _supabase
+                .from("player_scores")
+                .update(updates)
+                .neq("id", "00000000-0000-0000-0000-000000000000");
+
+              if (error) {
+                alert(`⚠️ Không thể reset dữ liệu trên Supabase!\nLỗi: ${error.message}\nKiểm tra lại RLS Policy của bảng 'player_scores'.`);
+                return;
+              }
+            } catch (err) {
+              alert("⚠️ Lỗi kết nối Supabase: " + (err.message || err));
+              return;
+            }
+          }
+
           const idx = currentMonth - 1;
           rankingData.forEach((p) => {
             p.monthlyGoals[idx] = 0;
             p.monthlyAssists[idx] = 0;
-            saveLocalOverride(p.name, p.monthlyGoals, p.monthlyAssists);
           });
           
           updateTotals();
           renderRanking();
-
-          const updates = { ["m" + currentMonth]: 0, ["a" + currentMonth]: 0 };
-          if (typeof _supabase !== "undefined" && _supabase) {
-            try {
-              await _supabase
-                .from("player_scores")
-                .update(updates)
-                .neq("id", "00000000-0000-0000-0000-000000000000");
-            } catch (err) {
-              console.warn("Supabase reset issue:", err);
-            }
-          }
-          alert("Đã reset số liệu Tháng " + currentMonth + "!");
+          alert("Đã reset số liệu Tháng " + currentMonth + " trên hệ thống!");
         }
       }
 
@@ -729,53 +745,75 @@
         const val2 =
           parseInt(document.getElementById("edit-score-input2").value) || 0;
 
-        // 1. Update in-memory state and local storage immediately
-        item.monthlyGoals[currentMonth - 1] = val1;
-        item.monthlyAssists[currentMonth - 1] = val2;
-        saveLocalOverride(item.name, item.monthlyGoals, item.monthlyAssists);
-        
-        updateTotals();
-        renderRanking();
-        closeModal();
-
-        // 2. Sync with Supabase in background
         const updates = {
           ["m" + currentMonth]: val1,
           ["a" + currentMonth]: val2,
         };
 
+        let supabaseSuccess = false;
+
         if (typeof _supabase !== "undefined" && _supabase) {
           try {
+            let error = null;
+            let resData = null;
+
             if (item.scoreId) {
-              await _supabase
+              const res = await _supabase
                 .from("player_scores")
                 .update(updates)
-                .eq("id", item.scoreId);
+                .eq("id", item.scoreId)
+                .select();
+              error = res.error;
+              resData = res.data;
             } else {
-              let { data } = await _supabase
+              let res = await _supabase
                 .from("player_scores")
                 .update(updates)
                 .eq("name", item.name)
                 .select();
+              error = res.error;
+              resData = res.data;
 
-              if (!data || data.length === 0) {
+              if (!error && (!resData || resData.length === 0)) {
                 const insertPayload = {
                   name: item.name,
                   player_id: item.id && !String(item.id).startsWith("p-") ? item.id : null,
                   ...updates,
                 };
-                const res = await _supabase
+                const insertRes = await _supabase
                   .from("player_scores")
                   .insert([insertPayload])
                   .select();
-                if (res.data && res.data.length > 0) {
-                  item.scoreId = res.data[0].id;
+                error = insertRes.error;
+                if (insertRes.data && insertRes.data.length > 0) {
+                  item.scoreId = insertRes.data[0].id;
                 }
               }
             }
+
+            if (error) {
+              console.error("Supabase sync error:", error);
+              alert(`⚠️ CẢNH BÁO LƯU DỮ LIỆU THẤT BẠI!\n\nKhông thể lưu lên Supabase: ${error.message || JSON.stringify(error)}\n\nHãy vào Supabase Dashboard -> Table Editor -> 'player_scores' để kiểm tra xem đã cho phép người dùng nặc danh (anon) INSERT/UPDATE chưa (RLS Policy).`);
+            } else {
+              supabaseSuccess = true;
+            }
           } catch (err) {
-            console.warn("Supabase sync issue:", err);
+            console.error("Supabase sync exception:", err);
+            alert("⚠️ Lỗi kết nối Supabase: " + (err.message || err));
           }
+        } else {
+          alert("⚠️ Không tìm thấy đối tượng kết nối Supabase!");
+        }
+
+        if (supabaseSuccess) {
+          // Update in-memory state and render
+          item.monthlyGoals[currentMonth - 1] = val1;
+          item.monthlyAssists[currentMonth - 1] = val2;
+          saveLocalOverride(item.name, item.monthlyGoals, item.monthlyAssists);
+
+          updateTotals();
+          renderRanking();
+          closeModal();
         }
       }
 
