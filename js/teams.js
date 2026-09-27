@@ -9,7 +9,7 @@
     // ==========================================
     // 1. DEFAULT DATA & STORAGE KEYS
     // ==========================================
-    const STORAGE_PLAYERS_KEY = 'phn_teams_players_v2';
+    const STORAGE_PLAYERS_KEY = 'phn_teams_players_v3';
     const STORAGE_POSITIONS_KEY = 'phn_teams_positions_v1';
     const STORAGE_SKILLS_KEY = 'phn_teams_skills_v1';
     const STORAGE_HISTORY_KEY = 'phn_teams_history_v1';
@@ -237,6 +237,16 @@
         const savedPlayers = localStorage.getItem(STORAGE_PLAYERS_KEY);
         if (savedPlayers && JSON.parse(savedPlayers).length >= 70) {
             players = JSON.parse(savedPlayers);
+            // Sync position & skill level from DEFAULT_ROSTER if present
+            players.forEach(p => {
+                const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === p.name.trim().toLowerCase());
+                if (defaultMatch) {
+                    p.primaryPosition = defaultMatch.primaryPosition;
+                    p.skillLevel = defaultMatch.skillLevel;
+                    p.overall = defaultMatch.overall;
+                }
+            });
+            savePlayers();
         } else {
             // Load default roster with generated IDs and monthly scores
             players = DEFAULT_ROSTER.map((p, idx) => ({
@@ -269,27 +279,29 @@
                 if (pList && pList.length > 0) {
                     players = pList.map((p, idx) => {
                         let name = p.name;
-                        let pos = p.position || 'CM';
                         if (name && name.startsWith('{') && name.endsWith('}')) {
                             try {
                                 const meta = JSON.parse(name);
                                 name = meta.name || name;
-                                pos = meta.position || pos;
                             } catch(e) {}
                         }
 
-                        const scoreRow = sList ? sList.find(s => (s.player_id && s.player_id === p.id) || (s.name && s.name.trim().toLowerCase() === name.trim().toLowerCase())) : null;
                         const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === name.trim().toLowerCase());
+                        const scoreRow = sList ? sList.find(s => (s.player_id && s.player_id === p.id) || (s.name && s.name.trim().toLowerCase() === name.trim().toLowerCase())) : null;
+
+                        const finalPos = defaultMatch ? defaultMatch.primaryPosition : (p.position && p.position !== 'CM' ? p.position : 'CM');
+                        const finalSkill = defaultMatch ? defaultMatch.skillLevel : 'Khá';
+                        const finalOverall = defaultMatch ? defaultMatch.overall : 65;
 
                         return {
                             id: p.id,
                             num: p.num || (idx + 1),
                             name: name,
-                            primaryPosition: pos || (defaultMatch ? defaultMatch.primaryPosition : 'CM'),
+                            primaryPosition: finalPos,
                             secondaryPosition1: '',
                             secondaryPosition2: '',
-                            skillLevel: defaultMatch ? defaultMatch.skillLevel : 'Khá',
-                            overall: defaultMatch ? defaultMatch.overall : 65,
+                            skillLevel: finalSkill,
+                            overall: finalOverall,
                             scores: scoreRow || defaultMatch || {},
                             active: true,
                             lockedTeam: null
