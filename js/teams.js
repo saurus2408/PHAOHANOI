@@ -129,6 +129,22 @@
     let currentProposals = [];
     let activeProposalIndex = 0;
 
+    // Helper: Get formatted period text
+    function getPeriodText(year, period) {
+        let yearStr = (!year || year === 'all') ? 'Mọi năm' : 'Năm ' + year;
+        if (!period || period === 'all') return yearStr;
+        if (period.startsWith('m')) {
+            return `Tháng ${period.replace('m', '')} (${yearStr})`;
+        }
+        if (period.startsWith('q')) {
+            return `Quý ${period.replace('q', '')} (${yearStr})`;
+        }
+        return `${period} (${yearStr})`;
+    }
+
+    let currentDivisionYear = '2025';
+    let currentDivisionPeriod = 'q3';
+
     // Initialize State
     function initData() {
         // Positions
@@ -142,6 +158,76 @@
         // History
         const savedHist = localStorage.getItem(STORAGE_HISTORY_KEY);
         sessionHistory = savedHist ? JSON.parse(savedHist) : [];
+
+        if (!sessionHistory || sessionHistory.length === 0) {
+            sessionHistory = [{
+                id: 'hist_default_2025_q3',
+                date: '28/09/2025 15:00',
+                year: '2025',
+                period: 'q3',
+                periodLabel: 'Quý 3 (Năm 2025)',
+                numTeams: 4,
+                totalPlayers: 28,
+                balanceScore: 94.8,
+                powerDev: 1.1,
+                posDev: 0.3,
+                teams: [
+                    {
+                        name: 'Đội 1',
+                        totalOverall: 540,
+                        players: [
+                            { id: 'p1', num: 1, name: 'Vũ Tấn Lộc', pos: 'ST', primaryPosition: 'ST', overall: 92 },
+                            { id: 'p2', num: 7, name: 'Hồng Viết Hiệp', pos: 'ST', primaryPosition: 'ST', overall: 75 },
+                            { id: 'p3', num: 10, name: 'Đỗ Việt Hoàng', pos: 'CM', primaryPosition: 'CM', overall: 80 },
+                            { id: 'p4', num: 13, name: 'Đàm Minh Tuấn', pos: 'CB/TH', primaryPosition: 'CB/TH', overall: 73 },
+                            { id: 'p5', num: 18, name: 'Nguyễn Thái', pos: 'LB/RB', primaryPosition: 'LB/RB', overall: 67 },
+                            { id: 'p6', num: 29, name: 'Nguyễn Tiến Mạnh', pos: 'CAM', primaryPosition: 'CAM', overall: 68 },
+                            { id: 'p7', num: 37, name: 'Lê Gia Linh', pos: 'GK', primaryPosition: 'GK', overall: 65 }
+                        ]
+                    },
+                    {
+                        name: 'Đội 2',
+                        totalOverall: 538,
+                        players: [
+                            { id: 'p8', num: 3, name: 'Đinh Phạm Kiên', pos: 'ST', primaryPosition: 'ST', overall: 90 },
+                            { id: 'p9', num: 2, name: 'Phùng Đức Huỳnh', pos: 'W', primaryPosition: 'W', overall: 84 },
+                            { id: 'p10', num: 8, name: 'Nguyễn Duy Tiên', pos: 'CM', primaryPosition: 'CM', overall: 72 },
+                            { id: 'p11', num: 19, name: 'Bùi Văn Niêm', pos: 'CB/TH', primaryPosition: 'CB/TH', overall: 65 },
+                            { id: 'p12', num: 26, name: 'Nguyễn Xuân Đạt', pos: 'LB/RB', primaryPosition: 'LB/RB', overall: 58 },
+                            { id: 'p13', num: 32, name: 'Trần Anh Tuấn', pos: 'CM', primaryPosition: 'CM', overall: 65 },
+                            { id: 'p14', num: 55, name: 'Trần Hữu Bảo', pos: 'GK', primaryPosition: 'GK', overall: 55 }
+                        ]
+                    },
+                    {
+                        name: 'Đội 3',
+                        totalOverall: 536,
+                        players: [
+                            { id: 'p15', num: 4, name: 'Phạm Hồng Quân', pos: 'CAM', primaryPosition: 'CAM', overall: 85 },
+                            { id: 'p16', num: 12, name: 'Phạm Thế Duy', pos: 'W', primaryPosition: 'W', overall: 81 },
+                            { id: 'p17', num: 9, name: 'Bùi Văn Chiều', pos: 'W', primaryPosition: 'W', overall: 74 },
+                            { id: 'p18', num: 21, name: 'Hoàng Xuân Giao', pos: 'CB/TH', primaryPosition: 'CB/TH', overall: 65 },
+                            { id: 'p19', num: 33, name: 'Phạm Quang Phương', pos: 'LB/RB', primaryPosition: 'LB/RB', overall: 57 },
+                            { id: 'p20', num: 45, name: 'Đặng Quốc Anh', pos: 'W', primaryPosition: 'W', overall: 60 },
+                            { id: 'p21', num: 37, name: 'Lê Gia Linh', pos: 'GK', primaryPosition: 'GK', overall: 65 }
+                        ]
+                    },
+                    {
+                        name: 'Đội 4',
+                        totalOverall: 539,
+                        players: [
+                            { id: 'p22', num: 6, name: 'Nguyễn Tiến', pos: 'ST', primaryPosition: 'ST', overall: 83 },
+                            { id: 'p23', num: 5, name: 'Lại Anh Đức', pos: 'W', primaryPosition: 'W', overall: 82 },
+                            { id: 'p24', num: 11, name: 'Nguyễn Duy Nam', pos: 'CAM', primaryPosition: 'CAM', overall: 76 },
+                            { id: 'p25', num: 14, name: 'Nguyễn Viết Tú', pos: 'ST', primaryPosition: 'ST', overall: 68 },
+                            { id: 'p26', num: 16, name: 'Lê Bá Tùng', pos: 'CAM', primaryPosition: 'CAM', overall: 69 },
+                            { id: 'p27', num: 25, name: 'Nguyễn Công Minh', pos: 'W', primaryPosition: 'W', overall: 66 },
+                            { id: 'p28', num: 55, name: 'Trần Hữu Bảo', pos: 'GK', primaryPosition: 'GK', overall: 55 }
+                        ]
+                    }
+                ]
+            }];
+            saveHistory();
+        }
 
         // Constraints
         const savedConst = localStorage.getItem(STORAGE_CONSTRAINTS_KEY);
@@ -638,8 +724,12 @@
     // 6. BALANCED TEAM GENERATOR ALGORITHM
     // ==========================================
     window.generateBalancedTeams = function () {
-        const yearKey = document.getElementById('p-year-filter')?.value || 'all';
+        const yearKey = document.getElementById('p-year-filter')?.value || '2025';
         const timePeriod = document.getElementById('p-time-period')?.value || 'all';
+
+        currentDivisionYear = yearKey;
+        currentDivisionPeriod = timePeriod;
+
         const activePlayers = players.filter(p => p.active).map(p => {
             const stats = calculatePeriodStats(p, yearKey, timePeriod);
             return {
@@ -671,8 +761,20 @@
             return;
         }
 
+        candidates.forEach(c => {
+            c.year = yearKey;
+            c.period = timePeriod;
+            c.periodLabel = getPeriodText(yearKey, timePeriod);
+        });
+
         currentProposals = candidates;
         activeProposalIndex = 0;
+
+        // Sync search filters in Results view
+        const resYearSelect = document.getElementById('res-year-filter');
+        const resPeriodSelect = document.getElementById('res-period-filter');
+        if (resYearSelect) resYearSelect.value = yearKey;
+        if (resPeriodSelect) resPeriodSelect.value = timePeriod;
 
         // Switch to Results Tab
         switchTab('results');
@@ -856,7 +958,56 @@
         const isAdmin = sessionStorage.getItem('phn_admin') === 'true' || document.body.classList.contains('admin-active');
         const warningBox = document.getElementById('team-warning-banner');
 
-        if (!currentProposals || currentProposals.length === 0) {
+        const searchYear = document.getElementById('res-year-filter')?.value || 'all';
+        const searchPeriod = document.getElementById('res-period-filter')?.value || 'all';
+
+        const periodBadge = document.getElementById('results-period-badge');
+        if (periodBadge) {
+            periodBadge.textContent = '📌 Thời gian: ' + getPeriodText(searchYear, searchPeriod);
+        }
+
+        let displayProposals = null;
+
+        // 1. Check in-memory generated proposals
+        if (currentProposals && currentProposals.length > 0) {
+            const propYear = currentProposals[0].year || 'all';
+            const propPeriod = currentProposals[0].period || 'all';
+            const matchYear = searchYear === 'all' || propYear === searchYear;
+            const matchPeriod = searchPeriod === 'all' || propPeriod === searchPeriod;
+
+            if (matchYear && matchPeriod) {
+                displayProposals = currentProposals;
+            }
+        }
+
+        // 2. If no in-memory match, check sessionHistory records
+        if (!displayProposals && sessionHistory && sessionHistory.length > 0) {
+            const matchedHist = sessionHistory.find(h => {
+                const matchYear = searchYear === 'all' || h.year === searchYear;
+                const matchPeriod = searchPeriod === 'all' || h.period === searchPeriod;
+                return matchYear && matchPeriod;
+            });
+
+            if (matchedHist) {
+                displayProposals = [{
+                    score: matchedHist.balanceScore,
+                    powerDev: matchedHist.powerDev || 1.1,
+                    posDev: matchedHist.posDev || 0.3,
+                    year: matchedHist.year,
+                    period: matchedHist.period,
+                    periodLabel: matchedHist.periodLabel,
+                    teams: matchedHist.teams.map(t => t.players.map(p => ({
+                        id: p.id,
+                        num: p.num,
+                        name: p.name,
+                        primaryPosition: p.primaryPosition || p.pos || 'CM',
+                        overall: p.overall
+                    })))
+                }];
+            }
+        }
+
+        if (!displayProposals || displayProposals.length === 0) {
             const propTabsContainer = document.getElementById('proposal-selector-tabs');
             if (propTabsContainer) propTabsContainer.innerHTML = '';
 
@@ -864,17 +1015,10 @@
             const scoreDesc = document.getElementById('balance-score-desc');
             if (scoreCircle) scoreCircle.textContent = '0%';
             if (scoreDesc) {
-                if (isAdmin) {
-                    scoreDesc.innerHTML = `
-                        <strong>Chưa có kết quả chia đội</strong><br>
-                        <span>Vui lòng chuyển sang bước <b>2. Thiết Lập Chia Đội</b> và nhấn <b>"⚡ CHIA ĐỘI TỰ ĐỘNG"</b>.</span>
-                    `;
-                } else {
-                    scoreDesc.innerHTML = `
-                        <strong>Chưa có thông tin chia đội</strong><br>
-                        <span>Danh sách chia đội sẽ xuất hiện tại đây khi Ban Quản Trị thực hiện chia đội bóng.</span>
-                    `;
-                }
+                scoreDesc.innerHTML = `
+                    <strong>Chưa có thông tin chia đội [${getPeriodText(searchYear, searchPeriod)}]</strong><br>
+                    <span>${isAdmin ? 'Vui lòng chọn thời gian này tại bước 1 và bấm <b>"⚡ CHIA ĐỘI TỰ ĐỘNG"</b>.' : 'Danh sách chia đội cho thời gian này chưa có. Vui lòng chọn thời gian khác ở bộ lọc hoặc chờ BQT chia đội.'}</span>
+                `;
             }
 
             if (warningBox) warningBox.style.display = 'none';
@@ -883,9 +1027,9 @@
             if (teamsGrid) {
                 teamsGrid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
-                        <i data-lucide="shield-alert" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-muted);"></i>
-                        <h4 style="color: #fff; margin-bottom: 6px;">Chưa Có Dữ Liệu Chia Đội</h4>
-                        <p style="font-size: 0.9rem;">${isAdmin ? 'Vui lòng chọn các cầu thủ và bấm vào "2. Thiết Lập Chia Đội" để tạo đội bóng cân bằng.' : 'Hiện tại chưa có dữ liệu chia đội bóng nào được công bố. Vui lòng quay lại sau.'}</p>
+                        <i data-lucide="search-x" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-muted);"></i>
+                        <h4 style="color: #fff; margin-bottom: 6px;">Không Có Dữ Liệu Chia Đội (${getPeriodText(searchYear, searchPeriod)})</h4>
+                        <p style="font-size: 0.9rem;">${isAdmin ? 'Hãy chọn các cầu thủ và bấm vào "2. Thiết Lập Chia Đội" để tạo đội cho thời gian này.' : 'Hiện chưa có kết quả chia đội cho thời gian đã chọn. Vui lòng đổi bộ lọc thời gian ở trên.'}</p>
                     </div>
                 `;
             }
@@ -900,7 +1044,7 @@
         // Render Proposal Selector Tabs
         const propTabsContainer = document.getElementById('proposal-selector-tabs');
         if (propTabsContainer) {
-            propTabsContainer.innerHTML = currentProposals.map((prop, idx) => `
+            propTabsContainer.innerHTML = displayProposals.map((prop, idx) => `
                 <div class="proposal-card ${idx === activeProposalIndex ? 'active' : ''}" onclick="selectProposal(${idx})">
                     <div class="proposal-name">Phương án ${String.fromCharCode(65 + idx)}</div>
                     <div class="proposal-score">${prop.score}% Cân bằng</div>
@@ -909,7 +1053,7 @@
             `).join('');
         }
 
-        const activeProp = currentProposals[activeProposalIndex];
+        const activeProp = displayProposals[activeProposalIndex] || displayProposals[0];
         if (!activeProp) return;
 
         // Render Balance Banner
@@ -918,7 +1062,7 @@
         if (scoreCircle) scoreCircle.textContent = activeProp.score + '%';
         if (scoreDesc) {
             scoreDesc.innerHTML = `
-                <strong>Độ cân bằng tổng thể: ${activeProp.score}/100</strong><br>
+                <strong>Độ cân bằng tổng thể: ${activeProp.score}/100 [${getPeriodText(searchYear, searchPeriod)}]</strong><br>
                 <span>Chênh lệch Overall TB: ±${activeProp.powerDev} điểm | Độ lệch vị trí: ${activeProp.posDev < 1 ? 'Rất thấp' : 'Trung bình'}</span>
             `;
         }
@@ -1116,39 +1260,68 @@
         }
 
         const activeProp = currentProposals[activeProposalIndex];
+        const year = activeProp.year || currentDivisionYear || '2025';
+        const period = activeProp.period || currentDivisionPeriod || 'all';
+        const periodLabel = activeProp.periodLabel || getPeriodText(year, period);
+
         const record = {
             id: 'hist_' + Date.now(),
             date: new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+            year: year,
+            period: period,
+            periodLabel: periodLabel,
             numTeams: activeProp.teams.length,
             totalPlayers: activeProp.teams.reduce((s, t) => s + t.length, 0),
             balanceScore: activeProp.score,
+            powerDev: activeProp.powerDev,
+            posDev: activeProp.posDev,
             teams: activeProp.teams.map((t, idx) => ({
                 name: 'Đội ' + (idx + 1),
                 totalOverall: t.reduce((s, p) => s + p.overall, 0),
-                players: t.map(p => ({ id: p.id, name: p.name, pos: p.primaryPosition, overall: p.overall }))
+                players: t.map(p => ({
+                    id: p.id,
+                    num: p.num,
+                    name: p.name,
+                    primaryPosition: p.primaryPosition || 'CM',
+                    pos: p.primaryPosition || 'CM',
+                    overall: p.overall
+                }))
             }))
         };
 
+        sessionHistory = sessionHistory.filter(h => !(h.year === record.year && h.period === record.period));
         sessionHistory.unshift(record);
         saveHistory();
-        alert('Đã lưu kết quả chia đội vào Lịch Sử thành công!');
+        alert(`Đã lưu kết quả chia đội [${periodLabel}] vào Lịch Sử thành công!`);
     };
 
     window.renderHistoryTab = function () {
         const container = document.getElementById('history-list-container');
         if (!container) return;
 
-        if (sessionHistory.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding: 40px; color:#888;">Chưa có lịch sử chia đội nào được lưu.</div>';
+        const hYear = document.getElementById('hist-year-filter')?.value || 'all';
+        const hPeriod = document.getElementById('hist-period-filter')?.value || 'all';
+
+        const filtered = sessionHistory.filter(item => {
+            const matchYear = hYear === 'all' || item.year === hYear;
+            const matchPeriod = hPeriod === 'all' || item.period === hPeriod;
+            return matchYear && matchPeriod;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color:#888;">Chưa có lịch sử chia đội nào được lưu trong khoảng thời gian đã chọn (${getPeriodText(hYear, hPeriod)}).</div>`;
             return;
         }
 
-        container.innerHTML = sessionHistory.map(item => `
+        container.innerHTML = filtered.map(item => `
             <div class="panel-card" style="margin-bottom: 16px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; flex-wrap:wrap; gap:10px;">
                     <div>
                         <strong style="font-size: 1.1rem; color:#fff;">📅 Lần chia ngày: ${item.date}</strong>
-                        <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2px;">
+                        <span style="margin-left: 8px; background: rgba(239, 1, 7, 0.2); color: var(--accent); border: 1px solid rgba(239, 1, 7, 0.4); padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.82rem;">
+                            ${item.periodLabel || 'Năm 2025'}
+                        </span>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
                             ${item.numTeams} Đội | ${item.totalPlayers} Cầu thủ | Độ cân bằng: <span style="color:var(--accent); font-weight:800;">${item.balanceScore}%</span>
                         </div>
                     </div>
