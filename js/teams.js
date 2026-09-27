@@ -9,7 +9,7 @@
     // ==========================================
     // 1. DEFAULT DATA & STORAGE KEYS
     // ==========================================
-    const STORAGE_PLAYERS_KEY = 'phn_teams_players_v1';
+    const STORAGE_PLAYERS_KEY = 'phn_teams_players_v2';
     const STORAGE_POSITIONS_KEY = 'phn_teams_positions_v1';
     const STORAGE_SKILLS_KEY = 'phn_teams_skills_v1';
     const STORAGE_HISTORY_KEY = 'phn_teams_history_v1';
@@ -42,80 +42,80 @@
 
     // Preloaded 74 players roster from PHN FC dataset with monthly scores (M3-M12)
     const DEFAULT_ROSTER = [
-        { num: 1, name: "Vũ Tấn Lộc", primaryPosition: "ST", skillLevel: "Chuyên Nghiệp", overall: 92, m3: 6, a3: 3, m4: 1, a4: 2, m5: 5, a5: 0, m6: 7, a6: 1, m7: 3, a7: 0, m8: 7, a8: 2, m9: 8, a9: 0 },
-        { num: 2, name: "Phùng Đức Huỳnh", primaryPosition: "W", skillLevel: "Bán Chuyên", overall: 84, m4: 3, a4: 0, m5: 5, a5: 4, m6: 6, a6: 0, m7: 4, a7: 1, m8: 3, a8: 4, m9: 0, a9: 4 },
-        { num: 3, name: "Đinh Phạm Kiên", primaryPosition: "ST", skillLevel: "Chuyên Nghiệp", overall: 90, m3: 2, a3: 0, m4: 1, a4: 2, m5: 3, a5: 2, m6: 5, a6: 1, m7: 6, a7: 0, m8: 7, a8: 0, m9: 7, a9: 1 },
-        { num: 4, name: "Phạm Hồng Quân", primaryPosition: "CAM", skillLevel: "Bán Chuyên", overall: 85, m3: 1, a3: 3, m4: 3, a4: 0, m5: 5, a5: 2, m6: 1, a6: 1, m7: 3, a7: 0, m8: 1, a8: 1, m9: 1, a9: 0 },
-        { num: 5, name: "Lại Anh Đức", primaryPosition: "W", skillLevel: "Bán Chuyên", overall: 82, m4: 1, a4: 0, m5: 7, a5: 1, m6: 2, a6: 3, m7: 0, a7: 5, m8: 0, a8: 2, m9: 0, a9: 1 },
+        { num: 1, name: "Vũ Tấn Lộc", primaryPosition: "ST", skillLevel: "Khá", overall: 68, m3: 6, a3: 3, m4: 1, a4: 2, m5: 5, a5: 0, m6: 7, a6: 1, m7: 3, a7: 0, m8: 7, a8: 2, m9: 8, a9: 0 },
+        { num: 2, name: "Phùng Đức Huỳnh", primaryPosition: "CM", skillLevel: "Trung bình yếu", overall: 52, m4: 3, a4: 0, m5: 5, a5: 4, m6: 6, a6: 0, m7: 4, a7: 1, m8: 3, a8: 4, m9: 0, a9: 4 },
+        { num: 3, name: "Đinh Phạm Kiên", primaryPosition: "ST", skillLevel: "Trung bình yếu", overall: 52, m3: 2, a3: 0, m4: 1, a4: 2, m5: 3, a5: 2, m6: 5, a6: 1, m7: 6, a7: 0, m8: 7, a8: 0, m9: 7, a9: 1 },
+        { num: 4, name: "Phạm Hồng Quân", primaryPosition: "W", skillLevel: "Yếu", overall: 42, m3: 1, a3: 3, m4: 3, a4: 0, m5: 5, a5: 2, m6: 1, a6: 1, m7: 3, a7: 0, m8: 1, a8: 1, m9: 1, a9: 0 },
+        { num: 5, name: "Lại Anh Đức", primaryPosition: "CM", skillLevel: "Trung bình", overall: 55, m4: 1, a4: 0, m5: 7, a5: 1, m6: 2, a6: 3, m7: 0, a7: 5, m8: 0, a8: 2, m9: 0, a9: 1 },
         { num: 6, name: "Nguyễn Tiến", primaryPosition: "ST", skillLevel: "Bán Chuyên", overall: 83, m3: 2, a3: 2, m4: 3, a4: 1, m5: 2, a5: 1, m7: 3, a7: 2, m8: 7, a8: 0, m9: 0, a9: 1 },
-        { num: 7, name: "Hồng Viết Hiệp", primaryPosition: "ST", skillLevel: "Khá+", overall: 75, m3: 4, a3: 3, m5: 3, a5: 1, m6: 1, a6: 1, m7: 1, a7: 1, m8: 0, a8: 1 },
-        { num: 8, name: "Nguyễn Duy Tiên", primaryPosition: "CM", skillLevel: "Khá+", overall: 72, m4: 3, a4: 0, m5: 1, a5: 0, m6: 3, a6: 1, m7: 2, a7: 0, m8: 2, a8: 1 },
-        { num: 9, name: "Bùi Văn Chiều", primaryPosition: "W", skillLevel: "Khá+", overall: 74, m3: 4, a3: 0, m4: 1, a4: 0, m5: 0, a5: 1, m6: 1, a6: 0, m7: 2, a7: 1, m8: 3, a8: 0 },
-        { num: 10, name: "Đỗ Việt Hoàng", primaryPosition: "CM", skillLevel: "Bán Chuyên", overall: 80, m3: 1, a3: 0, m4: 2, a4: 1, m5: 2, a5: 2, m6: 1, a6: 0, m7: 1, a7: 4, m8: 2, a8: 1, m9: 0, a9: 1 },
-        { num: 11, name: "Nguyễn Duy Nam", primaryPosition: "CAM", skillLevel: "Khá+", overall: 76, m3: 3, a3: 5, m5: 2, a5: 1, m6: 2, a6: 0 },
+        { num: 7, name: "Hồng Viết Hiệp", primaryPosition: "W", skillLevel: "Trung bình", overall: 55, m3: 4, a3: 3, m5: 3, a5: 1, m6: 1, a6: 1, m7: 1, a7: 1, m8: 0, a8: 1 },
+        { num: 8, name: "Nguyễn Duy Tiên", primaryPosition: "CM", skillLevel: "Trung bình", overall: 55, m4: 3, a4: 0, m5: 1, a5: 0, m6: 3, a6: 1, m7: 2, a7: 0, m8: 2, a8: 1 },
+        { num: 9, name: "Bùi Văn Chiều", primaryPosition: "ST", skillLevel: "Yếu", overall: 42, m3: 4, a3: 0, m4: 1, a4: 0, m5: 0, a5: 1, m6: 1, a6: 0, m7: 2, a7: 1, m8: 3, a8: 0 },
+        { num: 10, name: "Đỗ Việt Hoàng", primaryPosition: "CM", skillLevel: "Khá", overall: 68, m3: 1, a3: 0, m4: 2, a4: 1, m5: 2, a5: 2, m6: 1, a6: 0, m7: 1, a7: 4, m8: 2, a8: 1, m9: 0, a9: 1 },
+        { num: 11, name: "Nguyễn Duy Nam", primaryPosition: "CM", skillLevel: "Trung bình yếu", overall: 52, m3: 3, a3: 5, m5: 2, a5: 1, m6: 2, a6: 0 },
         { num: 12, name: "Phạm Thế Duy", primaryPosition: "W", skillLevel: "Bán Chuyên", overall: 81, m5: 2, a5: 1, m6: 3, a6: 6, m7: 1, a7: 4, m8: 0, a8: 2 },
-        { num: 13, name: "Đàm Minh Tuấn", primaryPosition: "CB/TH", skillLevel: "Khá+", overall: 73, m3: 1, a3: 0, m4: 2, a4: 4, m5: 1, a5: 3, m6: 1, a6: 0, m7: 0, a7: 2 },
-        { num: 14, name: "Nguyễn Viết Tú", primaryPosition: "ST", skillLevel: "Khá", overall: 68, m3: 2, a3: 0, m4: 0, a4: 1, m5: 0, a5: 1, m6: 2, a6: 0, m7: 1, a7: 0 },
+        { num: 13, name: "Đàm Minh Tuấn", primaryPosition: "CM", skillLevel: "Trung bình", overall: 55, m3: 1, a3: 0, m4: 2, a4: 4, m5: 1, a5: 3, m6: 1, a6: 0, m7: 0, a7: 2 },
+        { num: 14, name: "Nguyễn Viết Tú", primaryPosition: "W", skillLevel: "Yếu", overall: 42, m3: 2, a3: 0, m4: 0, a4: 1, m5: 0, a5: 1, m6: 2, a6: 0, m7: 1, a7: 0 },
         { num: 15, name: "Nguyễn Trung Kiên", primaryPosition: "CM", skillLevel: "Khá", overall: 66, m3: 1, a3: 0, m5: 0, a5: 1, m6: 2, a6: 0 },
-        { num: 16, name: "Lê Bá Tùng", primaryPosition: "CAM", skillLevel: "Khá", overall: 69, m3: 0, a3: 2, m4: 0, a4: 3, m5: 0, a5: 1, m6: 1, a6: 0, m7: 0, a7: 2, m8: 2, a8: 0, m9: 0, a9: 1 },
-        { num: 17, name: "Bùi Đức Hạnh", primaryPosition: "CM", skillLevel: "Khá", overall: 65, m5: 1, a5: 1, m7: 1, a7: 1 },
-        { num: 18, name: "Nguyễn Thái", primaryPosition: "LB/RB", skillLevel: "Khá", overall: 67, m3: 0, a3: 1, m5: 0, a5: 1, m8: 1, a8: 0, m9: 1, a9: 0 },
-        { num: 19, name: "Bùi Văn Niêm", primaryPosition: "CB/TH", skillLevel: "Khá", overall: 65, m5: 1, a5: 0, m6: 0, a6: 1, m7: 1, a7: 0 },
-        { num: 20, name: "Trần Quang Thái", primaryPosition: "W", skillLevel: "Khá", overall: 66, m4: 0, a4: 1, m6: 0, a6: 1, m7: 1, a7: 0, m9: 1, a9: 0 },
+        { num: 16, name: "Lê Bá Tùng", primaryPosition: "GK", skillLevel: "Yếu+", overall: 48, m3: 0, a3: 2, m4: 0, a4: 3, m5: 0, a5: 1, m6: 1, a6: 0, m7: 0, a7: 2, m8: 2, a8: 0, m9: 0, a9: 1 },
+        { num: 17, name: "Bùi Đức Hạnh", primaryPosition: "W", skillLevel: "Trung bình yếu", overall: 52, m5: 1, a5: 1, m7: 1, a7: 1 },
+        { num: 18, name: "Nguyễn Thái", primaryPosition: "CM", skillLevel: "Trung bình", overall: 55, m3: 0, a3: 1, m5: 0, a5: 1, m8: 1, a8: 0, m9: 1, a9: 0 },
+        { num: 19, name: "Bùi Văn Niêm", primaryPosition: "GK", skillLevel: "Yếu+", overall: 48, m5: 1, a5: 0, m6: 0, a6: 1, m7: 1, a7: 0 },
+        { num: 20, name: "Trần Quang Thái", primaryPosition: "W", skillLevel: "Yếu", overall: 42, m4: 0, a4: 1, m6: 0, a6: 1, m7: 1, a7: 0, m9: 1, a9: 0 },
         { num: 21, name: "Hoàng Xuân Giao", primaryPosition: "CB/TH", skillLevel: "Khá", overall: 65, m3: 2, a3: 0, m9: 0, a9: 1 },
         { num: 22, name: "Tô Minh Tuấn", primaryPosition: "ST", skillLevel: "Khá", overall: 64, m3: 2, a3: 0 },
         { num: 23, name: "Lê Hiếu", primaryPosition: "CB/TH", skillLevel: "Khá", overall: 64, m4: 1, a4: 0, m5: 1, a5: 0 },
-        { num: 24, name: "Đặng Hùng Lĩnh", primaryPosition: "CM", skillLevel: "Khá", overall: 65, m4: 0, a4: 1, m5: 1, a5: 2 },
-        { num: 25, name: "Nguyễn Công Minh", primaryPosition: "W", skillLevel: "Khá", overall: 66, m5: 1, a5: 1, m9: 1, a9: 1 },
+        { num: 24, name: "Đặng Hùng Lĩnh", primaryPosition: "W", skillLevel: "Trung bình", overall: 55, m4: 0, a4: 1, m5: 1, a5: 2 },
+        { num: 25, name: "Nguyễn Công Minh", primaryPosition: "W", skillLevel: "Yếu+", overall: 48, m5: 1, a5: 1, m9: 1, a9: 1 },
         { num: 26, name: "Nguyễn Xuân Đạt", primaryPosition: "LB/RB", skillLevel: "Trung bình khá", overall: 58, m3: 1, a3: 0 },
         { num: 27, name: "Nguyễn Đức Anh", primaryPosition: "CB/TH", skillLevel: "Trung bình khá", overall: 58, m5: 1, a5: 0 },
-        { num: 28, name: "Dương Việt Anh", primaryPosition: "W", skillLevel: "Trung bình khá", overall: 58, m6: 1, a6: 0 },
-        { num: 29, name: "Nguyễn Tiến Mạnh", primaryPosition: "CAM", skillLevel: "Khá", overall: 68, m3: 0, a3: 2, m5: 0, a5: 4, m8: 1, a8: 1 },
+        { num: 28, name: "Dương Việt Anh", primaryPosition: "ST", skillLevel: "Trung bình", overall: 55, m6: 1, a6: 0 },
+        { num: 29, name: "Nguyễn Tiến Mạnh", primaryPosition: "GK", skillLevel: "Trung bình", overall: 55, m3: 0, a3: 2, m5: 0, a5: 4, m8: 1, a8: 1 },
         { num: 30, name: "Thạc Bảo", primaryPosition: "CM", skillLevel: "Trung bình khá", overall: 59, m3: 0, a3: 3, m7: 0, a7: 1 },
-        { num: 31, name: "Vũ Thế Hùng", primaryPosition: "LB/RB", skillLevel: "Trung bình khá", overall: 56, m5: 0, a5: 1, m6: 0, a6: 1 },
-        { num: 32, name: "Trần Anh Tuấn", primaryPosition: "CM", skillLevel: "Khá", overall: 65, m4: 0, a4: 1, m8: 1, a8: 2 },
-        { num: 33, name: "Phạm Quang Phương", primaryPosition: "LB/RB", skillLevel: "Trung bình khá", overall: 57, m3: 0, a3: 1, m8: 0, a8: 1, m9: 0, a9: 1 },
+        { num: 31, name: "Vũ Thế Hùng", primaryPosition: "W", skillLevel: "Trung bình yếu", overall: 52, m5: 0, a5: 1, m6: 0, a6: 1 },
+        { num: 32, name: "Trần Anh Tuấn", primaryPosition: "W", skillLevel: "Trung bình khá", overall: 60, m4: 0, a4: 1, m8: 1, a8: 2 },
+        { num: 33, name: "Phạm Quang Phương", primaryPosition: "W", skillLevel: "Yếu", overall: 42, m3: 0, a3: 1, m8: 0, a8: 1, m9: 0, a9: 1 },
         { num: 34, name: "Phạm Hải Phong", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 54, m6: 0, a6: 1 },
-        { num: 35, name: "Đặng Hoàng Nam", primaryPosition: "CM", skillLevel: "Trung bình", overall: 54, m5: 0, a5: 1, m7: 0, a7: 1 },
-        { num: 36, name: "Nguyễn Hoàng Anh", primaryPosition: "W", skillLevel: "Trung bình", overall: 54, m7: 0, a7: 1, m9: 0, a9: 1 },
+        { num: 35, name: "Đặng Hoàng Nam", primaryPosition: "W", skillLevel: "Yếu", overall: 42, m5: 0, a5: 1, m7: 0, a7: 1 },
+        { num: 36, name: "Nguyễn Hoàng Anh", primaryPosition: "GK", skillLevel: "Yếu+", overall: 48, m7: 0, a7: 1, m9: 0, a9: 1 },
         { num: 37, name: "Lê Gia Linh", primaryPosition: "GK", skillLevel: "Khá", overall: 65 },
         { num: 38, name: "Lưu Việt Hưng", primaryPosition: "ST", skillLevel: "Khá", overall: 62, m6: 1, a6: 0 },
-        { num: 39, name: "Lê Đức", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
+        { num: 39, name: "Lê Đức", primaryPosition: "W", skillLevel: "Trung bình yếu", overall: 52 },
         { num: 40, name: "Võ Phi Thức", primaryPosition: "LB/RB", skillLevel: "Trung bình", overall: 50 },
         { num: 41, name: "Đàm Hải Yến", primaryPosition: "W", skillLevel: "Trung bình", overall: 50 },
-        { num: 42, name: "Nguyễn Hồng Quân", primaryPosition: "CM", skillLevel: "Trung bình", overall: 52, m8: 0, a8: 1 },
-        { num: 43, name: "Lê Quang Đạo", primaryPosition: "ST", skillLevel: "Trung bình", overall: 50 },
-        { num: 44, name: "Đỗ Huy Anh Tú", primaryPosition: "CAM", skillLevel: "Trung bình khá", overall: 55, m8: 0, a8: 1 },
-        { num: 45, name: "Đặng Quốc Anh", primaryPosition: "W", skillLevel: "Khá", overall: 60, m8: 1, a8: 1 },
-        { num: 46, name: "Đinh Thế", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 50 },
-        { num: 47, name: "Nguyễn Anh Tuấn", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 48, name: "Lương Văn Hoà", primaryPosition: "LB/RB", skillLevel: "Trung bình", overall: 50 },
-        { num: 49, name: "Phạm Thành Mạnh", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 50 },
-        { num: 50, name: "Lương Hữu Tân", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 51, name: "Trần Văn Minh", primaryPosition: "W", skillLevel: "Trung bình", overall: 50 },
-        { num: 52, name: "Nguyễn Văn Bình", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 50 },
-        { num: 53, name: "Lương khánh Tùng", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 54, name: "Lê Hữu Minh", primaryPosition: "ST", skillLevel: "Trung bình", overall: 50 },
-        { num: 55, name: "Trần Hữu Bảo", primaryPosition: "GK", skillLevel: "Trung bình khá", overall: 55 },
-        { num: 56, name: "Đỗ Tuấn Anh", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 57, name: "Nguyễn Tiến Nam", primaryPosition: "W", skillLevel: "Trung bình", overall: 50 },
-        { num: 58, name: "lê minh Công", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 50 },
-        { num: 59, name: "Nguyễn Quang Huy", primaryPosition: "CAM", skillLevel: "Trung bình", overall: 50 },
-        { num: 60, name: "Hà Văn Hiệu", primaryPosition: "ST", skillLevel: "Trung bình", overall: 50 },
-        { num: 61, name: "Hoàng Trung Kiên", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 62, name: "Trác Phong", primaryPosition: "W", skillLevel: "Trung bình", overall: 50 },
-        { num: 63, name: "Phùng Tiến Đạt", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 50 },
-        { num: 64, name: "Trần Hoàng Dương", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 65, name: "Vũ Ngọc Duy", primaryPosition: "LB/RB", skillLevel: "Trung bình", overall: 50 },
-        { num: 66, name: "Ngô Mạnh Quí", primaryPosition: "ST", skillLevel: "Trung bình", overall: 50 },
-        { num: 67, name: "Nguyễn Ngọc Sơn", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 68, name: "Nguyễn Tiến Dũng", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 50 },
-        { num: 69, name: "Hoàng Quốc Dũng", primaryPosition: "W", skillLevel: "Trung bình", overall: 50 },
-        { num: 70, name: "Nguyễn Thương Tín", primaryPosition: "CAM", skillLevel: "Trung bình", overall: 50 },
-        { num: 71, name: "Đỗ Việt Minh Khôi", primaryPosition: "ST", skillLevel: "Trung bình", overall: 50 },
-        { num: 72, name: "Nguyễn Huy Cương", primaryPosition: "CM", skillLevel: "Trung bình", overall: 50 },
-        { num: 73, name: "Bùi Mạnh Hùng", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 50 },
-        { num: 74, name: "Nguyễn Mạnh Thanh", primaryPosition: "LB/RB", skillLevel: "Trung bình", overall: 50 }
+        { num: 42, name: "Nguyễn Hồng Quân", primaryPosition: "W", skillLevel: "Yếu", overall: 42, m8: 0, a8: 1 },
+        { num: 43, name: "Lê Quang Đạo", primaryPosition: "GK", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 44, name: "Đỗ Huy Anh Tú", primaryPosition: "CM", skillLevel: "Trung bình yếu", overall: 52, m8: 0, a8: 1 },
+        { num: 45, name: "Đặng Quốc Anh", primaryPosition: "CM", skillLevel: "Trung bình", overall: 55, m8: 1, a8: 1 },
+        { num: 46, name: "Đinh Thế", primaryPosition: "W", skillLevel: "Trung bình yếu", overall: 52 },
+        { num: 47, name: "Nguyễn Anh Tuấn", primaryPosition: "ST", skillLevel: "Trung bình", overall: 55 },
+        { num: 48, name: "Lương Văn Hoà", primaryPosition: "ST", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 49, name: "Phạm Thành Mạnh", primaryPosition: "CB/TH", skillLevel: "Yếu+", overall: 48 },
+        { num: 50, name: "Lương Hữu Tân", primaryPosition: "CM", skillLevel: "Trung bình", overall: 55 },
+        { num: 51, name: "Trần Văn Minh", primaryPosition: "CB/TH", skillLevel: "Khá", overall: 68 },
+        { num: 52, name: "Nguyễn Văn Bình", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 55 },
+        { num: 53, name: "Lương khánh Tùng", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 55 },
+        { num: 54, name: "Lê Hữu Minh", primaryPosition: "CM", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 55, name: "Trần Hữu Bảo", primaryPosition: "CB/TH", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 56, name: "Đỗ Tuấn Anh", primaryPosition: "GK", skillLevel: "Trung bình", overall: 55 },
+        { num: 57, name: "Nguyễn Tiến Nam", primaryPosition: "CB/TH", skillLevel: "Trung bình yếu", overall: 52 },
+        { num: 58, name: "lê minh Công", primaryPosition: "GK", skillLevel: "Trung bình", overall: 55 },
+        { num: 59, name: "Nguyễn Quang Huy", primaryPosition: "GK", skillLevel: "Khá", overall: 68 },
+        { num: 60, name: "Hà Văn Hiệu", primaryPosition: "CM", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 61, name: "Hoàng Trung Kiên", primaryPosition: "ST", skillLevel: "Khá", overall: 68 },
+        { num: 62, name: "Trác Phong", primaryPosition: "CM", skillLevel: "Trung bình yếu", overall: 52 },
+        { num: 63, name: "Phùng Tiến Đạt", primaryPosition: "CB/TH", skillLevel: "Trung bình yếu", overall: 52 },
+        { num: 64, name: "Trần Hoàng Dương", primaryPosition: "CB/TH", skillLevel: "Trung bình", overall: 55 },
+        { num: 65, name: "Vũ Ngọc Duy", primaryPosition: "CM", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 66, name: "Ngô Mạnh Quí", primaryPosition: "ST", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 67, name: "Nguyễn Ngọc Sơn", primaryPosition: "ST", skillLevel: "Trung bình", overall: 55 },
+        { num: 68, name: "Nguyễn Tiến Dũng", primaryPosition: "CM", skillLevel: "Trung bình", overall: 55 },
+        { num: 69, name: "Hoàng Quốc Dũng", primaryPosition: "ST", skillLevel: "Trung bình yếu", overall: 52 },
+        { num: 70, name: "Nguyễn Thương Tín", primaryPosition: "CB/TH", skillLevel: "Trung bình khá", overall: 60 },
+        { num: 71, name: "Đỗ Việt Minh Khôi", primaryPosition: "CM", skillLevel: "Khá", overall: 68 },
+        { num: 72, name: "Nguyễn Huy Cương", primaryPosition: "W", skillLevel: "Trung bình yếu", overall: 52 },
+        { num: 73, name: "Bùi Mạnh Hùng", primaryPosition: "ST", skillLevel: "Khá", overall: 68 },
+        { num: 74, name: "Nguyễn Mạnh Thanh", primaryPosition: "ST", skillLevel: "Trung bình yếu", overall: 52 }
     ];
 
     // ==========================================
@@ -363,14 +363,20 @@
     }
 
     // Helper: Map skill level name to point rating
+    function normalizeSkillName(name) {
+        return (name || '').toLowerCase().replace(/\s*\+\s*/g, '+').replace(/\s*-\s*/g, '-').trim();
+    }
+
     function getSkillRating(levelName, fallbackOverall) {
         if (fallbackOverall && typeof fallbackOverall === 'number') return fallbackOverall;
-        const found = skillLevels.find(s => s.name.toLowerCase() === (levelName || '').toLowerCase());
-        return found ? found.rating : 60;
+        const norm = normalizeSkillName(levelName);
+        const found = skillLevels.find(s => normalizeSkillName(s.name) === norm);
+        return found ? found.rating : 55;
     }
 
     function getSkillBadgeClass(levelName) {
-        const found = skillLevels.find(s => s.name.toLowerCase() === (levelName || '').toLowerCase());
+        const norm = normalizeSkillName(levelName);
+        const found = skillLevels.find(s => normalizeSkillName(s.name) === norm);
         return found ? (found.badgeClass || 'skill-avg') : 'skill-avg';
     }
 
