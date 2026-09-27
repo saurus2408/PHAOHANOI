@@ -9,7 +9,7 @@
     // ==========================================
     // 1. DEFAULT DATA & STORAGE KEYS
     // ==========================================
-    const STORAGE_PLAYERS_KEY = 'phn_teams_players_v3';
+    const STORAGE_PLAYERS_KEY = 'phn_teams_players_v4';
     const STORAGE_POSITIONS_KEY = 'phn_teams_positions_v1';
     const STORAGE_SKILLS_KEY = 'phn_teams_skills_v1';
     const STORAGE_HISTORY_KEY = 'phn_teams_history_v1';
@@ -142,7 +142,7 @@
         return `${period} (${yearStr})`;
     }
 
-    let currentDivisionYear = '2025';
+    let currentDivisionYear = '2026';
     let currentDivisionPeriod = 'q3';
 
     // Initialize State
@@ -161,11 +161,11 @@
 
         if (!sessionHistory || sessionHistory.length === 0) {
             sessionHistory = [{
-                id: 'hist_default_2025_q3',
-                date: '28/09/2025 15:00',
-                year: '2025',
+                id: 'hist_default_2026_q3',
+                date: '28/09/2026 15:00',
+                year: '2026',
                 period: 'q3',
-                periodLabel: 'Quý 3 (Năm 2025)',
+                periodLabel: 'Quý 3 (Năm 2026)',
                 numTeams: 4,
                 totalPlayers: 28,
                 balanceScore: 94.8,
@@ -321,7 +321,7 @@
         let g = 0, a = 0;
         const s = p.scores || p;
 
-        const scoreYear = s.year || 2025;
+        const scoreYear = s.year || 2026;
         if (year && year !== 'all' && parseInt(year) !== parseInt(scoreYear)) {
             const baseRating = p.overall || 65;
             return { goals: 0, assists: 0, periodOverall: baseRating };
