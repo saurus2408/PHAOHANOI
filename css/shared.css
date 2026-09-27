@@ -1409,3 +1409,56 @@ tr:nth-child(3) .rank-num {
 .admin-active td.admin-only {
   display: table-cell !important;
 }
+
+/* ==========================================================================
+   GLOBAL HIGH-CONTRAST FORM CONTROLS & DROPDOWN OPTION STYLING
+   ========================================================================== */
+select option,
+select optgroup {
+  background-color: #121624 !important;
+  color: #ffffff !important;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+}
+
+select option:checked,
+select option:hover {
+  background-color: #ef0107 !important;
+  color: #ffffff !important;
+}
+
+.form-group label {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background-color: #0c0f1d !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #ef0107 !important;
+  box-shadow: 0 0 0 2px rgba(239, 1, 7, 0.3) !important;
+}
+
+.modal-admin select,
+.modal-admin input,
+.modal-admin textarea {
+  background-color: #0c0f1d !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.modal-admin label {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
