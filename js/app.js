@@ -11,10 +11,33 @@ if (typeof supabase !== 'undefined') {
 // --- Admin Logic ---
 let isAdmin = sessionStorage.getItem('phn_admin') === 'true';
 
-function toggleAdmin() {
+// Encrypted SHA-256 hash of admin password
+const ADMIN_PASS_HASH = 'acfa59460d3b83747f362426faac5e54b9c18d9db6387d379160b9fac7ec4bb1';
+
+async function hashPassword(str) {
+    if (window.crypto && window.crypto.subtle) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    // Simple fallback string transformation if crypto.subtle is unavailable
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+    }
+    return hash.toString(16);
+}
+
+async function toggleAdmin() {
     if (!isAdmin) {
         const pass = prompt("Nhập mật khẩu quản lý:");
-        if (pass === 'Giao240806') {
+        if (!pass) return;
+
+        const hashedInput = await hashPassword(pass);
+        if (hashedInput === ADMIN_PASS_HASH) {
             isAdmin = true;
             sessionStorage.setItem('phn_admin', 'true');
             document.body.classList.add('admin-active');

@@ -39,6 +39,7 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-link">Home</a></li>
                     <li><a href="players.html" class="nav-link active">Cầu thủ</a></li>
+                    <li><a href="teams.html" class="nav-link">Chia đội</a></li>
                     <li><a href="videos.html" class="nav-link">Video</a></li>
                     <li><a href="results.html" class="nav-link">Kết quả</a></li>
                     <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
@@ -74,7 +75,6 @@
                         <th>Cầu thủ</th>
                         <th>Ngày sinh</th>
                         <th>Quê quán</th>
-                        <th>Nghề nghiệp</th>
                         <th id="admin-col-header" style="text-align: center; width: 140px; display: none;">Thao tác</th>
                     </tr>
                 </thead>
@@ -115,10 +115,6 @@
         <div class="form-group">
             <label>Quê quán</label>
             <input type="text" id="p-hometown" placeholder="Vd: Hà Nội">
-        </div>
-        <div class="form-group">
-            <label>Nghề nghiệp</label>
-            <input type="text" id="p-career" placeholder="Vd: Kỹ sư, Học sinh...">
         </div>
         <button class="btn-primary" onclick="savePlayer()" style="width: 100%;">Lưu</button>
     </div>
@@ -297,7 +293,7 @@
             if (!body) return;
 
             if (!playersToRender || playersToRender.length === 0) {
-                body.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" style="text-align:center; padding:30px; color:var(--text-muted);">Chưa có dữ liệu cầu thủ. Vui lòng chạy script SQL trên Supabase hoặc nhấn "Thêm cầu thủ".</td></tr>`;
+                body.innerHTML = `<tr><td colspan="${isAdmin ? 5 : 4}" style="text-align:center; padding:30px; color:var(--text-muted);">Chưa có dữ liệu cầu thủ. Vui lòng chạy script SQL trên Supabase hoặc nhấn "Thêm cầu thủ".</td></tr>`;
                 return;
             }
 
@@ -323,7 +319,6 @@
                     </td>
                     <td><i data-lucide="calendar" style="width:12px; height:12px; margin-right:4px; color:var(--text-muted);"></i>${dobFormatted}</td>
                     <td><i data-lucide="map-pin" style="width:12px; height:12px; margin-right:4px; color:var(--primary);"></i>${hometownDisplay}</td>
-                    <td><i data-lucide="briefcase" style="width:12px; height:12px; margin-right:4px; color:var(--accent);"></i>${p.career || 'Chưa cập nhật'}</td>
                     ${isAdmin ? `
                     <td style="text-align: center;" onclick="event.stopPropagation();">
                         <div style="display:flex; justify-content:center; gap:6px;">
