@@ -218,10 +218,16 @@
         }
     }
 
-    // Helper: Calculate goals, assists, and performance rating for selected Month or Quarter
-    function calculatePeriodStats(p, period) {
+    // Helper: Calculate goals, assists, and performance rating for selected Year, Month or Quarter
+    function calculatePeriodStats(p, year, period) {
         let g = 0, a = 0;
         const s = p.scores || p;
+
+        const scoreYear = s.year || 2025;
+        if (year && year !== 'all' && parseInt(year) !== parseInt(scoreYear)) {
+            const baseRating = p.overall || 65;
+            return { goals: 0, assists: 0, periodOverall: baseRating };
+        }
 
         if (!period || period === 'all') {
             for (let i = 1; i <= 12; i++) {
@@ -243,7 +249,7 @@
 
         const baseRating = p.overall || 65;
         let periodOverall = baseRating;
-        if (period !== 'all') {
+        if ((period && period !== 'all') || (year && year !== 'all')) {
             periodOverall = Math.min(99, Math.max(40, Math.round(baseRating + (g * 3) + (a * 2))));
         }
 
@@ -298,6 +304,12 @@
     // 3. UI TAB SWITCHER & RENDERING
     // ==========================================
     window.switchTab = function (tabId) {
+        const isAdmin = sessionStorage.getItem('phn_admin') === 'true' || document.body.classList.contains('admin-active');
+        // Non-admin can only access 'results' and 'history'
+        if (!isAdmin && (tabId === 'players' || tabId === 'setup' || tabId === 'settings')) {
+            tabId = 'results';
+        }
+
         document.querySelectorAll('.step-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
 
@@ -310,6 +322,7 @@
         if (tabId === 'players') renderPlayerTable();
         if (tabId === 'history') renderHistoryTab();
         if (tabId === 'settings') renderSettingsTab();
+        if (tabId === 'results') renderResultsView();
     };
 
     // Render Main Player List Table
@@ -335,6 +348,7 @@
             countSpan.textContent = `Tổng: ${players.length} cầu thủ | Đang chọn đá: ${activeCount} người`;
         }
 
+        const yearKey = document.getElementById('p-year-filter')?.value || 'all';
         const periodKey = document.getElementById('p-time-period')?.value || 'all';
 
         let html = '';
@@ -344,9 +358,9 @@
             const skillBadge = `<span class="skill-badge ${getSkillBadgeClass(p.skillLevel)}">${p.skillLevel}</span>`;
             const secPos = [p.secondaryPosition1, p.secondaryPosition2].filter(Boolean).join(', ') || '-';
 
-            const periodStats = calculatePeriodStats(p, periodKey);
-            const displayOverall = periodKey === 'all' ? p.overall : periodStats.periodOverall;
-            const statsBadge = (periodKey !== 'all' || periodStats.goals > 0 || periodStats.assists > 0)
+            const periodStats = calculatePeriodStats(p, yearKey, periodKey);
+            const displayOverall = (periodKey === 'all' && yearKey === 'all') ? p.overall : periodStats.periodOverall;
+            const statsBadge = (periodKey !== 'all' || yearKey !== 'all' || periodStats.goals > 0 || periodStats.assists > 0)
                 ? `<span style="font-size:0.75rem; color:var(--accent); font-weight:700; margin-left:6px;">(⚽ ${periodStats.goals} | 👟 ${periodStats.assists})</span>`
                 : '';
 
@@ -624,9 +638,10 @@
     // 6. BALANCED TEAM GENERATOR ALGORITHM
     // ==========================================
     window.generateBalancedTeams = function () {
+        const yearKey = document.getElementById('p-year-filter')?.value || 'all';
         const timePeriod = document.getElementById('p-time-period')?.value || 'all';
         const activePlayers = players.filter(p => p.active).map(p => {
-            const stats = calculatePeriodStats(p, timePeriod);
+            const stats = calculatePeriodStats(p, yearKey, timePeriod);
             return {
                 ...p,
                 overall: stats.periodOverall
@@ -838,7 +853,49 @@
     // 7. RENDER RESULTS VIEW & COMPARISON MATRIX
     // ==========================================
     window.renderResultsView = function () {
-        if (!currentProposals || currentProposals.length === 0) return;
+        const isAdmin = sessionStorage.getItem('phn_admin') === 'true' || document.body.classList.contains('admin-active');
+        const warningBox = document.getElementById('team-warning-banner');
+
+        if (!currentProposals || currentProposals.length === 0) {
+            const propTabsContainer = document.getElementById('proposal-selector-tabs');
+            if (propTabsContainer) propTabsContainer.innerHTML = '';
+
+            const scoreCircle = document.getElementById('balance-score-circle');
+            const scoreDesc = document.getElementById('balance-score-desc');
+            if (scoreCircle) scoreCircle.textContent = '0%';
+            if (scoreDesc) {
+                if (isAdmin) {
+                    scoreDesc.innerHTML = `
+                        <strong>Chưa có kết quả chia đội</strong><br>
+                        <span>Vui lòng chuyển sang bước <b>2. Thiết Lập Chia Đội</b> và nhấn <b>"⚡ CHIA ĐỘI TỰ ĐỘNG"</b>.</span>
+                    `;
+                } else {
+                    scoreDesc.innerHTML = `
+                        <strong>Chưa có thông tin chia đội</strong><br>
+                        <span>Danh sách chia đội sẽ xuất hiện tại đây khi Ban Quản Trị thực hiện chia đội bóng.</span>
+                    `;
+                }
+            }
+
+            if (warningBox) warningBox.style.display = 'none';
+
+            const teamsGrid = document.getElementById('teams-results-grid');
+            if (teamsGrid) {
+                teamsGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <i data-lucide="shield-alert" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-muted);"></i>
+                        <h4 style="color: #fff; margin-bottom: 6px;">Chưa Có Dữ Liệu Chia Đội</h4>
+                        <p style="font-size: 0.9rem;">${isAdmin ? 'Vui lòng chọn các cầu thủ và bấm vào "2. Thiết Lập Chia Đội" để tạo đội bóng cân bằng.' : 'Hiện tại chưa có dữ liệu chia đội bóng nào được công bố. Vui lòng quay lại sau.'}</p>
+                    </div>
+                `;
+            }
+
+            const compContainer = document.getElementById('comparison-table-wrapper');
+            if (compContainer) compContainer.innerHTML = '';
+
+            if (window.lucide) lucide.createIcons();
+            return;
+        }
 
         // Render Proposal Selector Tabs
         const propTabsContainer = document.getElementById('proposal-selector-tabs');
@@ -867,7 +924,6 @@
         }
 
         // Render Insufficient GK warning if needed
-        const warningBox = document.getElementById('team-warning-banner');
         if (warningBox) {
             const totalGK = activeProp.teams.flatMap(t => t).filter(p => p.primaryPosition === 'GK' || p.secondaryPosition1 === 'GK').length;
             if (totalGK < activeProp.teams.length) {
@@ -1272,6 +1328,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         initData();
         renderPlayerTable();
+        switchTab('results');
     });
 
 })();

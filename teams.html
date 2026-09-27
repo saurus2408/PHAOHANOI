@@ -66,15 +66,15 @@
 
         <!-- Stepper Navigation -->
         <div class="stepper-nav">
-            <button class="step-btn active" onclick="switchTab('players')">
+            <button class="step-btn admin-only" onclick="switchTab('players')">
                 <span class="badge-num">1</span>
                 <span>Danh Sách Cầu Thủ</span>
             </button>
-            <button class="step-btn" onclick="switchTab('setup')">
+            <button class="step-btn admin-only" onclick="switchTab('setup')">
                 <span class="badge-num">2</span>
                 <span>Thiết Lập Chia Đội</span>
             </button>
-            <button class="step-btn" onclick="switchTab('results')">
+            <button class="step-btn active" onclick="switchTab('results')">
                 <span class="badge-num">3</span>
                 <span>Kết Quả & So Sánh</span>
             </button>
@@ -82,14 +82,14 @@
                 <span class="badge-num">4</span>
                 <span>Lịch Sử Chia Đội</span>
             </button>
-            <button class="step-btn" onclick="switchTab('settings')">
+            <button class="step-btn admin-only" onclick="switchTab('settings')">
                 <span class="badge-num">5</span>
                 <span>Cài Đặt Hệ Thống</span>
             </button>
         </div>
 
         <!-- TAB 1: PLAYERS ROSTER -->
-        <div class="tab-panel active" id="players-panel">
+        <div class="tab-panel" id="players-panel">
             <div class="panel-card">
                 <div class="panel-title">
                     <div class="panel-title-left">
@@ -119,8 +119,15 @@
                             <option value="Bán Chuyên">Bán Chuyên</option>
                             <option value="Chuyên Nghiệp">Chuyên Nghiệp</option>
                         </select>
+                        <select id="p-year-filter" class="select-style" style="border-color: var(--accent); color: var(--accent); font-weight: 700;" onchange="renderPlayerTable()">
+                            <option value="all">🗓️ Tất cả các năm</option>
+                            <option value="2024">Năm 2024</option>
+                            <option value="2025" selected>Năm 2025</option>
+                            <option value="2026">Năm 2026</option>
+                            <option value="2027">Năm 2027</option>
+                        </select>
                         <select id="p-time-period" class="select-style" style="border-color: var(--accent); color: var(--accent); font-weight: 700;" onchange="renderPlayerTable()">
-                            <option value="all">📅 Tất cả thời gian (Overall)</option>
+                            <option value="all">📅 Tất cả tháng (Overall)</option>
                             <optgroup label="Chia Theo Tháng">
                                 <option value="m3">Tháng 3</option>
                                 <option value="m4">Tháng 4</option>
@@ -277,21 +284,21 @@
         </div>
 
         <!-- TAB 3: RESULTS & COMPARISON -->
-        <div class="tab-panel" id="results-panel">
+        <div class="tab-panel active" id="results-panel">
             <!-- Balance Banner -->
             <div class="balance-banner">
                 <div class="balance-score-box">
                     <div class="score-circle" id="balance-score-circle">--</div>
                     <div class="score-details" id="balance-score-desc">
                         <h4>Đang chờ chia đội...</h4>
-                        <p>Hãy bấm nút ⚡ CHIA ĐỘI TỰ ĐỘNG ở Bước 2 để hệ thống tối ưu.</p>
+                        <p>Chưa có danh sách chia đội cho trận đấu này.</p>
                     </div>
                 </div>
 
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button class="btn-secondary" onclick="generateBalancedTeams()"><i data-lucide="refresh-cw"></i> 🔄 Chia lại</button>
+                    <button class="btn-secondary admin-only" onclick="generateBalancedTeams()"><i data-lucide="refresh-cw"></i> 🔄 Chia lại</button>
                     <button class="btn-secondary" onclick="copyTextSummary()"><i data-lucide="copy"></i> Sao chép tin nhắn Zalo</button>
-                    <button class="btn-accent" onclick="saveCurrentDivisionToHistory()"><i data-lucide="save"></i> Lưu kết quả</button>
+                    <button class="btn-accent admin-only" onclick="saveCurrentDivisionToHistory()"><i data-lucide="save"></i> Lưu kết quả</button>
                 </div>
             </div>
 
