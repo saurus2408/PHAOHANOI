@@ -799,24 +799,36 @@
         renderResultsView();
     };
 
-    // Optimization Engine: Evaluates 100 candidate arrangements and scores them
-    function runOptimizationSearch(activeList, numTeams, weights) {
-        const targetTeamSize = Math.floor(activeList.length / numTeams);
-        const remainder = activeList.length % numTeams;
+    function get5PosCategory(p) {
+        const code = (p.primaryPosition || '').toUpperCase();
+        const posObj = positions.find(pos => pos.code === code);
+        const name = ((p.position || '') + ' ' + (posObj ? posObj.name : '')).toLowerCase();
 
-        // Candidates collection
+        if (code === 'GK' || name.includes('thủ môn')) return 'GK';
+        if (code === 'CB/TH' || name.includes('thòng') || name.includes('trung vệ')) return 'TH';
+        if (code === 'ST' || name.includes('tiền đạo')) return 'ST';
+        if (code === 'W' || code === 'LB/RB' || name.includes('cánh')) return 'WING';
+        if (code === 'CM' || code === 'CAM' || name.includes('tiền vệ') || name.includes('giữa')) return 'MID';
+
+        if (posObj) {
+            if (posObj.category === 'GK') return 'GK';
+            if (posObj.category === 'FW') return 'ST';
+            if (posObj.category === 'DEF') return 'TH';
+        }
+        return 'MID';
+    }
+
+    // Optimization Engine: Evaluates candidate arrangements and scores them
+    function runOptimizationSearch(activeList, numTeams, weights) {
         let candidates = [];
         const NUM_SAMPLES = weights.mode === 'random' ? 20 : 150;
 
         for (let s = 0; s < NUM_SAMPLES; s++) {
-            // Shuffle copy
-            let shuffled = [...activeList].sort(() => Math.random() - 0.5);
-
-            // Respect locked teams
             let teamsArr = Array.from({ length: numTeams }, () => []);
             let unassigned = [];
 
-            shuffled.forEach(p => {
+            // 1. Respect locked teams
+            activeList.forEach(p => {
                 if (p.lockedTeam && p.lockedTeam >= 1 && p.lockedTeam <= numTeams) {
                     teamsArr[p.lockedTeam - 1].push(p);
                 } else {
@@ -824,25 +836,57 @@
                 }
             });
 
-            // Distribute remaining players evenly
-            let teamIdx = 0;
-            unassigned.forEach(p => {
-                // Find team with smallest current size
-                let minSizeIdx = 0;
-                for (let t = 1; t < numTeams; t++) {
-                    if (teamsArr[t].length < teamsArr[minSizeIdx].length) {
-                        minSizeIdx = t;
+            if (weights.mode === 'random') {
+                // Pure random mode
+                let shuffled = [...unassigned].sort(() => Math.random() - 0.5);
+                shuffled.forEach(p => {
+                    let minSizeIdx = 0;
+                    for (let t = 1; t < numTeams; t++) {
+                        if (teamsArr[t].length < teamsArr[minSizeIdx].length) minSizeIdx = t;
                     }
-                }
-                teamsArr[minSizeIdx].push(p);
-            });
+                    teamsArr[minSizeIdx].push(p);
+                });
+            } else {
+                // Position-first Snake Draft (Mode 1 & 2): Group players into 5 main position buckets
+                const posCategories = ['GK', 'TH', 'MID', 'WING', 'ST'];
+                
+                posCategories.forEach(cat => {
+                    // Filter unassigned players in this category
+                    let catPlayers = unassigned.filter(p => get5PosCategory(p) === cat);
 
-            // If mode is not pure random, apply local greedy swap optimization
+                    // Add small random noise to overall score for variation across samples
+                    let noisyList = catPlayers.map(p => ({
+                        p,
+                        sortKey: (p.overall || 50) + (Math.random() * 4 - 2)
+                    }));
+                    noisyList.sort((a, b) => b.sortKey - a.sortKey);
+
+                    // Snake Draft distribution into N teams for equal count & skill
+                    let direction = 1;
+                    let currentTeamIndex = 0;
+
+                    noisyList.forEach(item => {
+                        // Find team with lowest player count for this category first, or use snake index
+                        teamsArr[currentTeamIndex].push(item.p);
+
+                        currentTeamIndex += direction;
+                        if (currentTeamIndex >= numTeams) {
+                            currentTeamIndex = numTeams - 1;
+                            direction = -1;
+                        } else if (currentTeamIndex < 0) {
+                            currentTeamIndex = 0;
+                            direction = 1;
+                        }
+                    });
+                });
+            }
+
+            // 2. If mode is not pure random, apply local greedy swap optimization
             if (weights.mode !== 'random') {
                 teamsArr = optimizeLocalSwaps(teamsArr, numTeams, weights);
             }
 
-            // Calculate metrics & Balance Score
+            // 3. Calculate metrics & Balance Score
             const scoreObj = calculateBalanceScore(teamsArr, numTeams, weights);
 
             candidates.push({
@@ -875,30 +919,33 @@
         return uniqueProposals;
     }
 
-    // Local swap optimizer to equalize total power & position distribution
+    // Local swap optimizer to equalize total power while respecting 5-position categories
     function optimizeLocalSwaps(teamsArr, numTeams, weights) {
-        let maxIter = 50;
+        let maxIter = 60;
         for (let iter = 0; iter < maxIter; iter++) {
-            // Find team with max power and min power
-            let teamPowers = teamsArr.map(t => t.reduce((sum, p) => sum + p.overall, 0));
+            let teamPowers = teamsArr.map(t => t.reduce((sum, p) => sum + (p.overall || 50), 0));
             let maxIdx = teamPowers.indexOf(Math.max(...teamPowers));
             let minIdx = teamPowers.indexOf(Math.min(...teamPowers));
 
             if (maxIdx === minIdx) break;
             let diff = teamPowers[maxIdx] - teamPowers[minIdx];
-            if (diff <= 3) break; // Already balanced enough
+            if (diff <= 2) break; // Already balanced enough
 
-            // Try to swap a player from maxIdx to minIdx
             let bestSwap = null;
             let minDiff = diff;
 
             for (let i = 0; i < teamsArr[maxIdx].length; i++) {
                 const p1 = teamsArr[maxIdx][i];
                 if (p1.lockedTeam) continue;
+                const cat1 = get5PosCategory(p1);
 
                 for (let j = 0; j < teamsArr[minIdx].length; j++) {
                     const p2 = teamsArr[minIdx][j];
                     if (p2.lockedTeam) continue;
+                    const cat2 = get5PosCategory(p2);
+
+                    // Prefer swapping players within the SAME 5-position category to maintain position equality
+                    if (weights.mode === 'position_snake' && cat1 !== cat2) continue;
 
                     const newMaxP = teamPowers[maxIdx] - p1.overall + p2.overall;
                     const newMinP = teamPowers[minIdx] - p2.overall + p1.overall;
@@ -925,37 +972,31 @@
 
     // Calculate Comprehensive Balance Score (0-100%)
     function calculateBalanceScore(teamsArr, numTeams, weights) {
-        const teamPowers = teamsArr.map(t => t.reduce((sum, p) => sum + p.overall, 0));
+        const teamPowers = teamsArr.map(t => t.reduce((sum, p) => sum + (p.overall || 50), 0));
         const avgPower = teamPowers.reduce((a, b) => a + b, 0) / numTeams;
         const powerVariance = teamPowers.reduce((sum, p) => sum + Math.pow(p - avgPower, 2), 0) / numTeams;
         const powerStdDev = Math.sqrt(powerVariance);
 
-        // Position variance (Check GK, DEF, MID, FW distribution)
+        // 5-Position variance (Check GK, TH, MID, WING, ST distribution)
         let posDevs = 0;
-        ['GK', 'DEF', 'MID', 'FW'].forEach(cat => {
-            const counts = teamsArr.map(t => t.filter(p => {
-                const posObj = positions.find(pos => pos.code === p.primaryPosition);
-                return posObj ? posObj.category === cat : false;
-            }).length);
+        ['GK', 'TH', 'MID', 'WING', 'ST'].forEach(cat => {
+            const counts = teamsArr.map(t => t.filter(p => get5PosCategory(p) === cat).length);
             const avgCat = counts.reduce((a, b) => a + b, 0) / numTeams;
             const varCat = counts.reduce((sum, c) => sum + Math.abs(c - avgCat), 0) / numTeams;
             posDevs += varCat;
         });
 
-        // High Skill (Pro/Semi-pro) distribution variance
-        const proCounts = teamsArr.map(t => t.filter(p => p.overall >= 80).length);
+        // High Skill distribution variance
+        const proCounts = teamsArr.map(t => t.filter(p => (p.overall || 50) >= 70).length);
         const avgPro = proCounts.reduce((a, b) => a + b, 0) / numTeams;
         const proDev = proCounts.reduce((sum, c) => sum + Math.abs(c - avgPro), 0) / numTeams;
 
-        // Balance Score Formulation
-        // 100 - penalties
         let powerPenalty = (powerStdDev / (avgPower || 1)) * 100 * weights.weightPower;
-        let posPenalty = posDevs * 8 * weights.weightPos;
-        let skillPenalty = proDev * 10 * weights.weightSkill;
+        let posPenalty = posDevs * 10 * weights.weightPos;
+        let skillPenalty = proDev * 8 * weights.weightSkill;
 
-        let totalScore = Math.max(70, Math.min(99.5, 100 - (powerPenalty + posPenalty + skillPenalty)));
+        let totalScore = Math.max(75, Math.min(99.8, 100 - (powerPenalty + posPenalty + skillPenalty)));
 
-        // Add minor random variation if random weight is enabled
         if (weights.weightRandom > 0) {
             totalScore += (Math.random() * 1.5 - 0.75) * weights.weightRandom;
         }
@@ -964,8 +1005,7 @@
             totalScore: parseFloat(totalScore.toFixed(1)),
             powerDev: parseFloat(powerStdDev.toFixed(1)),
             posDev: parseFloat(posDevs.toFixed(1)),
-            skillDev: parseFloat(proDev.toFixed(1)),
-            avgPower: parseFloat(avgPower.toFixed(1))
+            skillDev: parseFloat(proDev.toFixed(1))
         };
     }
 
@@ -1111,6 +1151,12 @@
                 const totalOverall = team.reduce((s, p) => s + p.overall, 0);
                 const avgOverall = (totalOverall / (team.length || 1)).toFixed(1);
 
+                const gkCnt = team.filter(p => get5PosCategory(p) === 'GK').length;
+                const thCnt = team.filter(p => get5PosCategory(p) === 'TH').length;
+                const midCnt = team.filter(p => get5PosCategory(p) === 'MID').length;
+                const wingCnt = team.filter(p => get5PosCategory(p) === 'WING').length;
+                const stCnt = team.filter(p => get5PosCategory(p) === 'ST').length;
+
                 // Group by tactical position for lineup pitch
                 const gkList = team.filter(p => p.primaryPosition === 'GK');
                 const defList = team.filter(p => {
@@ -1150,6 +1196,14 @@
                                 <div style="color: #aaa; font-size: 0.75rem;">CHUYÊN NGHIỆP</div>
                                 <div class="stat-val" style="color: #ffd700;">${team.filter(p => p.overall >= 80).length}</div>
                             </div>
+                        </div>
+
+                        <div class="team-pos-breakdown" style="padding: 8px 12px; background: rgba(255,255,255,0.04); font-size: 0.78rem; display: flex; flex-wrap: wrap; gap: 6px; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); color: #e0e0e0;">
+                            <span>🧤 <b>${gkCnt}</b> GK</span>
+                            <span>🛡️ <b>${thCnt}</b> Thòng</span>
+                            <span>⚽ <b>${midCnt}</b> Giữa</span>
+                            <span>⚡ <b>${wingCnt}</b> Cánh</span>
+                            <span>🎯 <b>${stCnt}</b> Tiền đạo</span>
                         </div>
 
                         <div class="team-player-list">

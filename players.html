@@ -40,7 +40,6 @@
                     <li><a href="index.html" class="nav-link">Home</a></li>
                     <li><a href="players.html" class="nav-link active">Cầu thủ</a></li>
                     <li><a href="teams.html" class="nav-link">Chia đội</a></li>
-                    <li><a href="videos.html" class="nav-link">Video</a></li>
                     <li><a href="results.html" class="nav-link">Kết quả</a></li>
                     <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
                     <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
@@ -102,10 +101,11 @@
         <div class="form-group">
             <label>Vị trí</label>
             <select id="p-position">
-                <option value="Thủ môn">Thủ môn</option>
-                <option value="Hậu vệ">Hậu vệ</option>
-                <option value="Tiền vệ">Tiền vệ</option>
-                <option value="Tiền đạo">Tiền đạo</option>
+                <option value="Thủ môn">Thủ môn (GK)</option>
+                <option value="Thòng / Trung vệ">Thòng / Trung vệ (CB/TH)</option>
+                <option value="Tiền vệ">Tiền vệ trung tâm (CM)</option>
+                <option value="Cánh">Cánh (W / LB / RB)</option>
+                <option value="Tiền đạo">Tiền đạo (ST)</option>
             </select>
         </div>
         <div class="form-group">
@@ -361,10 +361,9 @@
             document.getElementById('player-modal-title').innerText = 'Thêm Cầu thủ';
             document.getElementById('p-num').value = '';
             document.getElementById('p-name').value = '';
-            document.getElementById('p-position').value = 'Hậu vệ';
+            document.getElementById('p-position').value = 'Tiền vệ';
             document.getElementById('p-dob').value = '';
             document.getElementById('p-hometown').value = '';
-            document.getElementById('p-career').value = '';
             openModal('player');
         }
 
@@ -375,10 +374,9 @@
 
             document.getElementById('p-num').value = p.num || '';
             document.getElementById('p-name').value = p.name || '';
-            document.getElementById('p-position').value = p.position || 'Hậu vệ';
-            document.getElementById('p-dob').value = p.dob === 'Chưa cập nhật' ? '' : (p.dob || '');
-            document.getElementById('p-hometown').value = p.hometown === 'Chưa cập nhật' ? '' : (p.hometown || '');
-            document.getElementById('p-career').value = p.career === 'Chưa cập nhật' ? '' : (p.career || '');
+            document.getElementById('p-position').value = p.position || 'Tiền vệ';
+            document.getElementById('p-dob').value = (!p.dob || p.dob === 'Chưa cập nhật') ? '' : p.dob;
+            document.getElementById('p-hometown').value = (!p.hometown || p.hometown === 'Chưa cập nhật') ? '' : p.hometown;
             openModal('player');
         }
 
@@ -420,10 +418,6 @@
                                 <div class="detail-item-label">Quê quán</div>
                                 <div class="detail-item-value">🇻🇳 ${p.hometown}</div>
                             </div>
-                            <div>
-                                <div class="detail-item-label">Nghề nghiệp</div>
-                                <div class="detail-item-value">${p.career}</div>
-                            </div>
                         </div>
                     </div>
                 `;
@@ -437,14 +431,12 @@
             const posInput = document.getElementById('p-position');
             const dobInput = document.getElementById('p-dob');
             const hometownInput = document.getElementById('p-hometown');
-            const careerInput = document.getElementById('p-career');
 
             const num = numInput ? numInput.value : '';
             const name = nameInput ? nameInput.value : '';
-            const position = posInput ? posInput.value : 'Hậu vệ';
+            const position = posInput ? posInput.value : 'Tiền vệ';
             const dob = dobInput && dobInput.value ? dobInput.value : 'Chưa cập nhật';
             const hometown = hometownInput && hometownInput.value ? hometownInput.value : 'Chưa cập nhật';
-            const career = careerInput && careerInput.value ? careerInput.value : 'Chưa cập nhật';
             
             if (!num || !name) {
                 alert("Vui lòng điền số áo và tên cầu thủ!");
@@ -459,7 +451,7 @@
                 position: position,
                 dob: dob,
                 hometown: hometown,
-                career: career,
+                career: 'Chưa cập nhật',
                 img: ''
             };
 
@@ -479,14 +471,31 @@
 
             if (typeof _supabase !== 'undefined' && _supabase) {
                 try {
-                    const namePayload = JSON.stringify({ name, position, dob, hometown, career });
-                    const payload = { num: parseInt(num), name: namePayload, img: '' };
+                    const posCodeMap = {
+                        'Thủ môn': 'GK',
+                        'Thòng / Trung vệ': 'CB/TH',
+                        'Thòng': 'CB/TH',
+                        'Tiền vệ': 'CM',
+                        'Cánh': 'W',
+                        'Tiền đạo': 'ST'
+                    };
+                    const posCode = posCodeMap[position] || 'CM';
+                    const payload = { num: parseInt(num), name: name, position: posCode, img: '' };
+                    
                     if (editingPlayerId && typeof editingPlayerId === 'string' && !editingPlayerId.startsWith('p-')) {
                         await _supabase.from('players').update(payload).eq('id', editingPlayerId);
                     } else {
                         await _supabase.from('players').insert([payload]);
                     }
-                } catch(e) {}
+
+                    // Invalidate local storage caches for teams and rankings to force fresh sync
+                    try {
+                        localStorage.removeItem('phn_teams_players_v4');
+                        localStorage.removeItem('phn_rankings_players_v1');
+                    } catch(e) {}
+                } catch(e) {
+                    console.warn("Supabase save error:", e);
+                }
             }
         }
 
