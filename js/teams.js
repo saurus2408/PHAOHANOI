@@ -145,6 +145,25 @@
     let currentDivisionYear = '2026';
     let currentDivisionPeriod = 'q3';
 
+    function getOverallFromSkillLevel(skillLevel, fallbackOverall) {
+        if (!skillLevel) return fallbackOverall || 55;
+        const slObj = DEFAULT_SKILL_LEVELS.find(x => x.name.trim().toLowerCase() === skillLevel.trim().toLowerCase());
+        if (slObj && slObj.rating) return slObj.rating;
+
+        const s = skillLevel.trim().toLowerCase();
+        if (s === 'yếu') return 42;
+        if (s === 'yếu+') return 48;
+        if (s === 'trung bình yếu') return 52;
+        if (s === 'trung bình') return 55;
+        if (s === 'trung bình khá') return 60;
+        if (s === 'khá') return 68;
+        if (s === 'khá+') return 72;
+        if (s === 'bán chuyên') return 82;
+        if (s === 'chuyên nghiệp') return 95;
+
+        return fallbackOverall || 55;
+    }
+
     // Initialize State
     function initData() {
         // Positions
@@ -233,63 +252,42 @@
         const savedConst = localStorage.getItem(STORAGE_CONSTRAINTS_KEY);
         constraints = savedConst ? JSON.parse(savedConst) : { lockedTeams: {}, pairSame: [], pairDiff: [] };
 
-    function getOverallFromSkillLevel(skillLevel, fallbackOverall) {
-        if (!skillLevel) return fallbackOverall || 55;
-        const slObj = DEFAULT_SKILL_LEVELS.find(x => x.name.trim().toLowerCase() === skillLevel.trim().toLowerCase());
-        if (slObj && slObj.rating) return slObj.rating;
+        // Players
+        const savedPlayers = localStorage.getItem(STORAGE_PLAYERS_KEY);
+        if (savedPlayers && JSON.parse(savedPlayers).length >= 70) {
+            players = JSON.parse(savedPlayers);
+            players.forEach(p => {
+                const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === p.name.trim().toLowerCase());
+                if (defaultMatch) {
+                    p.primaryPosition = defaultMatch.primaryPosition;
+                    p.skillLevel = defaultMatch.skillLevel;
+                    p.overall = getOverallFromSkillLevel(defaultMatch.skillLevel, defaultMatch.overall);
+                } else {
+                    p.overall = getOverallFromSkillLevel(p.skillLevel, p.overall);
+                }
+            });
+            savePlayers();
+        } else {
+            players = DEFAULT_ROSTER.map((p, idx) => ({
+                id: 'p_' + Date.now() + '_' + idx,
+                num: p.num || (idx + 1),
+                name: p.name,
+                primaryPosition: p.primaryPosition || 'CM',
+                secondaryPosition1: p.secondaryPosition1 || '',
+                secondaryPosition2: '',
+                skillLevel: p.skillLevel || 'Khá',
+                overall: getOverallFromSkillLevel(p.skillLevel, p.overall || 68),
+                scores: p,
+                active: true,
+                lockedTeam: null,
+                notes: ''
+            }));
+            savePlayers();
+        }
 
-        const s = skillLevel.trim().toLowerCase();
-        if (s === 'yếu') return 42;
-        if (s === 'yếu+') return 48;
-        if (s === 'trung bình yếu') return 52;
-        if (s === 'trung bình') return 55;
-        if (s === 'trung bình khá') return 60;
-        if (s === 'khá') return 68;
-        if (s === 'khá+') return 72;
-        if (s === 'bán chuyên') return 82;
-        if (s === 'chuyên nghiệp') return 95;
-
-        return fallbackOverall || 55;
+        // Sync with Supabase if available
+        fetchSupabaseRoster();
     }
-
-    // Players
-    const savedPlayers = localStorage.getItem(STORAGE_PLAYERS_KEY);
-    if (savedPlayers && JSON.parse(savedPlayers).length >= 70) {
-        players = JSON.parse(savedPlayers);
-        // Sync position & skill level & calculate overall from skill level
-        players.forEach(p => {
-            const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === p.name.trim().toLowerCase());
-            if (defaultMatch) {
-                p.primaryPosition = defaultMatch.primaryPosition;
-                p.skillLevel = defaultMatch.skillLevel;
-                p.overall = getOverallFromSkillLevel(defaultMatch.skillLevel, defaultMatch.overall);
-            } else {
-                p.overall = getOverallFromSkillLevel(p.skillLevel, p.overall);
-            }
-        });
-        savePlayers();
-    } else {
-        // Load default roster with generated IDs and monthly scores
-        players = DEFAULT_ROSTER.map((p, idx) => ({
-            id: 'p_' + Date.now() + '_' + idx,
-            num: p.num || (idx + 1),
-            name: p.name,
-            primaryPosition: p.primaryPosition || 'CM',
-            secondaryPosition1: p.secondaryPosition1 || '',
-            secondaryPosition2: '',
-            skillLevel: p.skillLevel || 'Khá',
-            overall: getOverallFromSkillLevel(p.skillLevel, p.overall || 68),
-            scores: p,
-            active: true,
-            lockedTeam: null,
-            notes: ''
-        }));
-        savePlayers();
-    }
-
-    // Sync with Supabase if available
-    fetchSupabaseRoster();
-}
 
 async function fetchSupabaseRoster() {
     if (typeof _supabase !== 'undefined' && _supabase) {
