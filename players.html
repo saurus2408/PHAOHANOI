@@ -103,6 +103,7 @@
             <select id="p-position">
                 <option value="Thủ môn">Thủ môn (GK)</option>
                 <option value="Thòng / Trung vệ">Thòng / Trung vệ (CB/TH)</option>
+                <option value="Hậu vệ">Hậu vệ</option>
                 <option value="Tiền vệ">Tiền vệ trung tâm (CM)</option>
                 <option value="Cánh">Cánh (W / LB / RB)</option>
                 <option value="Tiền đạo">Tiền đạo (ST)</option>
@@ -189,6 +190,18 @@
             img: ''
         }));
 
+        function mapPositionToDisplay(pos) {
+            if (!pos) return 'Tiền vệ';
+            const p = String(pos).trim().toUpperCase();
+            if (p === 'GK' || p.includes('THỦ MÔN')) return 'Thủ môn';
+            if (p === 'CB/TH' || p === 'DEF' || p.includes('THÒNG') || p.includes('TRUNG VỆ')) return 'Thòng / Trung vệ';
+            if (p.includes('HẬU VỆ')) return 'Hậu vệ';
+            if (p === 'W' || p === 'LB/RB' || p.includes('CÁNH')) return 'Cánh';
+            if (p === 'ST' || p === 'FW' || p.includes('TIỀN ĐẠO')) return 'Tiền đạo';
+            if (p === 'CM' || p === 'CAM' || p === 'MID' || p.includes('TIỀN VỆ')) return 'Tiền vệ';
+            return pos;
+        }
+
         async function fetchPlayers() {
             let fetchedList = [];
             try {
@@ -206,19 +219,17 @@
                 allPlayersList = fetchedList.map(p => {
                     let rawName = p.name || '';
                     let name = rawName;
-                    let position = 'Hậu vệ';
+                    let position = mapPositionToDisplay(p.position || 'CM');
                     let dob = 'Chưa cập nhật';
                     let hometown = 'Chưa cập nhật';
-                    let career = 'Chưa cập nhật';
 
                     if (rawName && rawName.startsWith('{') && rawName.endsWith('}')) {
                         try {
                             const meta = JSON.parse(rawName);
                             name = meta.name || '';
-                            position = meta.position || 'Hậu vệ';
+                            position = mapPositionToDisplay(meta.position || p.position || 'CM');
                             dob = meta.dob || 'Chưa cập nhật';
                             hometown = meta.hometown || 'Chưa cập nhật';
-                            career = meta.career || 'Chưa cập nhật';
                         } catch(e) {}
                     }
 
@@ -230,7 +241,7 @@
                         position: position,
                         dob: dob,
                         hometown: hometown,
-                        career: career,
+                        career: 'Chưa cập nhật',
                         img: p.img || ''
                     };
                 });
@@ -248,7 +259,8 @@
             }
         }
 
-        function handleEditPlayerClick(idx) {
+        function handleEditPlayerClick(idx, event) {
+            if (event) event.stopPropagation();
             const p = allPlayersList[idx];
             if (p) {
                 openEditPlayerModal(p);
@@ -265,11 +277,9 @@
             const deletedId = p.id;
             const deletedNum = p.num;
 
-            // 1. Remove from local memory & update table immediately
             allPlayersList.splice(idx, 1);
             renderPlayerList(allPlayersList);
 
-            // 2. Sync deletion with Supabase in background
             if (typeof _supabase !== 'undefined' && _supabase) {
                 try {
                     if (deletedId && typeof deletedId === 'string' && !deletedId.startsWith('p-') && isNaN(deletedId)) {
@@ -322,7 +332,7 @@
                     ${isAdmin ? `
                     <td style="text-align: center;" onclick="event.stopPropagation();">
                         <div style="display:flex; justify-content:center; gap:6px;">
-                            <button type="button" class="edit-btn-card" onclick="handleEditPlayerClick(${idx})" style="padding:4px 8px;">
+                            <button type="button" class="edit-btn-card" onclick="handleEditPlayerClick(${idx}, event)" style="padding:4px 8px;">
                                 <i data-lucide="edit-3" style="width:12px; height:12px;"></i> Sửa
                             </button>
                             <button type="button" class="del-btn" onclick="deletePlayer(${idx}, event)" style="padding:4px 8px;">
@@ -349,14 +359,14 @@
                 p.name.toLowerCase().includes(query) ||
                 p.hometown.toLowerCase().includes(query) ||
                 p.position.toLowerCase().includes(query) ||
-                p.career.toLowerCase().includes(query) ||
                 String(p.num).includes(query)
             );
             renderPlayerList(filtered);
         }
 
         function openAddPlayerModal() {
-            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
+            const checkAdmin = (typeof isAdmin !== 'undefined' && isAdmin) || sessionStorage.getItem('phn_admin') === 'true' || document.body.classList.contains('admin-active');
+            if (!checkAdmin) { toggleAdmin(); return; }
             editingPlayerId = null;
             document.getElementById('player-modal-title').innerText = 'Thêm Cầu thủ';
             document.getElementById('p-num').value = '';
@@ -368,13 +378,19 @@
         }
 
         function openEditPlayerModal(p) {
-            if (!isAdmin) { alert('Bạn không có quyền thực hiện hành động này!'); return; }
-            editingPlayerId = p.id || null;
+            const checkAdmin = (typeof isAdmin !== 'undefined' && isAdmin) || sessionStorage.getItem('phn_admin') === 'true' || document.body.classList.contains('admin-active');
+            if (!checkAdmin) { toggleAdmin(); return; }
+            editingPlayerId = p.id || p.num;
             document.getElementById('player-modal-title').innerText = 'Chỉnh sửa Cầu thủ';
 
             document.getElementById('p-num').value = p.num || '';
             document.getElementById('p-name').value = p.name || '';
-            document.getElementById('p-position').value = p.position || 'Tiền vệ';
+            
+            const posSelect = document.getElementById('p-position');
+            if (posSelect) {
+                posSelect.value = mapPositionToDisplay(p.position);
+            }
+
             document.getElementById('p-dob').value = (!p.dob || p.dob === 'Chưa cập nhật') ? '' : p.dob;
             document.getElementById('p-hometown').value = (!p.hometown || p.hometown === 'Chưa cập nhật') ? '' : p.hometown;
             openModal('player');
