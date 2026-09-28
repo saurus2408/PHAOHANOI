@@ -29,13 +29,13 @@
 
     // Default Skill Tiers with Points (Extensible by Admin/User)
     const DEFAULT_SKILL_LEVELS = [
-        { id: 1, name: 'Yếu', rating: 10, badgeClass: 'skill-weak' },
-        { id: 2, name: 'Yếu+', rating: 20, badgeClass: 'skill-weak' },
-        { id: 3, name: 'Trung bình yếu', rating: 30, badgeClass: 'skill-avg' },
-        { id: 4, name: 'Trung bình', rating: 40, badgeClass: 'skill-avg' },
-        { id: 5, name: 'Trung bình khá', rating: 50, badgeClass: 'skill-avg' },
-        { id: 6, name: 'Khá', rating: 60, badgeClass: 'skill-good' },
-        { id: 7, name: 'Khá+', rating: 70, badgeClass: 'skill-good' },
+        { id: 1, name: 'Yếu', rating: 42, badgeClass: 'skill-weak' },
+        { id: 2, name: 'Yếu+', rating: 48, badgeClass: 'skill-weak' },
+        { id: 3, name: 'Trung bình yếu', rating: 52, badgeClass: 'skill-avg' },
+        { id: 4, name: 'Trung bình', rating: 55, badgeClass: 'skill-avg' },
+        { id: 5, name: 'Trung bình khá', rating: 60, badgeClass: 'skill-avg' },
+        { id: 6, name: 'Khá', rating: 68, badgeClass: 'skill-good' },
+        { id: 7, name: 'Khá+', rating: 72, badgeClass: 'skill-good' },
         { id: 8, name: 'Bán Chuyên', rating: 82, badgeClass: 'skill-semipro' },
         { id: 9, name: 'Chuyên Nghiệp', rating: 95, badgeClass: 'skill-pro' }
     ];
@@ -233,122 +233,142 @@
         const savedConst = localStorage.getItem(STORAGE_CONSTRAINTS_KEY);
         constraints = savedConst ? JSON.parse(savedConst) : { lockedTeams: {}, pairSame: [], pairDiff: [] };
 
-        // Players
-        const savedPlayers = localStorage.getItem(STORAGE_PLAYERS_KEY);
-        if (savedPlayers && JSON.parse(savedPlayers).length >= 70) {
-            players = JSON.parse(savedPlayers);
-            // Sync position & skill level from DEFAULT_ROSTER if present
-            players.forEach(p => {
-                const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === p.name.trim().toLowerCase());
-                if (defaultMatch) {
-                    p.primaryPosition = defaultMatch.primaryPosition;
-                    p.skillLevel = defaultMatch.skillLevel;
-                    p.overall = defaultMatch.overall;
-                }
-            });
-            savePlayers();
-        } else {
-            // Load default roster with generated IDs and monthly scores
-            players = DEFAULT_ROSTER.map((p, idx) => ({
-                id: 'p_' + Date.now() + '_' + idx,
-                num: p.num || (idx + 1),
-                name: p.name,
-                primaryPosition: p.primaryPosition || 'CM',
-                secondaryPosition1: p.secondaryPosition1 || '',
-                secondaryPosition2: '',
-                skillLevel: p.skillLevel || 'Khá',
-                overall: p.overall || 65,
-                scores: p,
-                active: true,
-                lockedTeam: null,
-                notes: ''
-            }));
-            savePlayers();
-        }
+    function getOverallFromSkillLevel(skillLevel, fallbackOverall) {
+        if (!skillLevel) return fallbackOverall || 55;
+        const slObj = DEFAULT_SKILL_LEVELS.find(x => x.name.trim().toLowerCase() === skillLevel.trim().toLowerCase());
+        if (slObj && slObj.rating) return slObj.rating;
 
-        // Sync with Supabase if available
-        fetchSupabaseRoster();
+        const s = skillLevel.trim().toLowerCase();
+        if (s === 'yếu') return 42;
+        if (s === 'yếu+') return 48;
+        if (s === 'trung bình yếu') return 52;
+        if (s === 'trung bình') return 55;
+        if (s === 'trung bình khá') return 60;
+        if (s === 'khá') return 68;
+        if (s === 'khá+') return 72;
+        if (s === 'bán chuyên') return 82;
+        if (s === 'chuyên nghiệp') return 95;
+
+        return fallbackOverall || 55;
     }
 
-    async function fetchSupabaseRoster() {
-        if (typeof _supabase !== 'undefined' && _supabase) {
-            try {
-                const { data: pList } = await _supabase.from('players').select('*').order('num', { ascending: true });
-                const { data: sList } = await _supabase.from('player_scores').select('*');
-
-                if (pList && pList.length > 0) {
-                    players = pList.map((p, idx) => {
-                        let name = p.name;
-                        if (name && name.startsWith('{') && name.endsWith('}')) {
-                            try {
-                                const meta = JSON.parse(name);
-                                name = meta.name || name;
-                            } catch(e) {}
-                        }
-
-                        const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === name.trim().toLowerCase());
-                        const scoreRow = sList ? sList.find(s => (s.player_id && s.player_id === p.id) || (s.name && s.name.trim().toLowerCase() === name.trim().toLowerCase())) : null;
-
-                        const finalPos = defaultMatch ? defaultMatch.primaryPosition : (p.position && p.position !== 'CM' ? p.position : 'CM');
-                        const finalSkill = defaultMatch ? defaultMatch.skillLevel : 'Khá';
-                        const finalOverall = defaultMatch ? defaultMatch.overall : 65;
-
-                        return {
-                            id: p.id,
-                            num: p.num || (idx + 1),
-                            name: name,
-                            primaryPosition: finalPos,
-                            secondaryPosition1: '',
-                            secondaryPosition2: '',
-                            skillLevel: finalSkill,
-                            overall: finalOverall,
-                            scores: scoreRow || defaultMatch || {},
-                            active: true,
-                            lockedTeam: null
-                        };
-                    });
-                    savePlayers();
-                    renderPlayerTable();
-                }
-            } catch (e) {
-                console.warn("Supabase sync teams:", e);
+    // Players
+    const savedPlayers = localStorage.getItem(STORAGE_PLAYERS_KEY);
+    if (savedPlayers && JSON.parse(savedPlayers).length >= 70) {
+        players = JSON.parse(savedPlayers);
+        // Sync position & skill level & calculate overall from skill level
+        players.forEach(p => {
+            const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === p.name.trim().toLowerCase());
+            if (defaultMatch) {
+                p.primaryPosition = defaultMatch.primaryPosition;
+                p.skillLevel = defaultMatch.skillLevel;
+                p.overall = getOverallFromSkillLevel(defaultMatch.skillLevel, defaultMatch.overall);
+            } else {
+                p.overall = getOverallFromSkillLevel(p.skillLevel, p.overall);
             }
+        });
+        savePlayers();
+    } else {
+        // Load default roster with generated IDs and monthly scores
+        players = DEFAULT_ROSTER.map((p, idx) => ({
+            id: 'p_' + Date.now() + '_' + idx,
+            num: p.num || (idx + 1),
+            name: p.name,
+            primaryPosition: p.primaryPosition || 'CM',
+            secondaryPosition1: p.secondaryPosition1 || '',
+            secondaryPosition2: '',
+            skillLevel: p.skillLevel || 'Khá',
+            overall: getOverallFromSkillLevel(p.skillLevel, p.overall || 68),
+            scores: p,
+            active: true,
+            lockedTeam: null,
+            notes: ''
+        }));
+        savePlayers();
+    }
+
+    // Sync with Supabase if available
+    fetchSupabaseRoster();
+}
+
+async function fetchSupabaseRoster() {
+    if (typeof _supabase !== 'undefined' && _supabase) {
+        try {
+            const { data: pList } = await _supabase.from('players').select('*').order('num', { ascending: true });
+            const { data: sList } = await _supabase.from('player_scores').select('*');
+
+            if (pList && pList.length > 0) {
+                players = pList.map((p, idx) => {
+                    let name = p.name;
+                    if (name && name.startsWith('{') && name.endsWith('}')) {
+                        try {
+                            const meta = JSON.parse(name);
+                            name = meta.name || name;
+                        } catch(e) {}
+                    }
+
+                    const defaultMatch = DEFAULT_ROSTER.find(d => d.name.trim().toLowerCase() === name.trim().toLowerCase());
+                    const scoreRow = sList ? sList.find(s => (s.player_id && s.player_id === p.id) || (s.name && s.name.trim().toLowerCase() === name.trim().toLowerCase())) : null;
+
+                    const finalPos = defaultMatch ? defaultMatch.primaryPosition : (p.position && p.position !== 'CM' ? p.position : 'CM');
+                    const finalSkill = defaultMatch ? defaultMatch.skillLevel : (p.skill_level || 'Khá');
+                    const finalOverall = getOverallFromSkillLevel(finalSkill, defaultMatch ? defaultMatch.overall : (p.overall || 65));
+
+                    return {
+                        id: p.id,
+                        num: p.num || (idx + 1),
+                        name: name,
+                        primaryPosition: finalPos,
+                        secondaryPosition1: '',
+                        secondaryPosition2: '',
+                        skillLevel: finalSkill,
+                        overall: finalOverall,
+                        scores: scoreRow || defaultMatch || {},
+                        active: true,
+                        lockedTeam: null
+                    };
+                });
+                savePlayers();
+                renderPlayerTable();
+            }
+        } catch (e) {
+            console.warn("Supabase sync teams:", e);
+        }
+    }
+}
+
+// Helper: Calculate goals & assists for selected Year, Month or Quarter
+function calculatePeriodStats(p, year, period) {
+    let g = 0, a = 0;
+    const s = p.scores || p;
+
+    const scoreYear = s.year || 2026;
+    if (year && year !== 'all' && parseInt(year) !== parseInt(scoreYear)) {
+        const baseRating = getOverallFromSkillLevel(p.skillLevel, p.overall);
+        return { goals: 0, assists: 0, periodOverall: baseRating };
+    }
+
+    if (!period || period === 'all') {
+        for (let i = 1; i <= 12; i++) {
+            g += (s['m' + i] || 0);
+            a += (s['a' + i] || 0);
+        }
+    } else if (period.startsWith('m')) {
+        const m = parseInt(period.replace('m', ''));
+        g = s['m' + m] || 0;
+        a = s['a' + m] || 0;
+    } else if (period.startsWith('q')) {
+        const q = parseInt(period.replace('q', ''));
+        const startM = (q - 1) * 3 + 1;
+        for (let i = startM; i < startM + 3; i++) {
+            g += (s['m' + i] || 0);
+            a += (s['a' + i] || 0);
         }
     }
 
-    // Helper: Calculate goals, assists, and performance rating for selected Year, Month or Quarter
-    function calculatePeriodStats(p, year, period) {
-        let g = 0, a = 0;
-        const s = p.scores || p;
-
-        const scoreYear = s.year || 2026;
-        if (year && year !== 'all' && parseInt(year) !== parseInt(scoreYear)) {
-            const baseRating = p.overall || 65;
-            return { goals: 0, assists: 0, periodOverall: baseRating };
-        }
-
-        if (!period || period === 'all') {
-            for (let i = 1; i <= 12; i++) {
-                g += (s['m' + i] || 0);
-                a += (s['a' + i] || 0);
-            }
-        } else if (period.startsWith('m')) {
-            const m = parseInt(period.replace('m', ''));
-            g = s['m' + m] || 0;
-            a = s['a' + m] || 0;
-        } else if (period.startsWith('q')) {
-            const q = parseInt(period.replace('q', ''));
-            const startM = (q - 1) * 3 + 1;
-            for (let i = startM; i < startM + 3; i++) {
-                g += (s['m' + i] || 0);
-                a += (s['a' + i] || 0);
-            }
-        }
-
-        // Pure skill rating overall (not modified by goals or assists)
-        const baseRating = p.overall || 60;
-        return { goals: g, assists: a, periodOverall: baseRating };
-    }
+    const baseRating = getOverallFromSkillLevel(p.skillLevel, p.overall);
+    return { goals: g, assists: a, periodOverall: baseRating };
+}
 
     function savePlayers() {
         localStorage.setItem(STORAGE_PLAYERS_KEY, JSON.stringify(players));
@@ -459,7 +479,7 @@
             const secPos = [p.secondaryPosition1, p.secondaryPosition2].filter(Boolean).join(', ') || '-';
 
             const periodStats = calculatePeriodStats(p, yearKey, periodKey);
-            const displayOverall = (periodKey === 'all' && yearKey === 'all') ? p.overall : periodStats.periodOverall;
+            const displayOverall = getOverallFromSkillLevel(p.skillLevel, p.overall);
             const statsBadge = (periodKey !== 'all' || yearKey !== 'all' || periodStats.goals > 0 || periodStats.assists > 0)
                 ? `<span style="font-size:0.75rem; color:var(--accent); font-weight:700; margin-left:6px;">(⚽ ${periodStats.goals} | 👟 ${periodStats.assists})</span>`
                 : '';
