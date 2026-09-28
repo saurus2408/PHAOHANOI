@@ -345,13 +345,9 @@
             }
         }
 
-        const baseRating = p.overall || 65;
-        let periodOverall = baseRating;
-        if ((period && period !== 'all') || (year && year !== 'all')) {
-            periodOverall = Math.min(99, Math.max(40, Math.round(baseRating + (g * 3) + (a * 2))));
-        }
-
-        return { goals: g, assists: a, periodOverall };
+        // Pure skill rating overall (not modified by goals or assists)
+        const baseRating = p.overall || 60;
+        return { goals: g, assists: a, periodOverall: baseRating };
     }
 
     function savePlayers() {
