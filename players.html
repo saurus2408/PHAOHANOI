@@ -39,10 +39,8 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-link">Home</a></li>
                     <li><a href="players.html" class="nav-link active">Cầu thủ</a></li>
-                    <li><a href="teams.html" class="nav-link">Chia đội</a></li>
                     <li><a href="results.html" class="nav-link">Kết quả</a></li>
                     <li><a href="rankings.html" class="nav-link">Xếp hạng</a></li>
-                    <li><a href="awards.html" class="nav-link">Giải thưởng</a></li>
                 </ul>
                 <div class="mobile-toggle" id="mobile-toggle">
                     <i data-lucide="menu"></i>
@@ -78,7 +76,11 @@
                     </tr>
                 </thead>
                 <tbody id="players-list-body">
-                    <!-- Dynamic List Rows -->
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i data-lucide="loader-2" class="spin" style="margin-right: 8px;"></i> Đang tải dữ liệu cầu thủ...
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -130,65 +132,8 @@
 
     <script src="js/app.js"></script>
     <script>
-        const DEFAULT_PLAYERS = [
-            { num: 5, name: 'NGUYÊN MẠNH', position: 'Hậu vệ', dob: '1998-03-16', hometown: 'THÁI NGUYÊN', career: 'BÁN CHÈ' },
-            { num: 12, name: 'NGUYỄN THÁI', position: 'Hậu vệ', dob: '2004-02-01', hometown: 'HÀ NỘI', career: 'SINH VIÊN IT' },
-            { num: 58, name: 'BÙI', position: 'Hậu vệ', dob: '1998-02-23', hometown: 'HÒA BÌNH', career: 'HÀN QUỐC' },
-            { num: 14, name: 'HIỆP VIẾT HIỆP', position: 'Hậu vệ', dob: '1996-03-07', hometown: 'LÀO CAI', career: 'THỢ ẢNH' },
-            { num: 19, name: 'PHẠM HỒNG QUÂN', position: 'Hậu vệ', dob: '2004-03-01', hometown: 'NGHỆ AN', career: 'SINH VIÊN MT' },
-            { num: 48, name: 'VŨ HÙNG', position: 'Hậu vệ', dob: '1997-01-28', hometown: 'HÀ NỘI', career: 'Chưa cập nhật' },
-            { num: 29, name: 'DUY TIÊN', position: 'Hậu vệ', dob: '2000-01-01', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 11, name: 'NGUYỄN TRUNG KIÊN', position: 'Hậu vệ', dob: '1985-04-29', hometown: 'HẢI PHÒNG', career: 'BÁN LOA' },
-            { num: 16, name: 'QUANG PHƯƠNG', position: 'Hậu vệ', dob: '1996-06-07', hometown: 'VIỆT NAM', career: 'KTV MÁY TÍNH' },
-            { num: 4, name: 'ĐÀM MINH TUẤN', position: 'Hậu vệ', dob: '1987-04-01', hometown: 'HÀ NỘI', career: 'KINH DOANH' },
-            { num: 3, name: 'LÊ HƯNG', position: 'Hậu vệ', dob: '1994-09-17', hometown: 'HÀ NỘI', career: 'Chưa cập nhật' },
-            { num: 66, name: 'NGUYỄN XUÂN ĐẠT', position: 'Hậu vệ', dob: '1992-07-11', hometown: 'VIỆT NAM', career: 'LÁI XE' },
-            { num: 8, name: 'ĐỖ VIỆT HOÀNG', position: 'Hậu vệ', dob: '2000-08-21', hometown: 'PHÚ THỌ', career: 'BÁC SĨ ĐẺ' },
-            { num: 92, name: 'NGUYỄN TÚ', position: 'Hậu vệ', dob: '1992-08-21', hometown: 'THÁI NGUYÊN', career: 'IN ẤN' },
-            { num: 2, name: 'NGUYỄN TIẾN THÀNH', position: 'Hậu vệ', dob: '1996-10-06', hometown: 'THÁI NGUYÊN', career: 'BÁN MÁY' },
-            { num: 6, name: 'TUẤN', position: 'Hậu vệ', dob: '1900-09-06', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 0, name: 'HOÀNG XUÂN GIAO', position: 'Hậu vệ', dob: '2006-08-24', hometown: 'HÀ NỘI', career: 'SINH VIÊN IT' },
-            { num: 7, name: 'LÊ HIẾU', position: 'Hậu vệ', dob: '1994-08-19', hometown: 'LÀO CAI', career: 'BÁC SĨ TRẤN THƯƠNG' },
-            { num: 34, name: 'PHÙNG ĐỨC HUỲNH', position: 'Hậu vệ', dob: '1997-07-06', hometown: 'VIỆT NAM', career: 'NGÂN HÀNG' },
-            { num: 15, name: 'LÊ ĐỨC', position: 'Hậu vệ', dob: '2006-10-03', hometown: 'VIỆT NAM', career: 'SINH VIÊN' },
-            { num: 20, name: 'VŨ TẤN LỘC', position: 'Hậu vệ', dob: '2004-10-10', hometown: 'HÀ NỘI', career: 'SINH VIÊN MT' },
-            { num: 10, name: 'DUY NAM', position: 'Hậu vệ', dob: '1998-12-01', hometown: 'HÀ NỘI', career: 'BÁN ÁO' },
-            { num: 25, name: 'PHẠM KIÊN', position: 'Hậu vệ', dob: '2004-10-18', hometown: 'HÀ NỘI', career: 'SINH VIÊN MT' },
-            { num: 33, name: 'TÔ MINH TUẤN', position: 'Hậu vệ', dob: '1992-12-30', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 9, name: 'LÊ BÁ TÙNG', position: 'Hậu vệ', dob: '1994-12-08', hometown: 'VIỆT NAM', career: 'VĂN PHÒNG' },
-            { num: 28, name: 'CHIỀU', position: 'Hậu vệ', dob: '1997-12-01', hometown: 'HÒA BÌNH', career: 'Chưa cập nhật' },
-            { num: 82, name: 'ANH ĐỨC', position: 'Hậu vệ', dob: '2002-10-28', hometown: 'HÒA BÌNH', career: 'Chưa cập nhật' },
-            { num: 23, name: 'ĐẶNG HÙNG LĨNH', position: 'Hậu vệ', dob: '1994-12-30', hometown: 'HÒA BÌNH', career: 'Chưa cập nhật' },
-            { num: 83, name: 'TRẦN QUANG THÁI', position: 'Hậu vệ', dob: '1983-10-01', hometown: 'VIỆT NAM', career: 'NHÀ BÁO' },
-            { num: 26, name: 'PHẠM HẢI PHONG', position: 'Hậu vệ', dob: '2003-12-23', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 30, name: 'VIỆT ANH', position: 'Hậu vệ', dob: '2000-12-24', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 35, name: 'ĐẶNG HOÀNG NAM', position: 'Hậu vệ', dob: '1992-11-11', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 18, name: 'HẠNH', position: 'Hậu vệ', dob: '2004-11-22', hometown: 'THANH HÓA', career: 'Chưa cập nhật' },
-            { num: 98, name: 'NGUYỄN HỒNG QUÂN', position: 'Hậu vệ', dob: '1998-11-15', hometown: 'HÀ NAM', career: 'Chưa cập nhật' },
-            { num: 27, name: 'PHẠM THẾ DUY', position: 'Hậu vệ', dob: '1997-10-27', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 22, name: 'NGUYỄN ĐỨC ANH', position: 'Hậu vệ', dob: '2004-11-22', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 33, name: 'LÊ GIA LINH', position: 'Hậu vệ', dob: '2003-12-18', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 97, name: 'NGUYỄN CÔNG MINH', position: 'Hậu vệ', dob: '1997-04-07', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 37, name: 'VÕ PHI THỨC', position: 'Hậu vệ', dob: '2004-05-19', hometown: 'NGHỆ AN', career: 'SINH VIÊN KT' },
-            { num: 41, name: 'THẠC BẢO', position: 'Hậu vệ', dob: 'Chưa cập nhật', hometown: 'NGHỆ AN', career: 'SINH VIÊN' },
-            { num: 0, name: 'HOÀNG ANH', position: 'Hậu vệ', dob: 'Chưa cập nhật', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 0, name: 'QUANG ĐẠO', position: 'Hậu vệ', dob: 'Chưa cập nhật', hometown: 'VIỆT NAM', career: 'Chưa cập nhật' },
-            { num: 93, name: 'ĐÀM HẢI YẾN', position: 'Hậu vệ', dob: 'Chưa cập nhật', hometown: 'HÀ NỘI', career: 'Chưa cập nhật' }
-        ];
-
         let editingPlayerId = null;
-        let currentEditingImg = '';
-        let allPlayersList = DEFAULT_PLAYERS.map(p => ({
-            id: p.num,
-            num: p.num,
-            rawName: p.name,
-            name: p.name,
-            position: p.position,
-            dob: p.dob,
-            hometown: p.hometown,
-            career: p.career,
-            img: ''
-        }));
+        let allPlayersList = [];
 
         function mapPositionToDisplay(pos) {
             if (!pos) return 'Tiền vệ';
@@ -246,6 +191,9 @@
                     };
                 });
                 renderPlayerList(allPlayersList);
+            } else {
+                allPlayersList = [];
+                renderPlayerList([]);
             }
         }
 
@@ -504,9 +452,8 @@
                         await _supabase.from('players').insert([payload]);
                     }
 
-                    // Invalidate local storage caches for teams and rankings to force fresh sync
+                    // Invalidate local storage cache for rankings to force fresh sync
                     try {
-                        localStorage.removeItem('phn_teams_players_v4');
                         localStorage.removeItem('phn_rankings_players_v1');
                     } catch(e) {}
                 } catch(e) {
@@ -516,15 +463,9 @@
         }
 
         function renderAll() { fetchPlayers(); }
-        renderPlayerList(allPlayersList);
         document.addEventListener('DOMContentLoaded', () => {
-            renderPlayerList(allPlayersList);
             fetchPlayers();
         });
-        window.onload = function() {
-            renderPlayerList(allPlayersList);
-            fetchPlayers();
-        };
     </script>
 </body>
 

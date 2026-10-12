@@ -1,4 +1,3 @@
-
 // --- Supabase Config ---
 const SUPABASE_URL = 'https://hiykohhpxogniosdowjo.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_9BGxNUPQ2XGuOH437-4PuA_lIaAzv0_';
@@ -55,8 +54,6 @@ async function toggleAdmin() {
         if (typeof renderAll === 'function') renderAll();
     }
 }
-
-
 
 function updateAdminUI() {
     const adminLink = document.getElementById('header-admin-btn');
